@@ -7,22 +7,19 @@ import de.hsharz.qwixx.model.dice.DicesSum;
 
 public class Computer extends Player {
 
+	public Computer(GameBoard board) {
+		super(board);
+	}
 
 	@Override
 	public DicesSum chooseWhiteDices(List<DicesSum> dices) {
-		// TODO Auto-generated method stub
+
+		
 		return null;
 	}
 
 	@Override
 	public DicesSum chooseColorDices(List<DicesSum> dices) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public GameBoard getGameBoard() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
