@@ -1,5 +1,8 @@
 package de.hsharz.qwixx.ui;
 
+import java.util.Objects;
+
+import de.hsharz.qwixx.model.board.UserScore;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,10 +10,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
-public class UserScore {
+public class UserScoreUI {
 
 	private static final int FONT_SIZE_OPERATOR = 32;
-	
+
 	private HBox root;
 
 	private Label lblScoreRedRow;
@@ -21,7 +24,10 @@ public class UserScore {
 
 	private Label lblScoreResult;
 
-	public UserScore() {
+	private UserScore userScore;
+
+	public UserScoreUI(UserScore userScore) {
+		this.userScore = Objects.requireNonNull(userScore);
 
 		createWidgets();
 //		setupInteractions();
@@ -35,13 +41,13 @@ public class UserScore {
 		root.setAlignment(Pos.CENTER);
 		root.setStyle("-fx-background-color: #BDBDBD;");
 
-		lblScoreRedRow = getBorderLabel("100", DiceColor.RED.getAsHex());
-		lblScoreYellowRow = getBorderLabel("100", DiceColor.YELLOW.getAsHex());
-		lblScoreGreenRow = getBorderLabel("100", DiceColor.GREEN.getAsHex());
-		lblScoreBlueRow = getBorderLabel("100", DiceColor.BLUE.getAsHex());
-		lblScoreMisses = getBorderLabel("100", "#999999");
+		lblScoreRedRow = getBorderLabel("", DiceColor.RED.getAsHex());
+		lblScoreYellowRow = getBorderLabel("", DiceColor.YELLOW.getAsHex());
+		lblScoreGreenRow = getBorderLabel("", DiceColor.GREEN.getAsHex());
+		lblScoreBlueRow = getBorderLabel("", DiceColor.BLUE.getAsHex());
+		lblScoreMisses = getBorderLabel("", "#999999");
 
-		lblScoreResult = getBorderLabel("100", "#000000");
+		lblScoreResult = getBorderLabel("", "#000000");
 		lblScoreResult.setPrefWidth(160);
 
 	}
@@ -77,6 +83,16 @@ public class UserScore {
 				+ "; -fx-border-radius: 10px; -fx-border-width: 3px; -fx-background-color: white; -fx-background-radius: 11px; ");
 
 		return lbl;
+	}
+
+	public void updateScore() {
+		lblScoreRedRow.setText(Integer.toString(userScore.getScoreRedRow()));
+		lblScoreYellowRow.setText(Integer.toString(userScore.getScoreYellowRow()));
+		lblScoreGreenRow.setText(Integer.toString(userScore.getScoreGreenRow()));
+		lblScoreBlueRow.setText(Integer.toString(userScore.getScoreBlueRow()));
+
+		lblScoreMisses.setText(Integer.toString(userScore.getScoreMisses()));
+		lblScoreResult.setText(Integer.toString(userScore.getScoreComplete()));
 	}
 
 	public Pane getPane() {
