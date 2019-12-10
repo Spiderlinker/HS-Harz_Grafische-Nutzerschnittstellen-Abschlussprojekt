@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.row;
 
 import java.io.File;
 
