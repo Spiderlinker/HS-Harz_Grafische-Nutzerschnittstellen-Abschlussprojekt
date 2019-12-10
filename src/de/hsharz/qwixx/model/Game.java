@@ -83,8 +83,16 @@ public class Game implements RowsClosedSupplier {
 				List<DicesSum> whiteDices = getWhiteDicesSums();
 				List<DicesSum> colorDices = getColorDicesSums();
 
-				letPlayerChooseWhiteDices(whiteDices);
-				currentPlayer.chooseColorDices(colorDices);
+				letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
+
+				DicesSum selectedWhiteDice = currentPlayer.chooseWhiteDices(whiteDices);
+				DicesSum selectedColorDice = currentPlayer.chooseColorDices(colorDices);
+
+				// Check if player selected any dice
+				if (DicesSum.EMPTY.equals(selectedWhiteDice) && DicesSum.EMPTY.equals(selectedColorDice)) {
+					// player did not select any dice, cross miss
+					currentPlayer.getGameBoard().crossMiss();
+				}
 
 				if (isGameOver()) {
 					isPlaying = false;
@@ -93,8 +101,7 @@ public class Game implements RowsClosedSupplier {
 			}
 		}
 		System.out.println("Game over");
-		
-		
+
 	}
 
 	private void rollDices() {
@@ -120,12 +127,25 @@ public class Game implements RowsClosedSupplier {
 				new DicesSum(DiceColor.BLUE, diceBlue.getCurrentValue() + diceWhite2.getCurrentValue()));
 	}
 
-	private void letPlayerChooseWhiteDices(List<DicesSum> whiteDices) {
-		player.forEach(p -> p.chooseWhiteDices(whiteDices));
+	private void letOtherPlayerChooseWhiteDices(List<DicesSum> whiteDices, IPlayer currentPlayer) {
+		player.forEach(p -> {
+			if (!p.equals(currentPlayer)) {
+				p.chooseWhiteDices(whiteDices);
+			}
+		});
 	}
 
 	private boolean isGameOver() {
-		return closedRows.size() >= 2;
+		return playerCrossedAllMisses() || closedRows.size() >= 2;
+	}
+
+	private boolean playerCrossedAllMisses() {
+		for (IPlayer p : player) {
+			if (p.getGameBoard().getRemainingMisses() <= 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -133,11 +153,10 @@ public class Game implements RowsClosedSupplier {
 		System.out.println("Row closed: " + color);
 		closedRows.add(color);
 	}
-	
+
 	@Override
 	public boolean isRowClosed(DiceColor rowColor) {
 		return closedRows.contains(rowColor);
 	}
-
 
 }
