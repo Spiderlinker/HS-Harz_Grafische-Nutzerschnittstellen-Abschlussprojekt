@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Objects;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowEndField;
 import de.hsharz.qwixx.model.board.row.field.Field;
+import de.hsharz.qwixx.ui.CrossButton;
+import de.hsharz.qwixx.ui.FieldCrossedListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -96,6 +98,10 @@ public class RowUI {
 		return row;
 	}
 
+	public RowEndBox getRowEnd() {
+		return rowEnd;
+	}
+	
 	public List<CrossButton> getButtons() {
 		return buttons;
 	}
