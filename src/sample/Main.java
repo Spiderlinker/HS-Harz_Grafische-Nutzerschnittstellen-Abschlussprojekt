@@ -7,28 +7,33 @@ import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.GameBoardUI;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		BorderPane root = new BorderPane();
+		VBox root = new VBox(10);
 
 		Game game = new Game();
-		GameBoard board = new GameBoard();
-		board.setRowClosedSupplier(game);
-		IPlayer player = new Human(board);
-		
-		GameBoardUI ui = new GameBoardUI(player);
-		((Human) player).setHumanInputSupplier(ui);
 
-		game.addPlayer(player);
+		for (int i = 0; i < 2; i++) {
+			GameBoard board = new GameBoard();
+			board.setRowClosedSupplier(game);
+			IPlayer player = new Human(board);
+
+			GameBoardUI ui = new GameBoardUI(player);
+			((Human) player).setHumanInputSupplier(ui);
+
+			game.addPlayer(player);
+			root.getChildren().add(ui.getPane());
+		}
 
 		new Thread(game::startGame).start();
 
-		root.setCenter(ui.getPane());
+
+		root.setStyle("-fx-background: gray;");
 
 		primaryStage.setOnCloseRequest(e -> System.exit(0));
 		primaryStage.setTitle("Hello World");
