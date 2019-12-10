@@ -59,7 +59,7 @@ public class CrossButton {
 			}
 		});
 		pane.setOnMouseExited(event -> {
-			if (!locked && !disabled && !btn.isSelected()) {
+			if (!locked && !btn.isSelected()) {
 				imgView.setVisible(false);
 			}
 		});
