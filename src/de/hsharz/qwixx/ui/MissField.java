@@ -22,8 +22,8 @@ public class MissField {
 	private void createWidgets() {
 		pane = new StackPane();
 		pane.setPrefSize(30, 40);
-		pane.setStyle(
-				"-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; -fx-background-color: white; -fx-background-radius: 11px;");
+		pane.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
+				+ "-fx-background-color: white; -fx-background-radius: 11px;");
 
 		imgView = new ImageView(new File("images/cross_klein.png").toURI().toString());
 		imgView.setVisible(false);
@@ -67,6 +67,7 @@ public class MissField {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+		imgView.setVisible(selected);
 	}
 
 	public boolean isSelected() {
