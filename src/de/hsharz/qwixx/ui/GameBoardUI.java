@@ -4,17 +4,21 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.GameBoard;
+import de.hsharz.qwixx.model.board.GameBoardListener;
 import de.hsharz.qwixx.model.board.row.RowUtils;
+import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.row.RowUI;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class GameBoardUI implements HumanInputSupplier, FieldCrossedListener {
+public class GameBoardUI implements HumanInputSupplier, GameBoardListener, FieldCrossedListener {
 
 	private VBox root;
 
@@ -26,10 +30,11 @@ public class GameBoardUI implements HumanInputSupplier, FieldCrossedListener {
 	private RowUI rowBlue;
 
 	private ScoreLegend scoreLegend;
-	private UserScore userScore;
+	private UserScoreUI userScore;
 
 	public GameBoardUI(IPlayer player) {
 		this.player = Objects.requireNonNull(player);
+		player.getGameBoard().addListener(this);
 
 		createWidgets();
 		setupInteractions();
@@ -48,7 +53,7 @@ public class GameBoardUI implements HumanInputSupplier, FieldCrossedListener {
 		rowBlue = new RowUI(player.getGameBoard().getBlueRow());
 
 		scoreLegend = new ScoreLegend();
-		userScore = new UserScore();
+		userScore = new UserScoreUI(player.getGameBoard().getScore());
 
 	}
 
@@ -57,10 +62,9 @@ public class GameBoardUI implements HumanInputSupplier, FieldCrossedListener {
 		rowYellow.addFieldCrossedListener(this);
 		rowGreen.addFieldCrossedListener(this);
 		rowBlue.addFieldCrossedListener(this);
-		
-		
-		root.setOnMouseClicked(e->{
-			if(MouseButton.SECONDARY == e.getButton()) {
+
+		root.setOnMouseClicked(e -> {
+			if (MouseButton.SECONDARY == e.getButton()) {
 				humanInput = DicesSum.EMPTY;
 
 				enableAllButtons();
@@ -170,6 +174,40 @@ public class GameBoardUI implements HumanInputSupplier, FieldCrossedListener {
 		for (CrossButton btn : rowBlue.getButtons()) {
 			btn.setDisabled(false);
 		}
+	}
+
+	@Override
+	public void fieldCrossed(Field fieldToCross) {
+		Platform.runLater(() -> userScore.updateScore());
+	}
+
+	@Override
+	public void rowFinished(DiceColor color) {
+		switch (color) {
+		case RED:
+			rowRed.getRowEnd().setCrossed(true);
+			break;
+		case YELLOW:
+			rowYellow.getRowEnd().setCrossed(true);
+			break;
+		case GREEN:
+			rowGreen.getRowEnd().setCrossed(true);
+			break;
+		case BLUE:
+			rowBlue.getRowEnd().setCrossed(true);
+			break;
+		}
+	}
+
+	@Override
+	public void missCrossed() {
+		for (int i = 0; i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses(); i++) {
+			MissField missField = scoreLegend.getMissFields().get(i);
+			missField.setSelected(true);
+			missField.setDisabled(true);
+		}
+
+		Platform.runLater(() -> userScore.updateScore());
 	}
 
 }
