@@ -5,13 +5,15 @@ import java.util.List;
 
 import de.hsharz.qwixx.model.board.row.Order;
 import de.hsharz.qwixx.model.board.row.Row;
-import de.hsharz.qwixx.model.board.row.RowEndField;
 import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 
 public class GameBoard {
+
+	private static final int MIN_FIELDS_CROSSED_TO_CLOSE_ROW = 6;
+	private static final int AMOUNT_MISSES = 4;
 
 	private RowsClosedSupplier rowClosedSupplier;
 
@@ -20,12 +22,14 @@ public class GameBoard {
 	private Row greenRow = new Row(DiceColor.GREEN, Order.DESC);
 	private Row blueRow = new Row(DiceColor.BLUE, Order.DESC);
 
-	private int remainingMisses = 4;
+	private int remainingMisses = AMOUNT_MISSES;
 
 	private List<GameBoardListener> listeners = new ArrayList<>();
 
-	public GameBoard() {
+	private UserScore userScore;
 
+	public GameBoard() {
+		userScore = new UserScore();
 	}
 
 	public void addListener(GameBoardListener l) {
@@ -66,6 +70,11 @@ public class GameBoard {
 		}
 
 		remainingMisses--;
+		updateScore();
+
+		for (GameBoardListener l : listeners) {
+			l.missCrossed();
+		}
 	}
 
 	public void crossField(DiceColor colorToCross, int numberToCross) {
@@ -110,12 +119,11 @@ public class GameBoard {
 				fieldsInFrontNotCrossed = false;
 			}
 		}
-		
+
 		boolean fieldsInFrontNotCrossed2 = RowUtils.isCrossedAfterValue(rowToCross, numberToCross);
-		
+
 		System.out.println("1: " + fieldsInFrontNotCrossed + " <> 2: " + fieldsInFrontNotCrossed2);
-		System.out.println(numberToCross + ":"+ rowToCross.getFields());
-		
+		System.out.println(numberToCross + ":" + rowToCross.getFields());
 
 		if (fieldToCrossIndex == -1) {
 			throw new IllegalArgumentException("Nummer nicht gefunden: " + numberToCross);
@@ -129,6 +137,7 @@ public class GameBoard {
 		fieldToCross.setCrossed(true);
 
 		checkIfCrossedFieldWasLastInRow(rowToCross, fieldToCross);
+		updateScore();
 
 		for (GameBoardListener listener : listeners) {
 			listener.fieldCrossed(fieldToCross);
@@ -144,7 +153,7 @@ public class GameBoard {
 
 		if ((rowOfField.getOrder().equals(Order.ASC) && crossedField.getValue() == Row.ASC_LAST_VALUE)
 				|| rowOfField.getOrder().equals(Order.DESC) && crossedField.getValue() == Row.DESC_LAST_VALUE) {
-			
+
 			rowOfField.getFields().get(rowOfField.getFields().size() - 1).setCrossed(true); // cross last field
 			rowClosedSupplier.closeRow(rowOfField.getColor());
 
@@ -157,8 +166,21 @@ public class GameBoard {
 
 	private boolean areEnoughFieldsCrossed(Row rowToCheck) {
 		return rowToCheck.getFields().stream() //
-				.mapToInt(f -> f.isCrossed() ? 1 : 0) //
-				.sum() >= 6; // TODO magic number
+				.filter(Field::isCrossed) //
+				.count() >= MIN_FIELDS_CROSSED_TO_CLOSE_ROW;
+	}
+
+	private void updateScore() {
+		userScore.setScoreRedRow((int) redRow.getFields().stream().filter(Field::isCrossed).count());
+		userScore.setScoreYellowRow((int) yellowRow.getFields().stream().filter(Field::isCrossed).count());
+		userScore.setScoreGreenRow((int) greenRow.getFields().stream().filter(Field::isCrossed).count());
+		userScore.setScoreBlueRow((int) blueRow.getFields().stream().filter(Field::isCrossed).count());
+
+		userScore.setScoreMisses(AMOUNT_MISSES - remainingMisses);
+	}
+
+	public UserScore getScore() {
+		return userScore;
 	}
 
 }
