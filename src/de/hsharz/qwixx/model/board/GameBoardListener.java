@@ -9,4 +9,6 @@ public interface GameBoardListener {
 
 	void rowFinished(DiceColor color);
 	
+	void missCrossed();
+	
 }
