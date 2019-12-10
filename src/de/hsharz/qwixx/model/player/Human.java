@@ -8,11 +8,10 @@ import de.hsharz.qwixx.model.dice.DicesSum;
 
 public class Human extends Player {
 
-	private GameBoard board;
 	private HumanInputSupplier inputSupplier;
 
 	public Human(GameBoard board) {
-		this.board = Objects.requireNonNull(board);
+		super(board);
 	}
 
 	public void setHumanInputSupplier(HumanInputSupplier inputSupplier) {
@@ -40,7 +39,7 @@ public class Human extends Player {
 				selection = inputSupplier.getHumanInput();
 
 				if (!selection.equals(DicesSum.EMPTY)) {
-					board.crossField(selection.getColor(), selection.getSum());
+					getGameBoard().crossField(selection.getColor(), selection.getSum());
 				}
 
 			} catch (InterruptedException e) {
@@ -49,11 +48,6 @@ public class Human extends Player {
 		}
 
 		return selection;
-	}
-
-	@Override
-	public GameBoard getGameBoard() {
-		return board;
 	}
 
 }
