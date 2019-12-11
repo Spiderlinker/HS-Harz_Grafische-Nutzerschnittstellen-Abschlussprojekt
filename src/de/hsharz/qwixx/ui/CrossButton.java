@@ -82,6 +82,7 @@ public class CrossButton {
 		} else {
 			pane.setOpacity(1);
 		}
+		
 	}
 
 	public void setLocked(boolean locked) {

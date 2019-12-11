@@ -4,13 +4,12 @@ import java.util.List;
 
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.pair.Pair;
 
 public interface IPlayer {
 
-	DicesSum chooseWhiteDices(List<DicesSum> dices);
-	
-	DicesSum chooseColorDices(List<DicesSum> dices);
-	
+	Pair<DicesSum> chooseDices(List<DicesSum> dices, int minDices, int maxDices);
+
 	GameBoard getGameBoard();
-	
+
 }

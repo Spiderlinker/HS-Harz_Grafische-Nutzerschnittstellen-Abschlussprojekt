@@ -130,7 +130,7 @@ public class GameBoard {
 		}
 
 		if (!fieldsInFrontNotCrossed) {
-			throw new IllegalAccessError("Es sind bereits Felder abgekreuzt.");
+			throw new IllegalAccessError("Es sind bereits Felder abgekreuzt in Reihe " + rowToCross.getColor() + " : " + numberToCross);
 		}
 
 		Field fieldToCross = rowToCross.getFields().get(fieldToCrossIndex);

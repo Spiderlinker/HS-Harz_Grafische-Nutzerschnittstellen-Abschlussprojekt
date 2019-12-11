@@ -3,12 +3,12 @@ package de.hsharz.qwixx.ui;
 import java.util.List;
 import java.util.Objects;
 
-import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.board.GameBoardListener;
-import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.pair.DicePair;
+import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.row.RowUI;
@@ -31,6 +31,12 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 
 	private ScoreLegend scoreLegend;
 	private UserScoreUI userScore;
+
+	private IPlayer playerWaitingForInput;
+
+	private DicesSum firstSelection;
+	private DicesSum secondSelection;
+	private int maxSelection;
 
 	public GameBoardUI(IPlayer player) {
 		this.player = Objects.requireNonNull(player);
@@ -65,15 +71,24 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
-				humanInput = DicesSum.EMPTY;
-
-				enableAllButtons();
-
-				synchronized (playerWaitingForInput) {
-					playerWaitingForInput.notify();
-				}
+				playerSelectedDice(DicesSum.EMPTY);
 			}
 		});
+	}
+
+	private void playerSelectedDice(DicesSum dice) {
+		if (firstSelection == null) {
+			firstSelection = new DicesSum(dice.getColor(), dice.getSum());
+		} else if (secondSelection == null) {
+			secondSelection = new DicesSum(dice.getColor(), dice.getSum());
+		}
+
+		if ((maxSelection == 1 && firstSelection != null) //
+				|| (maxSelection == 2 && secondSelection != null)) {
+			synchronized (playerWaitingForInput) {
+				playerWaitingForInput.notify();
+			}
+		}
 	}
 
 	private void addWidgets() {
@@ -90,90 +105,25 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		return root;
 	}
 
-	IPlayer playerWaitingForInput;
-	DicesSum humanInput;
-
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices) {
-
+	public void askForInput(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
 		playerWaitingForInput = player;
-		disableButtonsExcept(dices);
+		maxSelection = maxDices;
+		firstSelection = null;
+		secondSelection = null;
 
+		disableAllButtons();
+		highlightButtonsOfDices(dices);
 	}
 
 	@Override
-	public DicesSum getHumanInput() {
-		return humanInput;
+	public Pair<DicesSum> getHumanInput() {
+		return new DicePair(firstSelection, secondSelection);
 	}
 
 	@Override
 	public void fieldCrossed(RowUI ui, CrossButton btn) {
-		humanInput = new DicesSum(ui.getRow().getColor(), btn.getValue());
-
-		enableAllButtons();
-
-		synchronized (playerWaitingForInput) {
-			playerWaitingForInput.notify();
-		}
-	}
-
-	private void disableButtonsExcept(List<DicesSum> dices) {
-		for (CrossButton btn : rowRed.getButtons()) {
-			btn.setDisabled(true);
-		}
-		for (CrossButton btn : rowYellow.getButtons()) {
-			btn.setDisabled(true);
-		}
-		for (CrossButton btn : rowGreen.getButtons()) {
-			btn.setDisabled(true);
-		}
-		for (CrossButton btn : rowBlue.getButtons()) {
-			btn.setDisabled(true);
-		}
-
-		for (DicesSum sum : dices) {
-			for (CrossButton btn : rowRed.getButtons()) {
-				if ((DiceColor.RED.equals(sum.getColor()) || DiceColor.WHITE.equals(sum.getColor()))
-						&& sum.getSum() == btn.getValue() && !btn.getButton().isSelected()) {
-
-					btn.setDisabled(RowUtils.isCrossedAfterValue(rowRed.getRow(), btn.getValue()));
-				}
-			}
-			for (CrossButton btn : rowYellow.getButtons()) {
-				if ((DiceColor.YELLOW.equals(sum.getColor()) || DiceColor.WHITE.equals(sum.getColor()))
-						&& sum.getSum() == btn.getValue() && !btn.getButton().isSelected()) {
-					btn.setDisabled(RowUtils.isCrossedAfterValue(rowYellow.getRow(), btn.getValue()));
-				}
-			}
-			for (CrossButton btn : rowGreen.getButtons()) {
-				if ((DiceColor.GREEN.equals(sum.getColor()) || DiceColor.WHITE.equals(sum.getColor()))
-						&& sum.getSum() == btn.getValue() && !btn.getButton().isSelected()) {
-					btn.setDisabled(RowUtils.isCrossedAfterValue(rowGreen.getRow(), btn.getValue()));
-				}
-			}
-			for (CrossButton btn : rowBlue.getButtons()) {
-				if ((DiceColor.BLUE.equals(sum.getColor()) || DiceColor.WHITE.equals(sum.getColor()))
-						&& sum.getSum() == btn.getValue() && !btn.getButton().isSelected()) {
-					btn.setDisabled(RowUtils.isCrossedAfterValue(rowBlue.getRow(), btn.getValue()));
-				}
-			}
-		}
-
-	}
-
-	private void enableAllButtons() {
-		for (CrossButton btn : rowRed.getButtons()) {
-			btn.setDisabled(false);
-		}
-		for (CrossButton btn : rowYellow.getButtons()) {
-			btn.setDisabled(false);
-		}
-		for (CrossButton btn : rowGreen.getButtons()) {
-			btn.setDisabled(false);
-		}
-		for (CrossButton btn : rowBlue.getButtons()) {
-			btn.setDisabled(false);
-		}
+		playerSelectedDice(new DicesSum(ui.getRow().getColor(), btn.getValue()));
 	}
 
 	@Override
@@ -196,6 +146,9 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		case BLUE:
 			rowBlue.getRowEnd().setCrossed(true);
 			break;
+		default:
+			System.out.println("Row with unknown color was finished: " + color);
+			break;
 		}
 	}
 
@@ -208,6 +161,46 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		}
 
 		Platform.runLater(() -> userScore.updateScore());
+	}
+
+	private void disableAllButtons() {
+		disableButtonsOfRow(rowRed);
+		disableButtonsOfRow(rowYellow);
+		disableButtonsOfRow(rowGreen);
+		disableButtonsOfRow(rowBlue);
+	}
+
+	private void disableButtonsOfRow(RowUI row) {
+		for (CrossButton btn : row.getButtons()) {
+			btn.setDisabled(true);
+		}
+	}
+
+	private void highlightButtonsOfDices(List<DicesSum> dices) {
+		highlightButtonsOfDicesForRow(rowRed, dices);
+		highlightButtonsOfDicesForRow(rowYellow, dices);
+		highlightButtonsOfDicesForRow(rowGreen, dices);
+		highlightButtonsOfDicesForRow(rowBlue, dices);
+	}
+
+	private void highlightButtonsOfDicesForRow(RowUI row, List<DicesSum> dices) {
+
+		for (int i = row.getButtons().size() - 1; i >= 0; i--) {
+			if (row.getRow().getFields().get(i).isCrossed()) {
+				break;
+			}
+
+			CrossButton btn = row.getButtons().get(i);
+			for (DicesSum d : dices) {
+				if ((DiceColor.WHITE.equals(d.getColor()) || row.getRow().getColor().equals(d.getColor()))
+						&& d.getSum() == btn.getValue()) {
+					btn.setDisabled(false);
+					break;
+				}
+			}
+
+		}
+
 	}
 
 }
