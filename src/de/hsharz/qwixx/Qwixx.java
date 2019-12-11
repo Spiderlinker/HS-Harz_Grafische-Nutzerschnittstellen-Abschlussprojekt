@@ -1,44 +1,45 @@
 package de.hsharz.qwixx;
 
-import java.util.Arrays;
-import java.util.List;
-
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.board.GameBoard;
-import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.player.Human;
-import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.GameBoardUI;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class Qwixx {
+public class Qwixx extends Application {
 
-	private static List<Integer> score = Arrays.asList(0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78);
-
-	public static void main(String[] args) {
-
-		GameBoard board = new GameBoard();
-		HumanInputSupplier humanInputSupplier = new HumanInputSupplier() {
-
-			@Override
-			public void askForInput(IPlayer player, List<DicesSum> dices) {
-				player.notify();
-			}
-
-			@Override
-			public DicesSum getHumanInput() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		};
-//		IPlayer player1 = new Human(board, humanInputSupplier);
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		VBox root = new VBox(10);
 
 		Game game = new Game();
-//		game.addPlayer(player1);
-		
-		board.setRowClosedSupplier(game);
 
-		game.startGame();
+		for (int i = 0; i < 2; i++) {
+			GameBoard board = new GameBoard();
+			board.setRowClosedSupplier(game);
+			IPlayer player = new Human(board);
+
+			GameBoardUI ui = new GameBoardUI(player);
+			((Human) player).setHumanInputSupplier(ui);
+
+			game.addPlayer(player);
+			root.getChildren().add(ui.getPane());
+		}
+
+		new Thread(game::startGame).start();
+
+		primaryStage.setOnCloseRequest(e -> System.exit(0));
+		primaryStage.setTitle("Hello World");
+		primaryStage.setScene(new Scene(root, 800, 500));
+		primaryStage.show();
+
 	}
 
+	public static void main(String[] args) {
+		launch(args);
+	}
 }
