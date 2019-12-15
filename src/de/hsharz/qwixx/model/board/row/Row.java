@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.hsharz.qwixx.model.board.row.field.Field;
+import de.hsharz.qwixx.model.board.row.field.NumberField;
+import de.hsharz.qwixx.model.board.row.field.RowEndField;
 import de.hsharz.qwixx.model.dice.DiceColor;
 
 public class Row {
