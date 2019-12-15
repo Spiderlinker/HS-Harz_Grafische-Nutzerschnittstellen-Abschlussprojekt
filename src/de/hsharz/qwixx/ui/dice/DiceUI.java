@@ -2,8 +2,8 @@ package de.hsharz.qwixx.ui.dice;
 
 import java.util.Objects;
 
-import de.hsharz.qwixx.model.dice.Dice;
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.model.dice.IDice;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
@@ -19,16 +19,15 @@ import javafx.scene.shape.Circle;
 
 public class DiceUI {
 
-	private Dice dice;
+	private IDice dice;
 
 	private GridPane root;
 	private DropShadow glowEffect;
 
-	public DiceUI(Dice dice) {
+	public DiceUI(IDice dice) {
 		this.dice = Objects.requireNonNull(dice);
 
 		createWidgets();
-		addWidgets();
 	}
 
 	public void createWidgets() {
@@ -40,6 +39,7 @@ public class DiceUI {
 //		root.setVgap(5);
 		root.setPadding(new Insets(5));
 		root.setAlignment(Pos.CENTER);
+		root.setMinSize(3*16, 3*16);
 
 		addColumnRowConstraints();
 		createGlowEffect();
@@ -56,7 +56,7 @@ public class DiceUI {
 			root.getRowConstraints().add(row);
 		}
 	}
-	
+
 	private void createGlowEffect() {
 		glowEffect = new DropShadow();
 		glowEffect.setColor(Color.valueOf(dice.getColor().getAsHex()));
@@ -104,10 +104,10 @@ public class DiceUI {
 	private Pane createDiceEye() {
 		BorderPane pane = new BorderPane();
 		pane.setPadding(new Insets(5));
-		
+
 		Circle eye = new Circle(8, Paint.valueOf(dice.getColor().equals(DiceColor.WHITE) ? "black" : "white"));
 		pane.setCenter(eye);
-		
+
 		return pane;
 	}
 
@@ -115,12 +115,17 @@ public class DiceUI {
 		root.setEffect(highlighted ? glowEffect : null);
 	}
 
-	public Dice getDice() {
+	public IDice getDice() {
 		return dice;
 	}
 
 	public Pane getPane() {
 		return root;
+	}
+
+	public void refreshDice() {
+		root.getChildren().clear();
+		addWidgets();
 	}
 
 }
