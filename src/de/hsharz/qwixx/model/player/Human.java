@@ -10,8 +10,8 @@ public class Human extends Player {
 
 	private HumanInputSupplier inputSupplier;
 
-	public Human(GameBoard board) {
-		super(board);
+	public Human(String name, GameBoard board) {
+		super(name, board);
 	}
 
 	public void setHumanInputSupplier(HumanInputSupplier inputSupplier) {
@@ -37,10 +37,6 @@ public class Human extends Player {
 				inputSupplier.askForInput(this, dices);
 				this.wait();
 				selection = inputSupplier.getHumanInput();
-
-				if (!selection.equals(DicesSum.EMPTY)) {
-					getGameBoard().crossField(selection.getColor(), selection.getSum());
-				}
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
