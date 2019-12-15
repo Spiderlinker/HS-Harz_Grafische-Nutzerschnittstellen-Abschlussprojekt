@@ -1,9 +1,11 @@
 package de.hsharz.qwixx.model;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
@@ -12,6 +14,7 @@ import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.dice.DiceListener;
 
 public class Game implements RowsClosedSupplier {
 
@@ -27,6 +30,9 @@ public class Game implements RowsClosedSupplier {
 	private IDice diceBlue = new Dice(DiceColor.BLUE);
 
 	private Set<DiceColor> closedRows = new HashSet<>();
+	private Queue<DiceColor> rowsToCloseAfterRoundFinished = new ArrayDeque<>();
+
+	private List<DiceListener> listeners = new ArrayList<>();
 
 	private boolean isPlaying;
 
@@ -47,6 +53,10 @@ public class Game implements RowsClosedSupplier {
 		}
 	}
 
+	public void addDiceListener(DiceListener l) {
+		this.listeners.add(l);
+	}
+
 	private void addDices() {
 		dices.add(diceWhite1);
 		dices.add(diceWhite2);
@@ -57,7 +67,7 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	public void addClosedRow(DiceColor closedRow) {
-		this.closedRows.add(closedRow);
+		this.rowsToCloseAfterRoundFinished.add(closedRow);
 	}
 
 	public void stopGame() {
@@ -66,6 +76,10 @@ public class Game implements RowsClosedSupplier {
 
 	public boolean isPlaying() {
 		return isPlaying;
+	}
+
+	public List<IDice> getDices() {
+		return dices;
 	}
 
 	public void startGame() {
@@ -79,14 +93,37 @@ public class Game implements RowsClosedSupplier {
 
 			for (IPlayer currentPlayer : this.player) {
 
+				System.out.println("\n\n Spieler ist an der Reihe: " + currentPlayer);
+				
 				rollDices();
 				List<DicesSum> whiteDices = getWhiteDicesSums();
 				List<DicesSum> colorDices = getColorDicesSums();
 
+				System.out.println("---------- Other Player choosing dices");
 				letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
+				System.out.println("---------- Current Player choosing dices");
 				DicesSum selectedWhiteDice = currentPlayer.chooseWhiteDices(whiteDices);
+				if (!selectedWhiteDice.equals(DicesSum.EMPTY)) {
+					if(whiteDices.contains(selectedWhiteDice)) {
+						System.out.println("###################### DiceSum not in list, Schummler!: " + selectedWhiteDice + " - " + whiteDices);
+					}
+					currentPlayer.getGameBoard().crossField(selectedWhiteDice.getColor(), selectedWhiteDice.getSum());
+				}
+
+				closeQueuedRows();
+				if (isGameOver()) {
+					isPlaying = false;
+					break;
+				}
+
 				DicesSum selectedColorDice = currentPlayer.chooseColorDices(colorDices);
+				if (!selectedColorDice.equals(DicesSum.EMPTY)) {
+					if(colorDices.contains(selectedWhiteDice)) {
+						System.out.println("###################### DiceSum not in list, Schummler!: " + selectedColorDice + " - " + colorDices);
+					}
+					currentPlayer.getGameBoard().crossField(selectedColorDice.getColor(), selectedColorDice.getSum());
+				}
 
 				// Check if player selected any dice
 				if (DicesSum.EMPTY.equals(selectedWhiteDice) && DicesSum.EMPTY.equals(selectedColorDice)) {
@@ -94,6 +131,7 @@ public class Game implements RowsClosedSupplier {
 					currentPlayer.getGameBoard().crossMiss();
 				}
 
+				closeQueuedRows();
 				if (isGameOver()) {
 					isPlaying = false;
 					break;
@@ -107,6 +145,8 @@ public class Game implements RowsClosedSupplier {
 	private void rollDices() {
 		dices.forEach(IDice::rollDice);
 		dices.forEach(System.out::println);
+
+		listeners.forEach(DiceListener::dicesRolled);
 	}
 
 	private List<DicesSum> getWhiteDicesSums() {
@@ -128,11 +168,24 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	private void letOtherPlayerChooseWhiteDices(List<DicesSum> whiteDices, IPlayer currentPlayer) {
+
 		player.forEach(p -> {
+//			new Thread(() -> {
 			if (!p.equals(currentPlayer)) {
-				p.chooseWhiteDices(whiteDices);
+				DicesSum selectedDices = p.chooseWhiteDices(whiteDices);
+				if (!selectedDices.equals(DicesSum.EMPTY)) {
+					p.getGameBoard().crossField(selectedDices.getColor(), selectedDices.getSum());
+				}
 			}
+//			}).start();
 		});
+	}
+
+	private void closeQueuedRows() {
+		while (!rowsToCloseAfterRoundFinished.isEmpty()) {
+			System.out.println("Row closed: " + rowsToCloseAfterRoundFinished.peek());
+			closedRows.add(rowsToCloseAfterRoundFinished.poll());
+		}
 	}
 
 	private boolean isGameOver() {
@@ -150,8 +203,8 @@ public class Game implements RowsClosedSupplier {
 
 	@Override
 	public void closeRow(DiceColor color) {
-		System.out.println("Row closed: " + color);
-		closedRows.add(color);
+		System.out.println("Closing row after round finished: " + color);
+		rowsToCloseAfterRoundFinished.add(color);
 	}
 
 	@Override
