@@ -100,6 +100,11 @@ public class CrossButton {
 		return this.btn;
 	}
 	
+	public void showCrossImage() {
+		imgView.setOpacity(1);
+		imgView.setVisible(true);
+	}
+	
 	public Pane getPane() {
 		return this.pane;
 	}
