@@ -104,26 +104,22 @@ public class GameBoard {
 		}
 
 		int fieldToCrossIndex = -1;
-		boolean fieldsInFrontNotCrossed = true;
 		for (int i = 0; i < rowToCross.getFields().size(); i++) {
 			Field field = rowToCross.getFields().get(i);
 			if (field.getValue() == numberToCross) {
 				// Ab der gefundenen Nummer wird nun nach Feldern gesucht, die bereits
 				// abgekreuzt sind
 				fieldToCrossIndex = i;
-				fieldsInFrontNotCrossed = true;
-			}
-
-			// Prüfe, ob Feld bereits abgekreuzt
-			if (field.isCrossed()) {
-				fieldsInFrontNotCrossed = false;
 			}
 		}
 
-		boolean fieldsInFrontNotCrossed2 = RowUtils.isCrossedAfterValue(rowToCross, numberToCross);
-
-		System.out.println("1: " + fieldsInFrontNotCrossed + " <> 2: " + fieldsInFrontNotCrossed2);
-		System.out.println(numberToCross + ":" + rowToCross.getFields());
+		boolean fieldsInFrontNotCrossed = true;
+		for (int i = fieldToCrossIndex + 1; i < rowToCross.getFields().size(); i++) {
+			// Prüfe, ob Feld bereits abgekreuzt
+			if (rowToCross.getFields().get(i).isCrossed()) {
+				fieldsInFrontNotCrossed = false;
+			}
+		}
 
 		if (fieldToCrossIndex == -1) {
 			throw new IllegalArgumentException("Nummer nicht gefunden: " + numberToCross);
@@ -140,7 +136,7 @@ public class GameBoard {
 		updateScore();
 
 		for (GameBoardListener listener : listeners) {
-			listener.fieldCrossed(fieldToCross);
+			listener.fieldCrossed(rowToCross, fieldToCross);
 		}
 
 	}
