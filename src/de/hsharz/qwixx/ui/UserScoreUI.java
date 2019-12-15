@@ -79,7 +79,7 @@ public class UserScoreUI {
 		Label lbl = new Label(text);
 		lbl.setPrefSize(60, 40);
 
-		lbl.setStyle("-fx-font-size: 16px; -fx-alignment: center; -fx-border-color: " + color
+		lbl.setStyle("-fx-font-size: 20px; -fx-alignment: center; -fx-border-color: " + color
 				+ "; -fx-border-radius: 10px; -fx-border-width: 3px; -fx-background-color: white; -fx-background-radius: 11px; ");
 
 		return lbl;
