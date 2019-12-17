@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.IDice;
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
@@ -13,24 +14,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
-public class DiceUI {
+public class DiceUI extends AbstractPane<GridPane> {
 
 	private IDice dice;
-
-	private GridPane root;
 	private DropShadow glowEffect;
-
-	// 1: __ | 2: __ | 3: __ | 4: __ | 5: __ | 6: __ |
-	// - - - | # - - | # - - | # - # | # - # | # - # |
-	// - # - | - - - | - # - | - - - | - # - | # - # |
-	// - - - | - - # | - - # | # - # | # - # | # - # |
 	private Circle[][] diceEyes = new Circle[3][3];
 
 	public DiceUI(IDice dice) {
+		super(new GridPane());
+
 		this.dice = Objects.requireNonNull(dice);
 
 		createWidgets();
@@ -38,21 +33,12 @@ public class DiceUI {
 	}
 
 	public void createWidgets() {
-		root = new GridPane();
 		root.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
 				+ "-fx-background-color: " + dice.getColor().getAsHex() + "; -fx-background-radius: 11px;");
-
-//		root.setHgap(5);
-//		root.setVgap(5);
 		root.setPadding(new Insets(5));
 		root.setAlignment(Pos.CENTER);
-		root.setMinSize(3 * 16, 3 * 16);
-		
-		root.setGridLinesVisible(true);
 
 		addColumnRowConstraints();
-		createGlowEffect();
-
 		createDiceEyes();
 	}
 
@@ -68,18 +54,11 @@ public class DiceUI {
 		}
 	}
 
-	private void createGlowEffect() {
-		glowEffect = new DropShadow();
-		glowEffect.setColor(Color.valueOf(dice.getColor().getAsHex()));
-		glowEffect.setWidth(30);
-		glowEffect.setHeight(30);
-	}
-
 	private void createDiceEyes() {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				diceEyes[i][j] = new Circle(8,
-						Paint.valueOf(dice.getColor().equals(DiceColor.WHITE) ? "black" : "white"));
+				String diceEyeColor = dice.getColor().equals(DiceColor.WHITE) ? "black" : "white";
+				diceEyes[i][j] = new Circle(8, Paint.valueOf(diceEyeColor));
 			}
 		}
 	}
@@ -99,18 +78,13 @@ public class DiceUI {
 		root.setEffect(highlighted ? glowEffect : null);
 	}
 
-	public IDice getDice() {
-		return dice;
-	}
-
-	public Pane getPane() {
-		return root;
-	}
-
 	public void refreshDice() {
-
 		hideDiceEyes();
 
+		// 1: __ | 2: __ | 3: __ | 4: __ | 5: __ | 6: __ |
+		// - - - | # - - | # - - | # - # | # - # | # - # |
+		// - # - | - - - | - # - | - - - | - # - | # - # |
+		// - - - | - - # | - - # | # - # | # - # | # - # |
 		switch (dice.getCurrentValue()) {
 		case 5:
 			// Für die 5 wird auch die 3 und die 1 gebaut
@@ -147,6 +121,10 @@ public class DiceUI {
 				diceEyes[i][j].setVisible(false);
 			}
 		}
+	}
+
+	public IDice getDice() {
+		return dice;
 	}
 
 }

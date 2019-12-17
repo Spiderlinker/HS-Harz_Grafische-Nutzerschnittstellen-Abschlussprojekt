@@ -6,16 +6,12 @@ import java.util.Objects;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.IDice;
-import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.application.Platform;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 
-public class DicePane implements DiceListener {
-
-	private HBox root;
+public class DicePane extends AbstractPane<HBox> implements DiceListener {
 
 	private List<IDice> dices;
 	private List<DiceUI> dicesUI = new ArrayList<>();
@@ -24,6 +20,8 @@ public class DicePane implements DiceListener {
 	private TilePane colorPane;
 
 	public DicePane(List<IDice> dices) {
+		super(new HBox());
+
 		this.dices = Objects.requireNonNull(dices);
 
 		createWidgets();
@@ -32,7 +30,7 @@ public class DicePane implements DiceListener {
 	}
 
 	private void createWidgets() {
-		root = new HBox(20);
+		root.setSpacing(20);
 
 		whitePane = new TilePane(10, 10);
 		colorPane = new TilePane(10, 10);
@@ -55,10 +53,6 @@ public class DicePane implements DiceListener {
 			}
 		}
 
-	}
-
-	public Pane getPane() {
-		return root;
 	}
 
 	public void refreshDices() {
