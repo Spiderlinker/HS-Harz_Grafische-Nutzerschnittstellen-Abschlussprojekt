@@ -24,10 +24,17 @@ public class DiceUI {
 	private GridPane root;
 	private DropShadow glowEffect;
 
+	// 1: __ | 2: __ | 3: __ | 4: __ | 5: __ | 6: __ |
+	// - - - | # - - | # - - | # - # | # - # | # - # |
+	// - # - | - - - | - # - | - - - | - # - | # - # |
+	// - - - | - - # | - - # | # - # | # - # | # - # |
+	private Circle[][] diceEyes = new Circle[3][3];
+
 	public DiceUI(IDice dice) {
 		this.dice = Objects.requireNonNull(dice);
 
 		createWidgets();
+		addWidgets();
 	}
 
 	public void createWidgets() {
@@ -39,10 +46,14 @@ public class DiceUI {
 //		root.setVgap(5);
 		root.setPadding(new Insets(5));
 		root.setAlignment(Pos.CENTER);
-		root.setMinSize(3*16, 3*16);
+		root.setMinSize(3 * 16, 3 * 16);
+		
+		root.setGridLinesVisible(true);
 
 		addColumnRowConstraints();
 		createGlowEffect();
+
+		createDiceEyes();
 	}
 
 	private void addColumnRowConstraints() {
@@ -64,51 +75,24 @@ public class DiceUI {
 		glowEffect.setHeight(30);
 	}
 
-	public void addWidgets() {
-
-		// 1: __ | 2: __ | 3: __ | 4: __ | 5: __ | 6: __ |
-		// - - - | # - - | # - - | # - # | # - # | # - # |
-		// - # - | - - - | - # - | - - - | - # - | # - # |
-		// - - - | - - # | - - # | # - # | # - # | # - # |
-
-		switch (dice.getCurrentValue()) {
-		case 5:
-			// Für die 5 wird auch die 3 und die 1 gebaut
-			root.add(createDiceEye(), 0, 2); // oben rechts
-			root.add(createDiceEye(), 2, 0); // unten links
-		case 3:
-			// für die 3 wird auch die 1 gebaut
-			root.add(createDiceEye(), 0, 0); // oben links
-			root.add(createDiceEye(), 2, 2); // unten rechts
-		case 1:
-			root.add(createDiceEye(), 1, 1); // mitte mitte
-			break;
-		case 6:
-			// für die 6 wird auch die 4 und die 2 gebaut
-			root.add(createDiceEye(), 0, 1); // links mitte
-			root.add(createDiceEye(), 2, 1); // rechts mitte
-		case 4:
-			// für die 4 wird auch die zwei gebaut
-			root.add(createDiceEye(), 0, 2); // oben rechts
-			root.add(createDiceEye(), 2, 0); // unten links
-		case 2:
-			root.add(createDiceEye(), 0, 0); // oben links
-			root.add(createDiceEye(), 2, 2); // unten rechts
-			break;
-		default:
-			throw new IllegalArgumentException("Zahl von Würfel nicht bekannt: " + dice.getCurrentValue());
+	private void createDiceEyes() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				diceEyes[i][j] = new Circle(8,
+						Paint.valueOf(dice.getColor().equals(DiceColor.WHITE) ? "black" : "white"));
+			}
 		}
-
 	}
 
-	private Pane createDiceEye() {
-		BorderPane pane = new BorderPane();
-		pane.setPadding(new Insets(5));
-
-		Circle eye = new Circle(8, Paint.valueOf(dice.getColor().equals(DiceColor.WHITE) ? "black" : "white"));
-		pane.setCenter(eye);
-
-		return pane;
+	public void addWidgets() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				BorderPane pane = new BorderPane();
+				pane.setPadding(new Insets(5));
+				pane.setCenter(diceEyes[i][j]);
+				root.add(pane, i, j);
+			}
+		}
 	}
 
 	public void setHighlighted(boolean highlighted) {
@@ -124,8 +108,45 @@ public class DiceUI {
 	}
 
 	public void refreshDice() {
-		root.getChildren().clear();
-		addWidgets();
+
+		hideDiceEyes();
+
+		switch (dice.getCurrentValue()) {
+		case 5:
+			// Für die 5 wird auch die 3 und die 1 gebaut
+			diceEyes[0][2].setVisible(true); // oben rechts
+			diceEyes[2][0].setVisible(true); // unten links
+		case 3:
+			// für die 3 wird auch die 1 gebaut
+			diceEyes[0][0].setVisible(true); // oben links
+			diceEyes[2][2].setVisible(true); // unten rechts
+		case 1:
+			diceEyes[1][1].setVisible(true); // mitte mitte
+			break;
+		case 6:
+			// für die 6 wird auch die 4 und die 2 gebaut
+			diceEyes[0][1].setVisible(true); // links mitte
+			diceEyes[2][1].setVisible(true); // rechts mitte
+		case 4:
+			// für die 4 wird auch die zwei gebaut
+			diceEyes[0][2].setVisible(true); // oben rechts
+			diceEyes[2][0].setVisible(true); // unten links
+		case 2:
+			diceEyes[0][0].setVisible(true); // oben links
+			diceEyes[2][2].setVisible(true); // unten rechts
+			break;
+		default:
+			throw new IllegalArgumentException("Zahl von Würfel nicht bekannt: " + dice.getCurrentValue());
+		}
+
+	}
+
+	private void hideDiceEyes() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				diceEyes[i][j].setVisible(false);
+			}
+		}
 	}
 
 }
