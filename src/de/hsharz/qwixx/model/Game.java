@@ -89,6 +89,10 @@ public class Game implements RowsClosedSupplier {
 		return dices;
 	}
 
+	public Set<IPlayer> getPlayer() {
+		return player;
+	}
+
 	public void startGame() {
 		if (player.isEmpty()) {
 			throw new IllegalArgumentException("There are no players to play with");
