@@ -1,6 +1,8 @@
 package de.hsharz.qwixx.ui;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.GameBoardListener;
@@ -13,21 +15,19 @@ import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.row.RowUI;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
-public class GameBoardUI implements HumanInputSupplier, GameBoardListener, FieldCrossedListener {
+public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener {
 
 	private VBox root;
 
 	private IPlayer player;
 
-	private RowUI rowRed;
-	private RowUI rowYellow;
-	private RowUI rowGreen;
-	private RowUI rowBlue;
-
+	private Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
 	private ScoreLegend scoreLegend;
 	private UserScoreUI userScore;
 
@@ -41,7 +41,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		createWidgets();
 		setupInteractions();
 		addWidgets();
-		
+
 		disableAllButtons();
 	}
 
@@ -51,10 +51,10 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		root.setPadding(new Insets(20, 20, 0, 20));
 		root.setStyle("-fx-background-color: #E3E3E3;");
 
-		rowRed = new RowUI(player.getGameBoard().getRedRow());
-		rowYellow = new RowUI(player.getGameBoard().getYellowRow());
-		rowGreen = new RowUI(player.getGameBoard().getGreenRow());
-		rowBlue = new RowUI(player.getGameBoard().getBlueRow());
+		rows.put(DiceColor.RED, new RowUI(player.getGameBoard().getRedRow()));
+		rows.put(DiceColor.YELLOW, new RowUI(player.getGameBoard().getYellowRow()));
+		rows.put(DiceColor.GREEN, new RowUI(player.getGameBoard().getGreenRow()));
+		rows.put(DiceColor.BLUE, new RowUI(player.getGameBoard().getBlueRow()));
 
 		scoreLegend = new ScoreLegend();
 		userScore = new UserScoreUI(player.getGameBoard().getScore());
@@ -62,11 +62,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 	}
 
 	private void setupInteractions() {
-		rowRed.addFieldCrossedListener(this);
-		rowYellow.addFieldCrossedListener(this);
-		rowGreen.addFieldCrossedListener(this);
-		rowBlue.addFieldCrossedListener(this);
-
+		rows.values().forEach(r -> r.addFieldCrossedListener(this));
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
 				doInput(DicesSum.EMPTY);
@@ -76,10 +72,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 	}
 
 	private void addWidgets() {
-		root.getChildren().add(rowRed.getPane());
-		root.getChildren().add(rowYellow.getPane());
-		root.getChildren().add(rowGreen.getPane());
-		root.getChildren().add(rowBlue.getPane());
+		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
 
 		root.getChildren().add(scoreLegend.getPane());
 		root.getChildren().add(userScore.getPane());
@@ -89,7 +82,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		humanInput = input;
 
 		disableAllButtons();
-		
+
 		if (playerWaitingForInput != null) {
 			synchronized (playerWaitingForInput) {
 				playerWaitingForInput.notify();
@@ -113,7 +106,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 	public DicesSum getHumanInput() {
 		return humanInput;
 	}
-	
+
 	@Override
 	public void fieldCrossed(RowUI ui, CrossButton btn) {
 		doInput(new DicesSum(ui.getRow().getColor(), btn.getValue()));
@@ -121,26 +114,11 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 
 	@Override
 	public void fieldCrossed(Row rowToCross, Field fieldToCross) {
-		RowUI rowToCrossUI = null;
-		
-		switch(rowToCross.getColor()) {
-		case RED:
-			rowToCrossUI = rowRed;
-			break;
-		case YELLOW:
-			rowToCrossUI = rowYellow;
-			break;
-		case GREEN:
-			rowToCrossUI = rowGreen;
-			break;
-		case BLUE:
-			rowToCrossUI = rowBlue;
-			break;
-		}
-		
+		RowUI rowToCrossUI = rows.get(rowToCross.getColor());
+
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
-		for(CrossButton btn : rowToCrossUI.getButtons()) {
-			if(btn.getValue() == fieldToCross.getValue()) {
+		for (CrossButton btn : rowToCrossUI.getButtons()) {
+			if (btn.getValue() == fieldToCross.getValue()) {
 				System.out.println("Button found to enable");
 				btn.setLocked(true);
 				btn.setDisabled(true);
@@ -149,30 +127,13 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 				break;
 			}
 		}
-		
-		
+
 		Platform.runLater(() -> userScore.updateScore());
 	}
 
 	@Override
 	public void rowFinished(DiceColor color) {
-		switch (color) {
-		case RED:
-			rowRed.getRowEnd().setCrossed(true);
-			break;
-		case YELLOW:
-			rowYellow.getRowEnd().setCrossed(true);
-			break;
-		case GREEN:
-			rowGreen.getRowEnd().setCrossed(true);
-			break;
-		case BLUE:
-			rowBlue.getRowEnd().setCrossed(true);
-			break;
-		default:
-			System.out.println("Row with unknown color was finished: " + color);
-			break;
-		}
+		rows.get(color).getRowEnd().setCrossed(true);
 	}
 
 	@Override
@@ -187,10 +148,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 	}
 
 	private void disableAllButtons() {
-		disableButtonsOfRow(rowRed);
-		disableButtonsOfRow(rowYellow);
-		disableButtonsOfRow(rowGreen);
-		disableButtonsOfRow(rowBlue);
+		rows.values().forEach(this::disableButtonsOfRow);
 	}
 
 	private void disableButtonsOfRow(RowUI row) {
@@ -200,10 +158,7 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 	}
 
 	private void highlightButtonsOfDices(List<DicesSum> dices) {
-		highlightButtonsOfDicesForRow(rowRed, dices);
-		highlightButtonsOfDicesForRow(rowYellow, dices);
-		highlightButtonsOfDicesForRow(rowGreen, dices);
-		highlightButtonsOfDicesForRow(rowBlue, dices);
+		rows.values().forEach(row -> highlightButtonsOfDicesForRow(row, dices));
 	}
 
 	private void highlightButtonsOfDicesForRow(RowUI row, List<DicesSum> dices) {
@@ -225,5 +180,21 @@ public class GameBoardUI implements HumanInputSupplier, GameBoardListener, Field
 		}
 
 	}
-	
+
+	public void highlightGameboard(boolean highlight) {
+		DropShadow glowEffect = null;
+		if (highlight) {
+			glowEffect = new DropShadow();
+			glowEffect.setColor(Color.RED);
+			glowEffect.setWidth(30);
+			glowEffect.setHeight(30);
+		}
+		root.setEffect(glowEffect);
+	}
+
+	@Override
+	public void nextPlayersTurn(IPlayer nextPlayer) {
+			highlightGameboard(player.equals(nextPlayer));
+	}
+
 }
