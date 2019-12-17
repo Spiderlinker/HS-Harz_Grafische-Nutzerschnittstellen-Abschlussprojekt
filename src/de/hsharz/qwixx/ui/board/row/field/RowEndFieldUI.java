@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.row;
+package de.hsharz.qwixx.ui.board.row.field;
 
 import java.io.File;
 
@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-public class RowEndBox {
+public class RowEndFieldUI {
 
 	private DiceColor color;
 
@@ -15,7 +15,7 @@ public class RowEndBox {
 	private ImageView imgLock;
 	private ImageView imgCross;
 
-	public RowEndBox(DiceColor color) {
+	public RowEndFieldUI(DiceColor color) {
 		this.color = color;
 
 		createWidgets();

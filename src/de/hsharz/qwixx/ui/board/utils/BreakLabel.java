@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.board.utils;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

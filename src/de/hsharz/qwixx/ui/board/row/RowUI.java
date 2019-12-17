@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.row;
+package de.hsharz.qwixx.ui.board.row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,9 @@ import java.util.Objects;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.board.row.field.RowEndField;
-import de.hsharz.qwixx.ui.CrossButton;
-import de.hsharz.qwixx.ui.FieldCrossedListener;
+import de.hsharz.qwixx.ui.board.FieldCrossedListener;
+import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
+import de.hsharz.qwixx.ui.board.row.field.RowEndFieldUI;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Pane;
@@ -22,8 +23,8 @@ public class RowUI {
 
 	private StackPane root;
 	private TilePane rowPane;
-	private List<CrossButton> buttons = new ArrayList<>();
-	private RowEndBox rowEnd;
+	private List<NumberFieldUI> buttons = new ArrayList<>();
+	private RowEndFieldUI rowEnd;
 
 	private Polygon triangle;
 
@@ -50,11 +51,11 @@ public class RowUI {
 
 		for (Field field : row.getFields()) {
 			if (field.getValue() != RowEndField.ROW_END_FIELD_VALUE) {
-				buttons.add(new CrossButton(field.getValue(), row.getColor()));
+				buttons.add(new NumberFieldUI(field.getValue(), row.getColor()));
 			}
 		}
 
-		rowEnd = new RowEndBox(row.getColor());
+		rowEnd = new RowEndFieldUI(row.getColor());
 
 		triangle = new Polygon();
 		triangle.getPoints().addAll(new Double[] { //
@@ -79,7 +80,7 @@ public class RowUI {
 
 	private void addWidgets() {
 
-		for (CrossButton btn : buttons) {
+		for (NumberFieldUI btn : buttons) {
 			rowPane.getChildren().add(btn.getPane());
 		}
 
@@ -96,11 +97,11 @@ public class RowUI {
 		return row;
 	}
 
-	public RowEndBox getRowEnd() {
+	public RowEndFieldUI getRowEnd() {
 		return rowEnd;
 	}
 	
-	public List<CrossButton> getButtons() {
+	public List<NumberFieldUI> getButtons() {
 		return buttons;
 	}
 
