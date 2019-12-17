@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.board.row.field.Field;
-import de.hsharz.qwixx.ui.GameBoardUI;
+import de.hsharz.qwixx.ui.board.GameBoardUI;
 
 public class QwixxController {
 

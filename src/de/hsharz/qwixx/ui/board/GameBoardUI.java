@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.board;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -12,7 +12,9 @@ import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.row.RowUI;
+import de.hsharz.qwixx.ui.GameListener;
+import de.hsharz.qwixx.ui.board.row.RowUI;
+import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.effect.DropShadow;
@@ -108,7 +110,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 	}
 
 	@Override
-	public void fieldCrossed(RowUI ui, CrossButton btn) {
+	public void fieldCrossed(RowUI ui, NumberFieldUI btn) {
 		doInput(new DicesSum(ui.getRow().getColor(), btn.getValue()));
 	}
 
@@ -117,7 +119,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 		RowUI rowToCrossUI = rows.get(rowToCross.getColor());
 
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
-		for (CrossButton btn : rowToCrossUI.getButtons()) {
+		for (NumberFieldUI btn : rowToCrossUI.getButtons()) {
 			if (btn.getValue() == fieldToCross.getValue()) {
 				System.out.println("Button found to enable");
 				btn.setLocked(true);
@@ -152,7 +154,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 	}
 
 	private void disableButtonsOfRow(RowUI row) {
-		for (CrossButton btn : row.getButtons()) {
+		for (NumberFieldUI btn : row.getButtons()) {
 			btn.setDisabled(true);
 		}
 	}
@@ -168,7 +170,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 				break;
 			}
 
-			CrossButton btn = row.getButtons().get(i);
+			NumberFieldUI btn = row.getButtons().get(i);
 			for (DicesSum d : dices) {
 				if ((DiceColor.WHITE.equals(d.getColor()) || row.getRow().getColor().equals(d.getColor()))
 						&& d.getSum() == btn.getValue()) {

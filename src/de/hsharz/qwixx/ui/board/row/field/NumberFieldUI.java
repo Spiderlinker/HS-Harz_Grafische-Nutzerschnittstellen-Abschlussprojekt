@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.board.row.field;
 
 import java.io.File;
 
@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-public class CrossButton {
+public class NumberFieldUI {
 
 	private int value;
 	private String color;
@@ -22,7 +22,7 @@ public class CrossButton {
 	private boolean disabled = false;
 	private boolean locked = false;
 
-	public CrossButton(int value, DiceColor textColor) {
+	public NumberFieldUI(int value, DiceColor textColor) {
 		this.value = value;
 		this.color = textColor.getAsHex();
 

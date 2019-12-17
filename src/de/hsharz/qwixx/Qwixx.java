@@ -6,7 +6,7 @@ import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.GameBoardUI;
+import de.hsharz.qwixx.ui.board.GameBoardUI;
 import de.hsharz.qwixx.ui.dice.DicePane;
 import javafx.application.Application;
 import javafx.geometry.HPos;
