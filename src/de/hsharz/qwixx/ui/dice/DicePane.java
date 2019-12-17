@@ -10,13 +10,14 @@ import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.application.Platform;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 
 public class DicePane extends AbstractPane<HBox> implements DiceListener {
 
 	private List<IDice> dices;
 	private List<DiceUI> dicesUI = new ArrayList<>();
 
-	private TilePane whitePane;
+	private VBox whitePane;
 	private TilePane colorPane;
 
 	public DicePane(List<IDice> dices) {
@@ -26,13 +27,12 @@ public class DicePane extends AbstractPane<HBox> implements DiceListener {
 
 		createWidgets();
 		addWidgets();
-
 	}
 
 	private void createWidgets() {
 		root.setSpacing(20);
 
-		whitePane = new TilePane(10, 10);
+		whitePane = new VBox(10);
 		colorPane = new TilePane(10, 10);
 
 		for (IDice dice : dices) {
