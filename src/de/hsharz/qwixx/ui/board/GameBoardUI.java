@@ -18,6 +18,7 @@ import de.hsharz.qwixx.ui.board.row.RowUI;
 import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
@@ -28,12 +29,15 @@ public class GameBoardUI extends AbstractPane<VBox>
 
 	private IPlayer player;
 
+	private Label lblName;
 	private Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
 	private ScoreLegend scoreLegend;
 	private UserScoreUI userScore;
 
 	private IPlayer playerWaitingForInput;
 	private DicesSum humanInput;
+
+	private DropShadow glowEffect;
 
 	public GameBoardUI(IPlayer player) {
 		super(new VBox());
@@ -51,8 +55,11 @@ public class GameBoardUI extends AbstractPane<VBox>
 	private void createWidgets() {
 		root.setSpacing(3);
 		root.setMinWidth(800);
-		root.setPadding(new Insets(20, 20, 0, 20));
+		root.setPadding(new Insets(10, 20, 0, 20));
 		root.setStyle("-fx-background-color: #E3E3E3;");
+
+		lblName = new Label(player.getName());
+		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
 
 		rows.put(DiceColor.RED, new RowUI(player.getGameBoard().getRedRow()));
 		rows.put(DiceColor.YELLOW, new RowUI(player.getGameBoard().getYellowRow()));
@@ -62,6 +69,11 @@ public class GameBoardUI extends AbstractPane<VBox>
 		scoreLegend = new ScoreLegend();
 		userScore = new UserScoreUI(player.getGameBoard().getScore());
 
+		glowEffect = new DropShadow();
+		glowEffect.setColor(Color.WHITE);
+		glowEffect.setWidth(30);
+		glowEffect.setHeight(30);
+		root.setEffect(glowEffect);
 	}
 
 	private void setupInteractions() {
@@ -75,10 +87,12 @@ public class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	private void addWidgets() {
+		root.getChildren().add(lblName);
 		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
 
 		root.getChildren().add(scoreLegend.getPane());
 		root.getChildren().add(userScore.getPane());
+
 	}
 
 	private void doInput(DicesSum input) {
@@ -181,14 +195,7 @@ public class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	public void highlightGameboard(boolean highlight) {
-		DropShadow glowEffect = null;
-		if (highlight) {
-			glowEffect = new DropShadow();
-			glowEffect.setColor(Color.RED);
-			glowEffect.setWidth(30);
-			glowEffect.setHeight(30);
-		}
-		root.setEffect(glowEffect);
+		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
 	}
 
 	@Override
