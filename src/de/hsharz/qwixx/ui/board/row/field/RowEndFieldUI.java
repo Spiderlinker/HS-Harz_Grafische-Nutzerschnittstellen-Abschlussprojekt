@@ -3,19 +3,19 @@ package de.hsharz.qwixx.ui.board.row.field;
 import java.io.File;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-public class RowEndFieldUI {
+public class RowEndFieldUI extends AbstractPane<StackPane> {
 
 	private DiceColor color;
-
-	private StackPane root;
 	private ImageView imgLock;
 	private ImageView imgCross;
 
 	public RowEndFieldUI(DiceColor color) {
+		super(new StackPane());
+
 		this.color = color;
 
 		createWidgets();
@@ -23,12 +23,11 @@ public class RowEndFieldUI {
 	}
 
 	private void createWidgets() {
-		root = new StackPane();
 		root.setScaleX(0.7);
 		root.setScaleY(0.7);
 		root.setScaleZ(0.7);
-		root.setStyle(
-				"-fx-background-color: white; -fx-background-radius: 100%; -fx-border-color: black; -fx-border-width: 1px; -fx-border-radius: 100%; ");
+		root.setStyle("-fx-background-color: white; -fx-background-radius: 100%; "
+				+ "-fx-border-color: black; -fx-border-width: 1px; -fx-border-radius: 100%; ");
 		root.setOpacity(0.8);
 
 		String img = "images/lock_" + color.toString().toLowerCase() + "_klein.png";
@@ -43,10 +42,6 @@ public class RowEndFieldUI {
 	private void addWidgets() {
 		root.getChildren().add(imgLock);
 		root.getChildren().add(imgCross);
-	}
-
-	public Pane getPane() {
-		return root;
 	}
 
 	public void setCrossed(boolean crossed) {

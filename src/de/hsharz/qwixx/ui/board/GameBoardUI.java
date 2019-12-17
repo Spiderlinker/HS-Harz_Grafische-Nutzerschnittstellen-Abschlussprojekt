@@ -12,6 +12,7 @@ import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.GameListener;
 import de.hsharz.qwixx.ui.board.row.RowUI;
 import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
@@ -19,13 +20,11 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener {
-
-	private VBox root;
+public class GameBoardUI extends AbstractPane<VBox>
+		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener {
 
 	private IPlayer player;
 
@@ -37,6 +36,8 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 	private DicesSum humanInput;
 
 	public GameBoardUI(IPlayer player) {
+		super(new VBox());
+
 		this.player = Objects.requireNonNull(player);
 		player.getGameBoard().addListener(this);
 
@@ -48,7 +49,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 	}
 
 	private void createWidgets() {
-		root = new VBox(3);
+		root.setSpacing(3);
 		root.setMinWidth(800);
 		root.setPadding(new Insets(20, 20, 0, 20));
 		root.setStyle("-fx-background-color: #E3E3E3;");
@@ -90,10 +91,6 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 				playerWaitingForInput.notify();
 			}
 		}
-	}
-
-	public Pane getPane() {
-		return root;
 	}
 
 	@Override
@@ -196,7 +193,7 @@ public class GameBoardUI implements GameListener, HumanInputSupplier, GameBoardL
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-			highlightGameboard(player.equals(nextPlayer));
+		highlightGameboard(player.equals(nextPlayer));
 	}
 
 }

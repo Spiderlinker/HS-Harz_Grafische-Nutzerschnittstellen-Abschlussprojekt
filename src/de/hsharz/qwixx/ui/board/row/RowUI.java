@@ -7,21 +7,20 @@ import java.util.Objects;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.board.row.field.RowEndField;
+import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.board.FieldCrossedListener;
 import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
 import de.hsharz.qwixx.ui.board.row.field.RowEndFieldUI;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.shape.Polygon;
 
-public class RowUI {
+public class RowUI extends AbstractPane<StackPane> {
 
 	private Row row;
 
-	private StackPane root;
 	private TilePane rowPane;
 	private List<NumberFieldUI> buttons = new ArrayList<>();
 	private RowEndFieldUI rowEnd;
@@ -31,6 +30,8 @@ public class RowUI {
 	private List<FieldCrossedListener> listeners = new ArrayList<>();
 
 	public RowUI(Row row) {
+		super(new StackPane());
+
 		this.row = Objects.requireNonNull(row);
 
 		createWidgets();
@@ -43,7 +44,6 @@ public class RowUI {
 	}
 
 	private void createWidgets() {
-		root = new StackPane();
 		root.setStyle("-fx-background-color: " + row.getColor().getAsHex() + ";");
 		root.setPadding(new Insets(5, 10, 5, 0));
 
@@ -100,13 +100,9 @@ public class RowUI {
 	public RowEndFieldUI getRowEnd() {
 		return rowEnd;
 	}
-	
+
 	public List<NumberFieldUI> getButtons() {
 		return buttons;
-	}
-
-	public Pane getPane() {
-		return root;
 	}
 
 }

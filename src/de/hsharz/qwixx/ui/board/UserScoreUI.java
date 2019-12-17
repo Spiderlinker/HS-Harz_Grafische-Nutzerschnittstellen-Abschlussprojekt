@@ -4,17 +4,15 @@ import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.UserScore;
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 
-public class UserScoreUI {
+public class UserScoreUI extends AbstractPane<HBox> {
 
 	private static final int FONT_SIZE_OPERATOR = 32;
-
-	private HBox root;
 
 	private Label lblScoreRedRow;
 	private Label lblScoreYellowRow;
@@ -27,6 +25,8 @@ public class UserScoreUI {
 	private UserScore userScore;
 
 	public UserScoreUI(UserScore userScore) {
+		super(new HBox());
+
 		this.userScore = Objects.requireNonNull(userScore);
 
 		createWidgets();
@@ -35,8 +35,7 @@ public class UserScoreUI {
 	}
 
 	private void createWidgets() {
-
-		root = new HBox(5);
+		root.setSpacing(5);
 		root.setPadding(new Insets(10, 20, 20, 20));
 		root.setAlignment(Pos.CENTER);
 		root.setStyle("-fx-background-color: #BDBDBD;");
@@ -93,10 +92,6 @@ public class UserScoreUI {
 
 		lblScoreMisses.setText(Integer.toString(userScore.getScoreMisses()));
 		lblScoreResult.setText(Integer.toString(userScore.getScoreComplete()));
-	}
-
-	public Pane getPane() {
-		return root;
 	}
 
 }

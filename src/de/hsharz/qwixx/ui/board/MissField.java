@@ -2,50 +2,50 @@ package de.hsharz.qwixx.ui.board;
 
 import java.io.File;
 
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-public class MissField {
+public class MissField extends AbstractPane<StackPane> {
 
-	private StackPane pane;
 	private ImageView imgView;
 
 	private boolean disabled = false;
 	private boolean selected = false;
 
 	public MissField() {
+		super(new StackPane());
+
 		createWidgets();
 		setupBindings();
 	}
 
 	private void createWidgets() {
-		pane = new StackPane();
-		pane.setPrefSize(30, 40);
-		pane.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
+		root.setPrefSize(30, 40);
+		root.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
 				+ "-fx-background-color: white; -fx-background-radius: 11px;");
 
 		imgView = new ImageView(new File("images/cross_klein.png").toURI().toString());
 		imgView.setVisible(false);
 		imgView.setMouseTransparent(true);
 
-		pane.getChildren().add(imgView);
+		root.getChildren().add(imgView);
 	}
 
 	private void setupBindings() {
-		pane.setOnMouseEntered(event -> {
+		root.setOnMouseEntered(event -> {
 			if (!isDisabled() && !isSelected()) {
 				imgView.setOpacity(0.6);
 				imgView.setVisible(true);
 			}
 		});
-		pane.setOnMouseExited(event -> {
+		root.setOnMouseExited(event -> {
 			if (!isDisabled() && !isSelected()) {
 				imgView.setVisible(false);
 			}
 		});
 
-		pane.setOnMousePressed(event -> {
+		root.setOnMousePressed(event -> {
 			if (!isDisabled()) {
 				selected = !selected;
 				imgView.setOpacity(1);
@@ -59,9 +59,9 @@ public class MissField {
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 		if (disabled) {
-			pane.setOpacity(0.6);
+			root.setOpacity(0.6);
 		} else {
-			pane.setOpacity(1);
+			root.setOpacity(1);
 		}
 	}
 
@@ -76,10 +76,6 @@ public class MissField {
 
 	public boolean isDisabled() {
 		return disabled;
-	}
-
-	public Pane getPane() {
-		return this.pane;
 	}
 
 }

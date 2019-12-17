@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.board.utils.BreakLabel;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -11,14 +12,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
-public class ScoreLegend {
+public class ScoreLegend extends AbstractPane<HBox> {
 
 	private static List<Integer> scoreLegend = Arrays.asList(1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78);
-
-	private HBox root;
 
 	private GridPane gridMisses;
 	private List<MissField> missFields = new LinkedList<>();
@@ -26,6 +24,7 @@ public class ScoreLegend {
 	private List<BreakLabel> scoreLegendLabels = new LinkedList<>();
 
 	public ScoreLegend() {
+		super(new HBox());
 
 		createWidgets();
 //		setupInteractions();
@@ -33,8 +32,7 @@ public class ScoreLegend {
 	}
 
 	private void createWidgets() {
-
-		root = new HBox(2);
+		root.setSpacing(2);
 		root.setPadding(new Insets(5, 0, 5, 0));
 		root.setAlignment(Pos.CENTER);
 
@@ -89,9 +87,4 @@ public class ScoreLegend {
 		return missFields;
 	}
 
-	public Pane getPane() {
-		return root;
-	}
-
-	
 }

@@ -3,19 +3,18 @@ package de.hsharz.qwixx.ui.board.row.field;
 import java.io.File;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-public class NumberFieldUI {
+public class NumberFieldUI extends AbstractPane<StackPane> {
 
 	private int value;
 	private String color;
 
-	private StackPane pane;
 	private ToggleButton btn;
 	private ImageView imgView;
 
@@ -23,6 +22,8 @@ public class NumberFieldUI {
 	private boolean locked = false;
 
 	public NumberFieldUI(int value, DiceColor textColor) {
+		super(new StackPane());
+
 		this.value = value;
 		this.color = textColor.getAsHex();
 
@@ -31,8 +32,6 @@ public class NumberFieldUI {
 	}
 
 	private void createWidgets() {
-		pane = new StackPane();
-
 		btn = new ToggleButton(Integer.toString(value));
 		btn.setStyle("-fx-background-color: white; -fx-text-fill: " + color + "; -fx-font-size: 18pt;");
 		btn.setOpacity(0.85);
@@ -47,24 +46,24 @@ public class NumberFieldUI {
 		imgView.setVisible(false);
 		imgView.setMouseTransparent(true);
 
-		pane.getChildren().add(btn);
-		pane.getChildren().add(imgView);
+		root.getChildren().add(btn);
+		root.getChildren().add(imgView);
 	}
 
 	private void setupBindings() {
-		pane.setOnMouseEntered(event -> {
+		root.setOnMouseEntered(event -> {
 			if (!locked && !disabled && !btn.isSelected()) {
 				imgView.setOpacity(0.6);
 				imgView.setVisible(true);
 			}
 		});
-		pane.setOnMouseExited(event -> {
+		root.setOnMouseExited(event -> {
 			if (!locked && !btn.isSelected()) {
 				imgView.setVisible(false);
 			}
 		});
 
-		pane.setOnMousePressed(event -> {
+		root.setOnMousePressed(event -> {
 			if (!locked && !disabled && MouseButton.PRIMARY == event.getButton()) {
 				btn.setSelected(!btn.isSelected());
 				imgView.setOpacity(1);
@@ -78,9 +77,9 @@ public class NumberFieldUI {
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 		if (disabled) {
-			pane.setOpacity(0.6);
+			root.setOpacity(0.6);
 		} else {
-			pane.setOpacity(1);
+			root.setOpacity(1);
 		}
 	}
 
@@ -99,14 +98,10 @@ public class NumberFieldUI {
 	public ToggleButton getButton() {
 		return this.btn;
 	}
-	
+
 	public void showCrossImage() {
 		imgView.setOpacity(1);
 		imgView.setVisible(true);
-	}
-	
-	public Pane getPane() {
-		return this.pane;
 	}
 
 	public int getValue() {
