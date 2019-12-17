@@ -2,20 +2,37 @@ package de.hsharz.qwixx.model.board.row;
 
 public class RowUtils {
 
+	public static final int NO_FIELD_CROSSED = -1;
+
+	private RowUtils() {
+		// Utility class
+	}
+
 	public static boolean isCrossedAfterValue(Row row, int value) {
-		int indexOfValue = -1;
-		for (int i = 0; i < row.getFields().size(); i++) {
-			if (row.getFields().get(i).getValue() == value) {
-				indexOfValue = i;
-				break;
-			}
+		int lastCrossedValue = getLastCrossedValue(row);
+
+		if (lastCrossedValue == NO_FIELD_CROSSED) {
+			return false;
 		}
-		for (int i = indexOfValue; i < row.getFields().size(); i++) {
+
+		if (row.getOrder().equals(Order.ASC)) {
+			return lastCrossedValue >= value;
+		}
+		return lastCrossedValue <= value;
+	}
+
+	public static int getLastCrossedValue(Row row) {
+		int index = getLastCrossedIndex(row);
+		return index == NO_FIELD_CROSSED ? index : row.getFields().get(index).getValue();
+	}
+
+	public static int getLastCrossedIndex(Row row) {
+		for (int i = row.getFields().size() - 1; i >= 0; i--) {
 			if (row.getFields().get(i).isCrossed()) {
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return NO_FIELD_CROSSED;
 	}
 
 }
