@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.board.row.Row;
+import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
@@ -50,8 +51,10 @@ public class Computer extends Player {
 		DicesSum bestDices = null;
 
 		Map<DicesSum, Integer> distance = getDistancesForDices(dices);
-		Entry<DicesSum, Integer> entry = distance.entrySet().stream().filter(e -> e.getValue() >= 0)
-				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second).get();
+		Entry<DicesSum, Integer> entry = distance.entrySet().stream()//
+				.filter(e -> e.getValue() >= 0)//
+				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second)//
+				.get();
 
 		System.out.println("Distances: " + distance);
 		System.out.println("Filtered dice: " + entry);
@@ -74,64 +77,53 @@ public class Computer extends Player {
 			}
 
 			int distance = Integer.MAX_VALUE;
-			Field lastCrossedFieldOfRow = null;
+			int lastCrossedValue= -1;
 
 			switch (dice.getColor()) {
 			case RED:
-				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getRedRow());
+				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getRedRow());
 
-				if (lastCrossedFieldOfRow == null) {
+				if (lastCrossedValue == -1) {
 					distance = dice.getSum() - 2;
 				} else {
-					distance = dice.getSum() - lastCrossedFieldOfRow.getValue();
+					distance = dice.getSum() - lastCrossedValue;
 				}
 				break;
 			case YELLOW:
-				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getYellowRow());
+				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getYellowRow());
 
-				if (lastCrossedFieldOfRow == null) {
+				if (lastCrossedValue == -1) {
 					distance = dice.getSum() - 2;
 				} else {
-					distance = dice.getSum() - lastCrossedFieldOfRow.getValue();
+					distance = dice.getSum() - lastCrossedValue;
 				}
 				break;
 			case GREEN:
-				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getGreenRow());
+				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getGreenRow());
 
-				if (lastCrossedFieldOfRow == null) {
+				if (lastCrossedValue == -1) {
 					distance = 12 - dice.getSum();
 				} else {
-					distance = lastCrossedFieldOfRow.getValue() - dice.getSum();
+					distance = lastCrossedValue - dice.getSum();
 				}
 				break;
 			case BLUE:
-				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getBlueRow());
+				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getBlueRow());
 
-				if (lastCrossedFieldOfRow == null) {
+				if (lastCrossedValue == -1) {
 					distance = 12 - dice.getSum();
 				} else {
-					distance = lastCrossedFieldOfRow.getValue() - dice.getSum();
+					distance = lastCrossedValue - dice.getSum();
 				}
 				break;
 			default:
 //				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getRedRow());
 			}
 
-
 			distances.put(dice, distance);
 		}
 
 		return distances;
-	}
-
-	private Field getLastCrossedFieldOfRow(Row row) {
-		for (int i = row.getFields().size() - 1; i >= 0; i--) {
-			Field field = row.getFields().get(i);
-			if (field.isCrossed()) {
-				return field;
-			}
-		}
-		return null;
 	}
 
 }
