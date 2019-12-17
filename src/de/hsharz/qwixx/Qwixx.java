@@ -1,83 +1,62 @@
 package de.hsharz.qwixx;
 
+import java.io.File;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.board.GameBoardUI;
-import de.hsharz.qwixx.ui.dice.DicePane;
+import de.hsharz.qwixx.ui.GameUI;
 import javafx.application.Application;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class Qwixx extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		GridPane root = new GridPane();
-		root.setGridLinesVisible(true);
+		BorderPane root = new BorderPane();
+
 		Game game = new Game();
 
 		{
 			GameBoard board = new GameBoard();
 			board.setRowClosedSupplier(game);
-			IPlayer player = new Human("Peter",board);
-			GameBoardUI ui = new GameBoardUI(player);
-			game.addGameListener(ui);
-			((Human) player).setHumanInputSupplier(ui);
+			IPlayer player = new Human("Peter", board);
 			game.addPlayer(player);
-
-			ui.getPane().setScaleX(0.65);
-			ui.getPane().setScaleY(0.65);
-			root.add(new Group(ui.getPane()), 1, 2);
 		}
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 2; i++) {
 			GameBoard board = new GameBoard();
 			board.setRowClosedSupplier(game);
 
 			IPlayer player = new Computer("Computer #" + i, board);
-			GameBoardUI ui = new GameBoardUI(player);
-			game.addGameListener(ui);
-			
 			game.addPlayer(player);
-
-			ui.getPane().setScaleX(0.6);
-			ui.getPane().setScaleY(0.6);
-			
-			switch(i) {
-			case 0:
-				root.add(new Group(ui.getPane()), 0, 1);
-				break;
-			case 1:
-				root.add(new Group(ui.getPane()), 1, 0);
-				break;
-			case 2:
-				root.add(new Group(ui.getPane()), 2, 1);
-				break;
-			
-			}
 		}
 
-		DicePane dicePane = new DicePane(game.getDices());
-		game.addDiceListener(dicePane);
+		GameUI gameUI = new GameUI(game);
+		root.setCenter(gameUI.getPane());
 
-		root.add(dicePane.getPane(), 1, 1);
-
-		GridPane.setHalignment(dicePane.getPane(), HPos.CENTER);
-		GridPane.setValignment(dicePane.getPane(), VPos.CENTER);
-		
 		new Thread(game::startGame).start();
+
+//		Background background = new Background(new BackgroundImage(new Image(new File("images/background.jpg").toURI().toString()),
+//				BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
+//				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)));
+//		root.setBackground(background);
 
 		primaryStage.setOnCloseRequest(e -> System.exit(0));
 		primaryStage.setTitle("Hello World");
 		primaryStage.setScene(new Scene(root, 900, 600));
+		primaryStage.setFullScreen(true);
+
 		primaryStage.show();
 
 	}
