@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import de.hsharz.qwixx.model.board.GameBoard;
-import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowUtils;
-import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 
@@ -51,16 +50,16 @@ public class Computer extends Player {
 		DicesSum bestDices = null;
 
 		Map<DicesSum, Integer> distance = getDistancesForDices(dices);
-		Entry<DicesSum, Integer> entry = distance.entrySet().stream()//
+		Optional<Entry<DicesSum, Integer>> entry = distance.entrySet().stream()//
+				.filter(e -> !getGameBoard().getRowClosedSupplier().isRowClosed(e.getKey().getColor())) //
 				.filter(e -> e.getValue() >= 0)//
-				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second)//
-				.get();
+				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second);
 
 		System.out.println("Distances: " + distance);
 		System.out.println("Filtered dice: " + entry);
-		if (entry.getValue() <= 2) {
+		if (entry.isPresent() && entry.get().getValue() <= 2) {
 			System.out.println("Found dices <= 2 " + entry);
-			bestDices = entry.getKey();
+			bestDices = entry.get().getKey();
 		} else {
 			bestDices = DicesSum.EMPTY;
 			System.out.println("No dice found");
@@ -77,7 +76,7 @@ public class Computer extends Player {
 			}
 
 			int distance = Integer.MAX_VALUE;
-			int lastCrossedValue= -1;
+			int lastCrossedValue = -1;
 
 			switch (dice.getColor()) {
 			case RED:
