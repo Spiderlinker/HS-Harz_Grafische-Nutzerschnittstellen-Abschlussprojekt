@@ -39,6 +39,7 @@ public class DiceUI extends AbstractPane<GridPane> {
 
 		addColumnRowConstraints();
 		createDiceEyes();
+		hideDiceEyes();
 	}
 
 	private void addColumnRowConstraints() {
