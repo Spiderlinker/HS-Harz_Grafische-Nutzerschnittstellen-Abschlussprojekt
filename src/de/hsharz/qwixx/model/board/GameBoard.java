@@ -175,6 +175,10 @@ public class GameBoard {
 		userScore.setScoreMisses(AMOUNT_MISSES - remainingMisses);
 	}
 
+	public RowsClosedSupplier getRowClosedSupplier() {
+		return rowClosedSupplier;
+	}
+
 	public UserScore getScore() {
 		return userScore;
 	}
