@@ -175,6 +175,9 @@ public class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	private void highlightButtonsOfDicesForRow(RowUI row, List<DicesSum> dices) {
+		if (player.getGameBoard().getRowClosedSupplier().isRowClosed(row.getRow().getColor())) {
+			return;
+		}
 
 		for (int i = row.getButtons().size() - 1; i >= 0; i--) {
 			if (row.getRow().getFields().get(i).isCrossed()) {
@@ -201,6 +204,10 @@ public class GameBoardUI extends AbstractPane<VBox>
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		highlightGameboard(player.equals(nextPlayer));
+	}
+
+	public IPlayer getPlayer() {
+		return player;
 	}
 
 }
