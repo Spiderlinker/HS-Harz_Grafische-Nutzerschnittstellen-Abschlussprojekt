@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Queue;
@@ -20,7 +21,7 @@ import de.hsharz.qwixx.ui.dice.DiceListener;
 
 public class Game implements RowsClosedSupplier {
 
-	private Set<IPlayer> player = new HashSet<>();
+	private List<IPlayer> player = new LinkedList<>();
 
 	private List<IDice> dices = new ArrayList<>();
 	private IDice diceWhite1 = new Dice(DiceColor.WHITE);
@@ -89,7 +90,7 @@ public class Game implements RowsClosedSupplier {
 		return dices;
 	}
 
-	public Set<IPlayer> getPlayer() {
+	public List<IPlayer> getPlayer() {
 		return player;
 	}
 
