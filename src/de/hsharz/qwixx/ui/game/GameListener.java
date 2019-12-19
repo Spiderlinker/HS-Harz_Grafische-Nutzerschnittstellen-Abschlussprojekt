@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.game;
 
 import de.hsharz.qwixx.model.player.IPlayer;
 

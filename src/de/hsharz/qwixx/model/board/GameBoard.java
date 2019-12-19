@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.hsharz.qwixx.model.board.row.Order;
 import de.hsharz.qwixx.model.board.row.Row;
-import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;

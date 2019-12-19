@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.board;
+package de.hsharz.qwixx.ui.game.board;
 
 import java.util.Objects;
 

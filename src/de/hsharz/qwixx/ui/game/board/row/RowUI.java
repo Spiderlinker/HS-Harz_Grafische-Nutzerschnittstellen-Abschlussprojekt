@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.board.row;
+package de.hsharz.qwixx.ui.game.board.row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,9 @@ import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.board.row.field.RowEndField;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.board.FieldCrossedListener;
-import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
-import de.hsharz.qwixx.ui.board.row.field.RowEndFieldUI;
+import de.hsharz.qwixx.ui.game.board.FieldCrossedListener;
+import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
+import de.hsharz.qwixx.ui.game.board.row.field.RowEndFieldUI;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;

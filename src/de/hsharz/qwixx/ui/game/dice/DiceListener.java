@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.dice;
+package de.hsharz.qwixx.ui.game.dice;
 
 public interface DiceListener {
 

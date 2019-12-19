@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.board.row.field;
+package de.hsharz.qwixx.ui.game.board.row.field;
 
 import java.io.File;
 

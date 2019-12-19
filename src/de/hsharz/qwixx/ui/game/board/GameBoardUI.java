@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.board;
+package de.hsharz.qwixx.ui.game.board;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -13,9 +13,9 @@ import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.GameListener;
-import de.hsharz.qwixx.ui.board.row.RowUI;
-import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
+import de.hsharz.qwixx.ui.game.GameListener;
+import de.hsharz.qwixx.ui.game.board.row.RowUI;
+import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;

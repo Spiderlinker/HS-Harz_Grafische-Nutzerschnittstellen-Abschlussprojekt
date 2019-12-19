@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
-import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -185,7 +184,7 @@ class GameBoardTest {
 			board.crossMiss();
 		}
 
-		Assertions.assertThrows(IllegalAccessError.class, () -> board.crossMiss());
+		Assertions.assertThrows(IllegalAccessError.class, board::crossMiss);
 	}
 
 }

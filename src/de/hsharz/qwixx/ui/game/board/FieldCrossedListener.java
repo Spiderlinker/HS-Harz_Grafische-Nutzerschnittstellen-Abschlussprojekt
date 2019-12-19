@@ -1,7 +1,7 @@
-package de.hsharz.qwixx.ui.board;
+package de.hsharz.qwixx.ui.game.board;
 
-import de.hsharz.qwixx.ui.board.row.RowUI;
-import de.hsharz.qwixx.ui.board.row.field.NumberFieldUI;
+import de.hsharz.qwixx.ui.game.board.row.RowUI;
+import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 
 public interface FieldCrossedListener {
 

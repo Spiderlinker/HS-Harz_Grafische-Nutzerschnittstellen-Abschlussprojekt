@@ -1,11 +1,11 @@
-package de.hsharz.qwixx.ui.board;
+package de.hsharz.qwixx.ui.game.board;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.board.utils.BreakLabel;
+import de.hsharz.qwixx.ui.game.board.utils.BreakLabel;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

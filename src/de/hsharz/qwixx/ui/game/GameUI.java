@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui;
+package de.hsharz.qwixx.ui.game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,9 @@ import java.util.Objects;
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.board.GameBoardUI;
-import de.hsharz.qwixx.ui.dice.DicePane;
+import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.game.board.GameBoardUI;
+import de.hsharz.qwixx.ui.game.dice.DicePane;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;

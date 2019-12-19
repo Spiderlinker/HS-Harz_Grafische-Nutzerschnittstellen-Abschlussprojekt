@@ -1,7 +1,5 @@
 package de.hsharz.qwixx.model.dice;
 
-import java.util.Objects;
-
 public class DicesSum {
 
 	public static final DicesSum EMPTY = new DicesSum(null, -1);

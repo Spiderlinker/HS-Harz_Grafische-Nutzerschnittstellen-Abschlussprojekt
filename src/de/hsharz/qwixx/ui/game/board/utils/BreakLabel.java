@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.board.utils;
+package de.hsharz.qwixx.ui.game.board.utils;
 
 import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.geometry.Insets;

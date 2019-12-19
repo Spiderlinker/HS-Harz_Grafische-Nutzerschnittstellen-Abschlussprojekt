@@ -16,8 +16,8 @@ import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.GameListener;
-import de.hsharz.qwixx.ui.dice.DiceListener;
+import de.hsharz.qwixx.ui.game.GameListener;
+import de.hsharz.qwixx.ui.game.dice.DiceListener;
 
 public class Game implements RowsClosedSupplier {
 

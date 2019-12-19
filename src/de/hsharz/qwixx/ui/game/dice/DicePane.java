@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.dice;
+package de.hsharz.qwixx.ui.game.dice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.GameListener;
+import de.hsharz.qwixx.ui.game.GameListener;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

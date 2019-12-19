@@ -8,11 +8,11 @@ import de.hsharz.qwixx.model.dice.DicesSum;
 public interface IPlayer {
 
 	DicesSum chooseWhiteDices(List<DicesSum> dices);
-	
+
 	DicesSum chooseColorDices(List<DicesSum> dices);
-	
+
 	GameBoard getGameBoard();
-	
+
 	String getName();
-	
+
 }

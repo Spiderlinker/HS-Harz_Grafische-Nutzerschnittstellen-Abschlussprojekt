@@ -1,7 +1,5 @@
 package de.hsharz.qwixx.model.board.row.field;
 
-import de.hsharz.qwixx.utils.StringUtils;
-
 public abstract class AbstractField implements Field {
 
 	protected int value;
