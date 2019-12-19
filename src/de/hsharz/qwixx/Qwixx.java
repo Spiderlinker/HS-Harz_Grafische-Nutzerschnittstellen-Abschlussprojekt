@@ -1,29 +1,24 @@
 package de.hsharz.qwixx;
 
-import java.io.File;
-
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.GameUI;
+import de.hsharz.qwixx.ui.StartScreen;
+import de.hsharz.qwixx.ui.game.GameUI;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Qwixx extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		BorderPane root = new BorderPane();
+		StackPane root = new StackPane();
+
+//		root.setStyle("-fx-background-color: black;");
 
 		Game game = new Game();
 
@@ -34,7 +29,7 @@ public class Qwixx extends Application {
 			game.addPlayer(player);
 		}
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 4; i++) {
 			GameBoard board = new GameBoard();
 			board.setRowClosedSupplier(game);
 
@@ -43,7 +38,7 @@ public class Qwixx extends Application {
 		}
 
 		GameUI gameUI = new GameUI(game);
-		root.setCenter(gameUI.getPane());
+//		root.setCenter(gameUI.getPane());
 
 		new Thread(game::startGame).start();
 
@@ -52,10 +47,13 @@ public class Qwixx extends Application {
 //				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)));
 //		root.setBackground(background);
 
+		
+		root.getChildren().add(new StartScreen().getPane());
+		
 		primaryStage.setOnCloseRequest(e -> System.exit(0));
 		primaryStage.setTitle("Hello World");
-		primaryStage.setScene(new Scene(root, 900, 600));
-		primaryStage.setFullScreen(true);
+		primaryStage.setScene(new Scene(root, 400, 500));
+//		primaryStage.setFullScreen(true);
 
 		primaryStage.show();
 
