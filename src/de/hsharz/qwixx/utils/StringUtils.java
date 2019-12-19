@@ -2,6 +2,10 @@ package de.hsharz.qwixx.utils;
 
 public class StringUtils {
 	
+	private StringUtils() {
+		// Utility class
+	}
+	
 	/**
 	 * Returns the passed String if it is not null. Otherwise a NullPointerException
 	 * will be thrown.
