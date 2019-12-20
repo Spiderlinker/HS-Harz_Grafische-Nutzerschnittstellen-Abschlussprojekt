@@ -1,5 +1,7 @@
 package de.hsharz.qwixx.ui;
 
+import java.util.Objects;
+
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -13,26 +15,30 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class StartScreen extends AbstractPane<VBox> {
 
+	private Stage stage;
+
 	private Label lblQwixx;
-
 	private Separator separator;
-
 	private Button btnPlay;
 	private Button btnStatistics;
 	private Button btnExit;
 
 	private StartGameScreen startGameScreen;
 
-	public StartScreen() {
+	public StartScreen(Stage stage) {
 		super(new VBox());
+
+		this.stage = Objects.requireNonNull(stage);
 
 		createWidgets();
 		setupInteractions();
@@ -90,11 +96,11 @@ public class StartScreen extends AbstractPane<VBox> {
 
 	private void showStartGameScreen() {
 		if (startGameScreen == null) {
-			startGameScreen = new StartGameScreen(getPane());
+			startGameScreen = new StartGameScreen(stage, getPane());
 		}
 
 		Scene scene = getPane().getScene();
-		VBox paneToShow = startGameScreen.getPane();
+		Pane paneToShow = startGameScreen.getPane();
 
 		paneToShow.translateXProperty().set(scene.getWidth());
 
