@@ -6,7 +6,6 @@ public abstract class AbstractField implements Field {
 	protected boolean crossed;
 
 	public AbstractField(int value) {
-//		this.value = StringUtils.requireNonNullOrEmpty(value);
 		this.value = value;
 	}
 
