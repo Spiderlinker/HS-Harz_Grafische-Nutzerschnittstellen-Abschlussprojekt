@@ -2,6 +2,8 @@ package de.hsharz.qwixx.ui;
 
 import java.util.Objects;
 
+import com.jfoenix.controls.JFXButton;
+
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -12,7 +14,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Pane;
@@ -29,9 +30,9 @@ public class StartScreen extends AbstractPane<VBox> {
 
 	private Label lblQwixx;
 	private Separator separator;
-	private Button btnPlay;
-	private Button btnStatistics;
-	private Button btnExit;
+	private JFXButton btnPlay;
+	private JFXButton btnStatistics;
+	private JFXButton btnExit;
 
 	private StartGameScreen startGameScreen;
 
@@ -47,27 +48,29 @@ public class StartScreen extends AbstractPane<VBox> {
 	}
 
 	private void createWidgets() {
+		startGameScreen = new StartGameScreen(stage, getPane());
+
 		root.setPadding(new Insets(50));
 		root.setSpacing(20);
 		root.setAlignment(Pos.CENTER);
-		root.setStyle("-fx-background-color: white;");
+		root.setStyle("-fx-background-color: linear-gradient(to bottom, #5643fa, #2998ff);");
 
 		lblQwixx = new Label("Qwixx");
-		lblQwixx.setStyle("-fx-font-size: 40pt;");
+		lblQwixx.setStyle("-fx-font-size: 72pt; -fx-font-family: Gabriola; -fx-text-fill: white;");
 		lblQwixx.setAlignment(Pos.CENTER);
 
 		separator = new Separator(Orientation.HORIZONTAL);
 
-		btnPlay = new Button("Spiel starten");
-		btnPlay.setStyle("-fx-font-size: 16pt;");
+		btnPlay = new JFXButton("Spiel starten");
+		btnPlay.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
 		btnPlay.setMaxWidth(Double.MAX_VALUE);
 
-		btnStatistics = new Button("Statistik");
-		btnStatistics.setStyle("-fx-font-size: 16pt;");
+		btnStatistics = new JFXButton("Statistik");
+		btnStatistics.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
 		btnStatistics.setMaxWidth(Double.MAX_VALUE);
 
-		btnExit = new Button("Verlassen");
-		btnExit.setStyle("-fx-font-size: 16pt;");
+		btnExit = new JFXButton("Verlassen");
+		btnExit.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
 		btnExit.setMaxWidth(Double.MAX_VALUE);
 	}
 
@@ -95,10 +98,6 @@ public class StartScreen extends AbstractPane<VBox> {
 	}
 
 	private void showStartGameScreen() {
-		if (startGameScreen == null) {
-			startGameScreen = new StartGameScreen(stage, getPane());
-		}
-
 		Scene scene = getPane().getScene();
 		Pane paneToShow = startGameScreen.getPane();
 
