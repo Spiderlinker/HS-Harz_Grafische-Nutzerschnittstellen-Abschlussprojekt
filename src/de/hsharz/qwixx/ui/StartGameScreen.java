@@ -2,6 +2,12 @@ package de.hsharz.qwixx.ui;
 
 import java.util.Objects;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.validation.RequiredFieldValidator;
+
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.player.Computer;
@@ -12,29 +18,31 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -44,11 +52,11 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 
 	private Label lblCreateGame;
 	private Label lblChoosePlayer;
-	private Button btnBack;
-	private Button btnPlay;
+	private JFXButton btnBack;
+	private JFXButton btnPlay;
 
-	private TextField textName;
-	private ChoiceBox<Integer> boxChoosePlayer;
+	private JFXTextField textName;
+	private JFXComboBox<Integer> boxChoosePlayer;
 
 	private Pane previousPane;
 
@@ -69,23 +77,31 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		root.setVgap(20);
 		root.setStyle("-fx-background-color: white;");
 
-		btnBack = new Button("Zurück");
+		btnBack = new JFXButton("Zurück");
 		btnBack.setStyle("-fx-border: none;");
 
-		btnPlay = new Button("Spiel starten");
+		btnPlay = new JFXButton("Spiel starten");
 		btnPlay.setStyle("-fx-font-size: 16pt;");
 		btnPlay.setMaxWidth(Double.MAX_VALUE);
 
-		textName = new TextField();
+		textName = new JFXTextField();
 		textName.setPromptText("Wie heißt du?");
 		textName.setStyle("-fx-font-size: 16pt;");
 
-		boxChoosePlayer = new ChoiceBox<>(FXCollections.observableArrayList(1, 2, 3, 4));
+		RequiredFieldValidator validator = new RequiredFieldValidator("Bitte gib deinen Namen ein");
+		textName.getValidators().add(validator);
+		textName.focusedProperty().addListener((o, oldValue, newValue) -> {
+			if (!newValue.booleanValue()) {
+				textName.validate();
+			}
+		});
+
+		boxChoosePlayer = new JFXComboBox<>(FXCollections.observableArrayList(1, 2, 3, 4));
 		boxChoosePlayer.getSelectionModel().select(2);
 		boxChoosePlayer.setStyle("-fx-font-size: 16pt;");
 
 		lblCreateGame = new Label("Spiel erstellen");
-		lblCreateGame.setStyle("-fx-font-size: 32pt;");
+		lblCreateGame.setStyle("-fx-font-size: 50pt; -fx-font-family: Gabriola; ");
 		lblChoosePlayer = new Label("Anzahl deiner Mitspieler: ");
 		lblChoosePlayer.setStyle("-fx-font-size: 16pt;");
 
@@ -148,38 +164,80 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 	}
 
 	private void startNewGame() {
-		Game game = new Game();
 
-		{
-			GameBoard board = new GameBoard();
-			board.setRowClosedSupplier(game);
-			IPlayer player = new Human(textName.getText(), board);
-			game.addPlayer(player);
+		if (textName.getText().trim().isEmpty()) {
+			textName.requestFocus();
+			return;
 		}
 
-		for (int i = 0; i < boxChoosePlayer.getSelectionModel().getSelectedItem(); i++) {
-			GameBoard board = new GameBoard();
-			board.setRowClosedSupplier(game);
+		JFXDialog loadingDialog = new JFXDialog();
+		loadingDialog.setContent(new ProgressIndicator(-1));
+		loadingDialog.show((StackPane) stage.getScene().getRoot());
 
-			IPlayer player = new Computer("Computer #" + (i + 1), board);
-			game.addPlayer(player);
-		}
+		new Thread(() -> {
+			Game game = new Game();
 
-		GameUI gameUI = new GameUI(game);
-		GridPane pane = gameUI.getPane();
+			{
+				GameBoard board = new GameBoard();
+				board.setRowClosedSupplier(game);
+				IPlayer player = new Human(textName.getText(), board);
+				game.addPlayer(player);
+			}
 
-		stage.getScene().setRoot(new ScrollPane(pane));
-		stage.setFullScreen(true);
+			for (int i = 0; i < boxChoosePlayer.getSelectionModel().getSelectedItem(); i++) {
+				GameBoard board = new GameBoard();
+				board.setRowClosedSupplier(game);
 
-		double scaleX = stage.getWidth() / pane.getWidth();
-		double scaleY = stage.getHeight() / pane.getHeight();
-		double scale = Math.min(scaleX, scaleY);
-		
-		pane.setScaleX(scale);
-		pane.setScaleY(scale);
-		stage.getScene().setRoot(new BorderPane(new Group(pane)));
+				IPlayer player = new Computer("Computer #" + (i + 1), board);
+				game.addPlayer(player);
+			}
 
-		new Thread(game::startGame).start();
+			GameUI gameUI = new GameUI(game);
+			GridPane pane = gameUI.getPane();
+
+			Scene scene = new Scene(pane);
+			pane.applyCss();
+			pane.layout();
+
+			ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(this.stage.getX(),
+					this.stage.getY(), this.stage.getWidth(), this.stage.getHeight());
+			Screen screen = screensForRectangle.get(0);
+
+			double scaleX = screen.getBounds().getWidth() / pane.getBoundsInLocal().getWidth();
+			double scaleY = screen.getBounds().getHeight() / pane.getBoundsInLocal().getHeight();
+			double scale = Math.min(scaleX, scaleY);
+
+			System.out.println("Scaling to: " + scale);
+
+			pane.setScaleX(scale);
+			pane.setScaleY(scale);
+
+			Platform.runLater(() -> {
+				Stage stage = new Stage();
+				stage.setScene(scene);
+				stage.setFullScreen(true);
+				stage.setFullScreenExitHint("Drücke 'Escape', um das Spiel zu verlassen");
+				stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+				stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+					Alert gameExitAlert = new Alert(AlertType.CONFIRMATION, null,
+							ButtonType.YES, ButtonType.NO);
+					gameExitAlert.initOwner(stage);
+					gameExitAlert.setHeaderText("Möchtest du das Spiel wirklich verlassen?");
+					gameExitAlert.setTitle("Spiel beenden?");
+					gameExitAlert.showAndWait();
+
+					if (ButtonType.YES == gameExitAlert.getResult()) {
+						game.stopGame();
+						stage.hide();
+					}
+				});
+				loadingDialog.close();
+				stage.show();
+			});
+
+			new Thread(game::startGame).start();
+		}).start();
+
 	}
 
 }
