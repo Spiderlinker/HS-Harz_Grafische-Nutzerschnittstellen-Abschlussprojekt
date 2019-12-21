@@ -36,7 +36,6 @@ public class GameUI extends AbstractPane<GridPane> {
 
 		root.setHgap(10);
 		root.setVgap(5);
-		root.setGridLinesVisible(true);
 		root.setAlignment(Pos.CENTER);
 
 		dicePane = new DicePane(game.getDices());
