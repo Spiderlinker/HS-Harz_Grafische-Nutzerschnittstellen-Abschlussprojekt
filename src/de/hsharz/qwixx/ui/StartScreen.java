@@ -49,11 +49,15 @@ public class StartScreen extends AbstractPane<VBox> {
 
 	private void createWidgets() {
 		startGameScreen = new StartGameScreen(stage, getPane());
-
+		new Scene(startGameScreen.getPane());
+		startGameScreen.getPane().applyCss();
+		startGameScreen.getPane().layout();
+		
+		
 		root.setPadding(new Insets(50));
 		root.setSpacing(20);
 		root.setAlignment(Pos.CENTER);
-		root.setStyle("-fx-background-color: linear-gradient(to bottom, #5643fa, #2998ff);");
+		root.setStyle("-fx-background-color: linear-gradient(to bottom, #363542, #3095DD);");
 
 		lblQwixx = new Label("Qwixx");
 		lblQwixx.setStyle("-fx-font-size: 72pt; -fx-font-family: Gabriola; -fx-text-fill: white;");
