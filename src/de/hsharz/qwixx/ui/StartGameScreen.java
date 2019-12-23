@@ -1,6 +1,8 @@
 package de.hsharz.qwixx.ui;
 
+import java.io.File;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -26,14 +28,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -75,9 +77,9 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		root.setPadding(new Insets(50));
 		root.setHgap(10);
 		root.setVgap(20);
-		root.setStyle("-fx-background-color: white;");
+		root.setStyle("-fx-background-color: #EAEAEA;");
 
-		btnBack = new JFXButton("Zurück");
+		btnBack = new JFXButton("", new ImageView(new File("images/arrow_left.png").toURI().toString()));
 		btnBack.setStyle("-fx-border: none;");
 
 		btnPlay = new JFXButton("Spiel starten");
@@ -170,73 +172,108 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 			return;
 		}
 
-		JFXDialog loadingDialog = new JFXDialog();
-		loadingDialog.setContent(new ProgressIndicator(-1));
-		loadingDialog.show((StackPane) stage.getScene().getRoot());
+		JFXDialog loadingDialog = showLoadingScreen();
 
-		new Thread(() -> {
-			Game game = new Game();
+		new Thread() {
+			@Override
+			public void run() {
+				Game game = createNewGame();
+				GameUI gameUI = new GameUI(game);
 
-			{
-				GameBoard board = new GameBoard();
-				board.setRowClosedSupplier(game);
-				IPlayer player = new Human(textName.getText(), board);
-				game.addPlayer(player);
+				Scene scene = scaleGameUIOnScene(gameUI);
+				Platform.runLater(() -> createAndShowGameStage(scene, game, loadingDialog));
+
+				game.startGame();
 			}
+		}.start();
 
-			for (int i = 0; i < boxChoosePlayer.getSelectionModel().getSelectedItem(); i++) {
-				GameBoard board = new GameBoard();
-				board.setRowClosedSupplier(game);
+	}
 
-				IPlayer player = new Computer("Computer #" + (i + 1), board);
-				game.addPlayer(player);
+	private JFXDialog showLoadingScreen() {
+		JFXDialog dialog = new JFXDialog();
+		dialog.setContent(new ProgressIndicator(-1));
+		dialog.show((StackPane) stage.getScene().getRoot());
+		return dialog;
+	}
+
+	private Game createNewGame() {
+		Game game = new Game();
+
+		addHumanPlayer(game);
+		addComputerPlayer(game);
+
+		return game;
+	}
+
+	private void addHumanPlayer(Game game) {
+		addPlayer(game, board -> new Human(textName.getText(), board));
+	}
+
+	private void addComputerPlayer(Game game) {
+		for (int i = 0; i < boxChoosePlayer.getSelectionModel().getSelectedItem(); i++) {
+			String name = "Computer #" + (i + 1);
+			addPlayer(game, board -> new Computer(name, board));
+		}
+	}
+
+	private void addPlayer(Game game, Function<GameBoard, IPlayer> playerSupplier) {
+		GameBoard board = new GameBoard();
+		board.setRowClosedSupplier(game);
+		IPlayer player = playerSupplier.apply(board);
+		game.addPlayer(player);
+	}
+
+	private Scene scaleGameUIOnScene(GameUI gameUI) {
+		Pane gameUIPane = gameUI.getPane();
+		Scene scene = new Scene(gameUIPane);
+		gameUIPane.applyCss();
+		gameUIPane.layout();
+
+		ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(this.stage.getX(), this.stage.getY(),
+				this.stage.getWidth(), this.stage.getHeight());
+
+		if (screensForRectangle.isEmpty()) {
+			System.err.println("Kein Display gefunden, auf dem die Stage angezeigt wird!");
+			return scene;
+		}
+
+		Screen screen = screensForRectangle.get(0);
+
+		double scaleWidth = screen.getBounds().getWidth() / gameUIPane.getBoundsInLocal().getWidth();
+		double scaleHeight = screen.getBounds().getHeight() / gameUIPane.getBoundsInLocal().getHeight();
+		double scale = Math.min(scaleWidth, scaleHeight);
+
+		System.out.println("Scaling GameUI with factor " + scale);
+
+		gameUI.scaleGameUI(scale);
+
+		return scene;
+	}
+
+	private void createAndShowGameStage(Scene scene, Game game, JFXDialog loadingDialog) {
+
+		Stage stage = new Stage();
+		stage.setScene(scene);
+
+		stage.setFullScreenExitHint("Drücke 'Escape', um das Spiel zu verlassen");
+		stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+
+		stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+			Alert gameExitAlert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO);
+			gameExitAlert.initOwner(stage);
+			gameExitAlert.setHeaderText("Möchtest du das Spiel wirklich verlassen?");
+			gameExitAlert.setTitle("Spiel beenden?");
+			gameExitAlert.showAndWait();
+
+			if (ButtonType.YES == gameExitAlert.getResult()) {
+				game.stopGame();
+				stage.hide();
 			}
+		});
 
-			GameUI gameUI = new GameUI(game);
-			GridPane pane = gameUI.getPane();
-
-			Scene scene = new Scene(pane);
-			pane.applyCss();
-			pane.layout();
-
-			ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(this.stage.getX(),
-					this.stage.getY(), this.stage.getWidth(), this.stage.getHeight());
-			Screen screen = screensForRectangle.get(0);
-
-			double scaleX = screen.getBounds().getWidth() / pane.getBoundsInLocal().getWidth();
-			double scaleY = screen.getBounds().getHeight() / pane.getBoundsInLocal().getHeight();
-			double scale = Math.min(scaleX, scaleY);
-
-			System.out.println("Scaling to: " + scale);
-
-			pane.setScaleX(scale);
-			pane.setScaleY(scale);
-
-			Platform.runLater(() -> {
-				Stage stage = new Stage();
-				stage.setScene(scene);
-				stage.setFullScreen(true);
-				stage.setFullScreenExitHint("Drücke 'Escape', um das Spiel zu verlassen");
-				stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-				stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
-					Alert gameExitAlert = new Alert(AlertType.CONFIRMATION, null,
-							ButtonType.YES, ButtonType.NO);
-					gameExitAlert.initOwner(stage);
-					gameExitAlert.setHeaderText("Möchtest du das Spiel wirklich verlassen?");
-					gameExitAlert.setTitle("Spiel beenden?");
-					gameExitAlert.showAndWait();
-
-					if (ButtonType.YES == gameExitAlert.getResult()) {
-						game.stopGame();
-						stage.hide();
-					}
-				});
-				loadingDialog.close();
-				stage.show();
-			});
-
-			new Thread(game::startGame).start();
-		}).start();
+		loadingDialog.close();
+		stage.setFullScreen(true);
+		stage.show();
 
 	}
 
