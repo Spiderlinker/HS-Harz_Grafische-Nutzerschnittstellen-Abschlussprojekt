@@ -1,8 +1,11 @@
 package de.hsharz.qwixx.ui.game;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.jfoenix.controls.JFXButton;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
@@ -14,6 +17,12 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 
 public class GameUI extends AbstractPane<GridPane> {
@@ -21,6 +30,9 @@ public class GameUI extends AbstractPane<GridPane> {
 	private Game game;
 	private List<GameBoardUI> boards = new ArrayList<>();
 	private DicePane dicePane;
+
+	private JFXButton btnExit;
+	private JFXButton btnHelp;
 
 	public GameUI(Game game) {
 		super(new GridPane());
@@ -38,9 +50,17 @@ public class GameUI extends AbstractPane<GridPane> {
 		root.setVgap(5);
 		root.setAlignment(Pos.CENTER);
 
+		root.setBackground(
+				new Background(new BackgroundImage(new Image(new File("images/background.jpg").toURI().toString()),
+						BackgroundRepeat.NO_REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT,
+						new BackgroundSize(100, 100, true, true, true, true))));
+
 		dicePane = new DicePane(game.getDices());
 		game.addDiceListener(dicePane);
 		game.addGameListener(dicePane);
+
+		btnExit = new JFXButton("Spiel beenden");
+		btnHelp = new JFXButton("Hilfe");
 	}
 
 	private void createPlayerBoards() {
@@ -58,15 +78,17 @@ public class GameUI extends AbstractPane<GridPane> {
 
 	private void addWidgets() {
 
-		boards.forEach(board -> {
-			board.getPane().setScaleX(0.7);
-			board.getPane().setScaleY(0.7);
-		});
-
 		root.add(dicePane.getPane(), 1, 1);
-
 		GridPane.setHalignment(dicePane.getPane(), HPos.CENTER);
 		GridPane.setValignment(dicePane.getPane(), VPos.CENTER);
+
+		root.add(btnHelp, 0, 0);
+		GridPane.setHalignment(btnHelp, HPos.LEFT);
+		GridPane.setValignment(btnHelp, VPos.TOP);
+
+		root.add(btnExit, 2, 0);
+		GridPane.setHalignment(btnExit, HPos.RIGHT);
+		GridPane.setValignment(btnExit, VPos.TOP);
 
 		switch (boards.size()) {
 
@@ -159,6 +181,13 @@ public class GameUI extends AbstractPane<GridPane> {
 
 	public DicePane getDicePane() {
 		return dicePane;
+	}
+
+	public void scaleGameUI(double scale) {
+		boards.forEach(boardUI -> {
+			boardUI.getPane().setScaleX(scale);
+			boardUI.getPane().setScaleY(scale);
+		});
 	}
 
 }
