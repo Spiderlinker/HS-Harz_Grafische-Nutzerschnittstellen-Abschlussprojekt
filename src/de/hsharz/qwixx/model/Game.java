@@ -38,6 +38,7 @@ public class Game implements RowsClosedSupplier {
 	private List<DiceListener> diceListeners = new ArrayList<>();
 	private List<GameListener> gameListeners = new ArrayList<>();
 
+	private Thread gameThread;
 	private boolean isPlaying;
 
 	public Game(IPlayer... player) {
@@ -80,6 +81,7 @@ public class Game implements RowsClosedSupplier {
 
 	public void stopGame() {
 		this.isPlaying = false;
+		this.gameThread.interrupt();
 	}
 
 	public boolean isPlaying() {
@@ -99,74 +101,89 @@ public class Game implements RowsClosedSupplier {
 			throw new IllegalArgumentException("There are no players to play with");
 		}
 
-		isPlaying = true;
+		if (isPlaying) {
+			System.out.println("Game already running...");
+			return;
+		}
 
-		while (isPlaying) {
+		createGameThread();
+		gameThread.start();
+	}
 
-			for (IPlayer currentPlayer : this.player) {
+	private void createGameThread() {
+		gameThread = new Thread(() -> {
+			isPlaying = true;
 
-				System.out.println("\n\n Spieler ist an der Reihe: " + currentPlayer);
-				gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
+			while (isPlaying) {
 
-				rollDices();
-				List<DicesSum> whiteDices = getWhiteDicesSums();
-				List<DicesSum> colorDices = getColorDicesSums();
+				for (IPlayer currentPlayer : this.player) {
 
-				System.out.println("---------- Other Player choosing dices");
-				letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
+					System.out.println("\n\nSpieler ist an der Reihe: " + currentPlayer);
+					gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
 
-				System.out.println("---------- Current Player choosing dices");
-				DicesSum selectedWhiteDice = currentPlayer.chooseWhiteDices(whiteDices);
-				if (!selectedWhiteDice.equals(DicesSum.EMPTY)) {
+					rollDices();
+					List<DicesSum> whiteDices = getWhiteDicesSums();
+					List<DicesSum> colorDices = getColorDicesSums();
 
-					OptionalInt findFirst = whiteDices.stream().mapToInt(DicesSum::getSum)
-							.filter(i -> i == selectedWhiteDice.getSum()).findFirst();
+					System.out.println("---------- Other Player choosing dices");
+					letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
-					if (!findFirst.isPresent()) {
-						System.out.println("###################### DiceSum not in list, Schummler!: "
-								+ selectedWhiteDice + " - " + whiteDices);
+					System.out.println("---------- Current Player choosing dices");
+					DicesSum selectedWhiteDice = currentPlayer.chooseWhiteDices(whiteDices);
 
-						for (DicesSum sum : whiteDices) {
-							System.out.println(sum.equals(selectedWhiteDice));
+					if (selectedWhiteDice != null && !DicesSum.EMPTY.equals(selectedWhiteDice)) {
+
+						OptionalInt findFirst = whiteDices.stream().mapToInt(DicesSum::getSum)
+								.filter(i -> i == selectedWhiteDice.getSum()).findFirst();
+
+						if (!findFirst.isPresent()) {
+							System.out.println("###################### DiceSum not in list, Schummler!: "
+									+ selectedWhiteDice + " - " + whiteDices);
+
+							for (DicesSum sum : whiteDices) {
+								System.out.println(sum.equals(selectedWhiteDice));
+							}
+
 						}
-
+						currentPlayer.getGameBoard().crossField(selectedWhiteDice.getColor(),
+								selectedWhiteDice.getSum());
 					}
-					currentPlayer.getGameBoard().crossField(selectedWhiteDice.getColor(), selectedWhiteDice.getSum());
-				}
 
-				closeQueuedRows();
-				if (isGameOver()) {
-					isPlaying = false;
-					break;
-				}
+					closeQueuedRows();
+					if (isGameOver()) {
+						isPlaying = false;
+						break;
+					}
 
-				DicesSum selectedColorDice = currentPlayer.chooseColorDices(colorDices);
-				if (!selectedColorDice.equals(DicesSum.EMPTY)) {
-					if (!colorDices.contains(selectedColorDice)) {
-						System.out.println("###################### DiceSum not in list, Schummler!: "
-								+ selectedColorDice + " - " + colorDices);
+					DicesSum selectedColorDice = currentPlayer.chooseColorDices(colorDices);
+					if (selectedWhiteDice != null && !DicesSum.EMPTY.equals(selectedColorDice)) {
+						if (!colorDices.contains(selectedColorDice)) {
+							System.out.println("###################### DiceSum not in list, Schummler!: "
+									+ selectedColorDice + " - " + colorDices);
 
-						for (DicesSum sum : colorDices) {
-							System.out.println(sum.equals(selectedColorDice));
+							for (DicesSum sum : colorDices) {
+								System.out.println(sum.equals(selectedColorDice));
+							}
 						}
+						currentPlayer.getGameBoard().crossField(selectedColorDice.getColor(),
+								selectedColorDice.getSum());
 					}
-					currentPlayer.getGameBoard().crossField(selectedColorDice.getColor(), selectedColorDice.getSum());
-				}
 
-				// Check if player selected any dice
-				if (DicesSum.EMPTY.equals(selectedWhiteDice) && DicesSum.EMPTY.equals(selectedColorDice)) {
-					// player did not select any dice, cross miss
-					currentPlayer.getGameBoard().crossMiss();
-				}
+					// Check if player selected any dice
+					if (DicesSum.EMPTY.equals(selectedWhiteDice) && DicesSum.EMPTY.equals(selectedColorDice)) {
+						// player did not select any dice, cross miss
+						currentPlayer.getGameBoard().crossMiss();
+					}
 
-				closeQueuedRows();
-				if (isGameOver()) {
-					isPlaying = false;
-					break;
+					closeQueuedRows();
+					if (isGameOver()) {
+						isPlaying = false;
+						break;
+					}
 				}
 			}
-		}
-		System.out.println("Game over");
+			System.out.println("Game over");
+		});
 	}
 
 	private void rollDices() {
@@ -199,7 +216,7 @@ public class Game implements RowsClosedSupplier {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
 				DicesSum selectedDices = p.chooseWhiteDices(whiteDices);
-				if (!selectedDices.equals(DicesSum.EMPTY)) {
+				if (selectedDices != null && !selectedDices.equals(DicesSum.EMPTY)) {
 					p.getGameBoard().crossField(selectedDices.getColor(), selectedDices.getSum());
 				}
 			}
@@ -214,7 +231,7 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	private boolean isGameOver() {
-		return playerCrossedAllMisses() || closedRows.size() >= 2;
+		return !isPlaying || playerCrossedAllMisses() || closedRows.size() >= 2;
 	}
 
 	private boolean playerCrossedAllMisses() {
