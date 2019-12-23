@@ -39,7 +39,7 @@ public class Human extends Player {
 				selection = inputSupplier.getHumanInput();
 
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				System.err.println("Player left the game or system interrupted this thread! " + e.getMessage());
 			}
 		}
 
