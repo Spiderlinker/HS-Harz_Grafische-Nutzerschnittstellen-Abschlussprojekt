@@ -5,6 +5,6 @@ import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 
 public interface FieldCrossedListener {
 
-	void fieldCrossed(RowUI ui, NumberFieldUI btn);
+	void userCrossedField(RowUI ui, NumberFieldUI btn);
 	
 }
