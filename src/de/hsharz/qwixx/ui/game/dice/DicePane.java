@@ -83,4 +83,9 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 		dicesUI.stream().filter(isWhiteDice.negate()::test)
 				.forEach(d -> d.getPane().setOpacity(nextPlayer instanceof Computer ? 0.6 : 1));
 	}
+
+	@Override
+	public void gameOver() {
+		// ignore
+	}
 }
