@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.dice.Dice;
@@ -81,7 +82,9 @@ public class Game implements RowsClosedSupplier {
 
 	public void stopGame() {
 		this.isPlaying = false;
-		this.gameThread.interrupt();
+		if (gameThread != null) {
+			this.gameThread.interrupt();
+		}
 	}
 
 	public boolean isPlaying() {
@@ -182,7 +185,9 @@ public class Game implements RowsClosedSupplier {
 					}
 				}
 			}
+
 			System.out.println("Game over");
+			gameListeners.forEach(GameListener::gameOver);
 		});
 	}
 
@@ -243,14 +248,19 @@ public class Game implements RowsClosedSupplier {
 		return false;
 	}
 
-	public IPlayer getWinningPlayer() {
-		return player.stream().reduce(this::getPlayerWithMaxScore).orElseGet(null);
-	}
+	public List<IPlayer> getWinningPlayer() {
+		OptionalInt maxScore = player.stream() //
+				.mapToInt(p -> p.getGameBoard().getScore().getScoreComplete()) //
+				.max();
 
-	private IPlayer getPlayerWithMaxScore(IPlayer p1, IPlayer p2) {
-		return p1.getGameBoard().getScore().getScoreComplete() > p2.getGameBoard().getScore().getScoreComplete() //
-				? p1
-				: p2;
+		if (maxScore.isPresent()) {
+			// Filter for all players having same max score
+			return player.stream() //
+					.filter(p -> maxScore.getAsInt() == p.getGameBoard().getScore().getScoreComplete()) //
+					.collect(Collectors.toList());
+		}
+		// No max score available -> no players in match, no winning players
+		return new ArrayList<>();
 	}
 
 	@Override
