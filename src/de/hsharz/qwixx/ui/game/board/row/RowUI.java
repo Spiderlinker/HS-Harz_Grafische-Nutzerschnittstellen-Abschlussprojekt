@@ -71,7 +71,7 @@ public class RowUI extends AbstractPane<StackPane> {
 						.addListener((observable, oldValue, newValue) -> {
 							if (newValue.booleanValue()) {
 								for (FieldCrossedListener l : listeners) {
-									l.fieldCrossed(RowUI.this, button);
+									l.userCrossedField(RowUI.this, button);
 								}
 							}
 						}));
