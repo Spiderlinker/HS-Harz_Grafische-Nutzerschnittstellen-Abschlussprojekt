@@ -6,4 +6,5 @@ public interface GameListener {
 
 	void nextPlayersTurn(IPlayer nextPlayer);
 	
+	void gameOver();
 }
