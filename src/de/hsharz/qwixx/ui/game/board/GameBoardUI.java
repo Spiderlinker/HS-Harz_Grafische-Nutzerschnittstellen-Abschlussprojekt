@@ -24,18 +24,18 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class GameBoardUI extends AbstractPane<VBox>
+public abstract class GameBoardUI extends AbstractPane<VBox>
 		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener {
 
-	private IPlayer player;
-
+	protected IPlayer player;
 	private Label lblName;
-	private Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
+
+	protected Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
 	private ScoreLegend scoreLegend;
 	private UserScoreUI userScore;
 
-	private IPlayer playerWaitingForInput;
-	private DicesSum humanInput;
+	protected IPlayer playerWaitingForInput;
+	protected DicesSum humanInput;
 
 	private DropShadow glowEffect;
 
@@ -108,21 +108,15 @@ public class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices) {
-		playerWaitingForInput = player;
-
-		disableAllButtons();
-		highlightButtonsOfDices(dices);
-	}
-
-	@Override
 	public DicesSum getHumanInput() {
 		return humanInput;
 	}
 
 	@Override
-	public void fieldCrossed(RowUI ui, NumberFieldUI btn) {
+	public void userCrossedField(RowUI ui, NumberFieldUI btn) {
+		System.out.println("User crossed field: " + btn);
 		doInput(new DicesSum(ui.getRow().getColor(), btn.getValue()));
+		// Fehlerbehandlung bei falschem Input
 	}
 
 	@Override
@@ -159,8 +153,14 @@ public class GameBoardUI extends AbstractPane<VBox>
 
 		Platform.runLater(() -> userScore.updateScore());
 	}
+	
+	@Override
+	public void askForInput(IPlayer player, List<DicesSum> dices) {
+		playerWaitingForInput = player;
+		disableAllButtons();
+	}
 
-	private void disableAllButtons() {
+	protected void disableAllButtons() {
 		rows.values().forEach(this::disableButtonsOfRow);
 	}
 
@@ -170,33 +170,6 @@ public class GameBoardUI extends AbstractPane<VBox>
 		}
 	}
 
-	private void highlightButtonsOfDices(List<DicesSum> dices) {
-		rows.values().forEach(row -> highlightButtonsOfDicesForRow(row, dices));
-	}
-
-	private void highlightButtonsOfDicesForRow(RowUI row, List<DicesSum> dices) {
-		if (player.getGameBoard().getRowClosedSupplier().isRowClosed(row.getRow().getColor())) {
-			return;
-		}
-
-		for (int i = row.getButtons().size() - 1; i >= 0; i--) {
-			if (row.getRow().getFields().get(i).isCrossed()) {
-				break;
-			}
-
-			NumberFieldUI btn = row.getButtons().get(i);
-			for (DicesSum d : dices) {
-				if ((DiceColor.WHITE.equals(d.getColor()) || row.getRow().getColor().equals(d.getColor()))
-						&& d.getSum() == btn.getValue()) {
-					btn.setDisabled(false);
-					break;
-				}
-			}
-
-		}
-
-	}
-
 	public void highlightGameboard(boolean highlight) {
 		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
 	}
@@ -204,6 +177,11 @@ public class GameBoardUI extends AbstractPane<VBox>
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		highlightGameboard(player.equals(nextPlayer));
+	}
+
+	@Override
+	public void gameOver() {
+		// ignore
 	}
 
 	public IPlayer getPlayer() {
