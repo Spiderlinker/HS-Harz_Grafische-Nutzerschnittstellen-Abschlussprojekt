@@ -5,18 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialog.DialogTransition;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
+import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -24,20 +28,20 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 
-public class GameUI extends AbstractPane<GridPane> {
+public class GameUI extends AbstractPane<StackPane> implements GameListener {
 
 	private Game game;
 	private List<GameBoardUI> boards = new ArrayList<>();
+	private GridPane gamePane;
 	private DicePane dicePane;
 
-	private JFXButton btnExit;
-	private JFXButton btnHelp;
-
 	public GameUI(Game game) {
-		super(new GridPane());
+		super(new StackPane());
 
 		this.game = Objects.requireNonNull(game);
+		this.game.addGameListener(this);
 
 		createWidgets();
 		addWidgets();
@@ -46,11 +50,12 @@ public class GameUI extends AbstractPane<GridPane> {
 	private void createWidgets() {
 		createPlayerBoards();
 
-		root.setHgap(10);
-		root.setVgap(5);
-		root.setAlignment(Pos.CENTER);
+		gamePane = new GridPane();
+		gamePane.setHgap(10);
+		gamePane.setVgap(5);
+		gamePane.setAlignment(Pos.CENTER);
 
-		root.setBackground(
+		gamePane.setBackground(
 				new Background(new BackgroundImage(new Image(new File("images/background.jpg").toURI().toString()),
 						BackgroundRepeat.NO_REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT,
 						new BackgroundSize(100, 100, true, true, true, true))));
@@ -58,14 +63,11 @@ public class GameUI extends AbstractPane<GridPane> {
 		dicePane = new DicePane(game.getDices());
 		game.addDiceListener(dicePane);
 		game.addGameListener(dicePane);
-
-		btnExit = new JFXButton("Spiel beenden");
-		btnHelp = new JFXButton("Hilfe");
 	}
 
 	private void createPlayerBoards() {
 		for (IPlayer player : game.getPlayer()) {
-			GameBoardUI boardUI = new GameBoardUI(player);
+			GameBoardUI boardUI = new GameBoardSimple(player);
 			game.addGameListener(boardUI);
 
 			if (player instanceof Human) {
@@ -77,18 +79,12 @@ public class GameUI extends AbstractPane<GridPane> {
 	}
 
 	private void addWidgets() {
+		root.getChildren().add(gamePane);
 
-		root.add(dicePane.getPane(), 1, 1);
+		gamePane.add(dicePane.getPane(), 1, 1);
+//		gamePane.add(new Group(dicePane.getPane()), 1, 1);
 		GridPane.setHalignment(dicePane.getPane(), HPos.CENTER);
 		GridPane.setValignment(dicePane.getPane(), VPos.CENTER);
-
-		root.add(btnHelp, 0, 0);
-		GridPane.setHalignment(btnHelp, HPos.LEFT);
-		GridPane.setValignment(btnHelp, VPos.TOP);
-
-		root.add(btnExit, 2, 0);
-		GridPane.setHalignment(btnExit, HPos.RIGHT);
-		GridPane.setValignment(btnExit, VPos.TOP);
 
 		switch (boards.size()) {
 
@@ -97,10 +93,10 @@ public class GameUI extends AbstractPane<GridPane> {
 			for (GameBoardUI board : boards) {
 				Group group = new Group(board.getPane());
 				if (board.getPlayer() instanceof Human) {
-					root.add(group, 1, 2);
+					gamePane.add(group, 1, 2);
 					GridPane.setHalignment(group, HPos.CENTER);
 				} else {
-					root.add(group, 1, 0);
+					gamePane.add(group, 1, 0);
 					GridPane.setHalignment(group, HPos.CENTER);
 				}
 			}
@@ -111,13 +107,13 @@ public class GameUI extends AbstractPane<GridPane> {
 			for (GameBoardUI board : boards) {
 				Group group = new Group(board.getPane());
 				if (board.getPlayer() instanceof Human) {
-					root.add(group, 1, 2);
+					gamePane.add(group, 1, 2);
 					GridPane.setHalignment(group, HPos.CENTER);
 				} else {
 					if (index == 0) {
-						root.add(group, 0, 1);
+						gamePane.add(group, 0, 1);
 					} else {
-						root.add(group, 2, 1);
+						gamePane.add(group, 2, 1);
 					}
 					index++;
 				}
@@ -129,16 +125,16 @@ public class GameUI extends AbstractPane<GridPane> {
 			for (GameBoardUI board : boards) {
 				Group group = new Group(board.getPane());
 				if (board.getPlayer() instanceof Human) {
-					root.add(group, 1, 2);
+					gamePane.add(group, 1, 2);
 					GridPane.setHalignment(group, HPos.CENTER);
 				} else {
 					if (index == 0) {
-						root.add(group, 0, 1);
+						gamePane.add(group, 0, 1);
 					} else if (index == 1) {
-						root.add(group, 1, 0);
+						gamePane.add(group, 1, 0);
 						GridPane.setHalignment(group, HPos.CENTER);
 					} else {
-						root.add(group, 2, 1);
+						gamePane.add(group, 2, 1);
 					}
 					index++;
 				}
@@ -150,19 +146,19 @@ public class GameUI extends AbstractPane<GridPane> {
 			for (GameBoardUI board : boards) {
 				Group group = new Group(board.getPane());
 				if (board.getPlayer() instanceof Human) {
-					root.add(group, 1, 2);
+					gamePane.add(group, 1, 2);
 					GridPane.setHalignment(group, HPos.CENTER);
 				} else {
 					if (index == 0) {
-						root.add(group, 0, 1);
+						gamePane.add(group, 0, 1);
 					} else if (index == 1) {
-						root.add(group, 0, 0, 2, 1);
+						gamePane.add(group, 0, 0, 2, 1);
 						GridPane.setHalignment(group, HPos.CENTER);
 					} else if (index == 2) {
-						root.add(group, 1, 0, 2, 1);
+						gamePane.add(group, 1, 0, 2, 1);
 						GridPane.setHalignment(group, HPos.CENTER);
 					} else {
-						root.add(group, 2, 1);
+						gamePane.add(group, 2, 1);
 					}
 					index++;
 				}
@@ -188,6 +184,28 @@ public class GameUI extends AbstractPane<GridPane> {
 			boardUI.getPane().setScaleX(scale);
 			boardUI.getPane().setScaleY(scale);
 		});
+//		dicePane.getPane().setScaleX(scale);
+//		dicePane.getPane().setScaleY(scale);
+	}
+
+	@Override
+	public void nextPlayersTurn(IPlayer nextPlayer) {
+		// ignore
+	}
+
+	@Override
+	public void gameOver() {
+		showGameOverScreen();
+	}
+
+	private void showGameOverScreen() {
+		List<IPlayer> winningPlayer = game.getWinningPlayer();
+		JFXDialog dialog = new JFXDialog(getPane(), new Label(winningPlayer.toString()), DialogTransition.CENTER);
+		dialog.setOverlayClose(false);
+		dialog.setOnDialogClosed(e -> {
+			System.out.println("Should exit...");
+		});
+		Platform.runLater(() -> dialog.show());
 	}
 
 }

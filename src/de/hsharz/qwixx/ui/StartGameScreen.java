@@ -2,6 +2,7 @@ package de.hsharz.qwixx.ui;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import com.jfoenix.controls.JFXButton;
@@ -15,7 +16,7 @@ import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.game.GameUI;
+import de.hsharz.qwixx.ui.game.GameStage;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -23,21 +24,18 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -174,25 +172,43 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 
 		JFXDialog loadingDialog = showLoadingScreen();
 
-		new Thread() {
+		ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(this.stage.getX(), this.stage.getY(),
+				this.stage.getWidth(), this.stage.getHeight());
+
+		if (screensForRectangle.isEmpty()) {
+			System.err.println("Kein Display gefunden, auf dem die Stage angezeigt wird!");
+			return;
+		}
+
+		Screen screen = screensForRectangle.get(0);
+		
+		Task<GameStage> createUITask = new Task<GameStage>() {
 			@Override
-			public void run() {
+			protected GameStage call() throws Exception {
 				Game game = createNewGame();
-				GameUI gameUI = new GameUI(game);
-
-				Scene scene = scaleGameUIOnScene(gameUI);
-				Platform.runLater(() -> createAndShowGameStage(scene, game, loadingDialog));
-
-				game.startGame();
+				return new GameStage(game, screen);
 			}
-		}.start();
+		};
 
+		createUITask.setOnRunning(e -> loadingDialog.show());
+		createUITask.setOnSucceeded(e -> {
+			loadingDialog.close();
+			try {
+				GameStage gameStage = createUITask.get();
+				gameStage.show();
+				gameStage.getGame().startGame();
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
+			}
+		});
+
+		new Thread(createUITask).start();
 	}
 
 	private JFXDialog showLoadingScreen() {
 		JFXDialog dialog = new JFXDialog();
+		dialog.setDialogContainer((StackPane) stage.getScene().getRoot());
 		dialog.setContent(new ProgressIndicator(-1));
-		dialog.show((StackPane) stage.getScene().getRoot());
 		return dialog;
 	}
 
@@ -221,60 +237,6 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		board.setRowClosedSupplier(game);
 		IPlayer player = playerSupplier.apply(board);
 		game.addPlayer(player);
-	}
-
-	private Scene scaleGameUIOnScene(GameUI gameUI) {
-		Pane gameUIPane = gameUI.getPane();
-		Scene scene = new Scene(gameUIPane);
-		gameUIPane.applyCss();
-		gameUIPane.layout();
-
-		ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(this.stage.getX(), this.stage.getY(),
-				this.stage.getWidth(), this.stage.getHeight());
-
-		if (screensForRectangle.isEmpty()) {
-			System.err.println("Kein Display gefunden, auf dem die Stage angezeigt wird!");
-			return scene;
-		}
-
-		Screen screen = screensForRectangle.get(0);
-
-		double scaleWidth = screen.getBounds().getWidth() / gameUIPane.getBoundsInLocal().getWidth();
-		double scaleHeight = screen.getBounds().getHeight() / gameUIPane.getBoundsInLocal().getHeight();
-		double scale = Math.min(scaleWidth, scaleHeight);
-
-		System.out.println("Scaling GameUI with factor " + scale);
-
-		gameUI.scaleGameUI(scale);
-
-		return scene;
-	}
-
-	private void createAndShowGameStage(Scene scene, Game game, JFXDialog loadingDialog) {
-
-		Stage stage = new Stage();
-		stage.setScene(scene);
-
-		stage.setFullScreenExitHint("Drücke 'Escape', um das Spiel zu verlassen");
-		stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-
-		stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
-			Alert gameExitAlert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO);
-			gameExitAlert.initOwner(stage);
-			gameExitAlert.setHeaderText("Möchtest du das Spiel wirklich verlassen?");
-			gameExitAlert.setTitle("Spiel beenden?");
-			gameExitAlert.showAndWait();
-
-			if (ButtonType.YES == gameExitAlert.getResult()) {
-				game.stopGame();
-				stage.hide();
-			}
-		});
-
-		loadingDialog.close();
-		stage.setFullScreen(true);
-		stage.show();
-
 	}
 
 }
