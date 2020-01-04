@@ -34,7 +34,7 @@ public class DiceUI extends AbstractPane<GridPane> {
 	public void createWidgets() {
 		root.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
 				+ "-fx-background-color: " + dice.getColor().getAsHex() + "; -fx-background-radius: 11px;");
-		root.setPadding(new Insets(5));
+		root.setPadding(new Insets(10));
 		root.setAlignment(Pos.CENTER);
 
 		addColumnRowConstraints();
@@ -58,7 +58,7 @@ public class DiceUI extends AbstractPane<GridPane> {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				String diceEyeColor = dice.getColor().equals(DiceColor.WHITE) ? "black" : "white";
-				diceEyes[i][j] = new Circle(8, Paint.valueOf(diceEyeColor));
+				diceEyes[i][j] = new Circle(12, Paint.valueOf(diceEyeColor));
 			}
 		}
 	}
@@ -67,7 +67,7 @@ public class DiceUI extends AbstractPane<GridPane> {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				BorderPane pane = new BorderPane();
-				pane.setPadding(new Insets(5));
+				pane.setPadding(new Insets(6));
 				pane.setCenter(diceEyes[i][j]);
 				root.add(pane, i, j);
 			}
