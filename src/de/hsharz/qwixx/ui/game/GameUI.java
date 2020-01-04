@@ -12,6 +12,7 @@ import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.game.board.ComputerGameBoardUI;
 import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
@@ -67,13 +68,17 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 
 	private void createPlayerBoards() {
 		for (IPlayer player : game.getPlayer()) {
-			GameBoardUI boardUI = new GameBoardSimple(player);
-			game.addGameListener(boardUI);
+
+			GameBoardUI boardUI = null;
 
 			if (player instanceof Human) {
+				boardUI = new GameBoardSimple(player);
 				((Human) player).setHumanInputSupplier(boardUI);
+			} else {
+				boardUI = new ComputerGameBoardUI(player);
 			}
 
+			game.addGameListener(boardUI);
 			boards.add(boardUI);
 		}
 	}
@@ -81,94 +86,107 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 	private void addWidgets() {
 		root.getChildren().add(gamePane);
 
-		gamePane.add(dicePane.getPane(), 1, 1);
-//		gamePane.add(new Group(dicePane.getPane()), 1, 1);
+//		gamePane.add(dicePane.getPane(), 1, 1);
+		gamePane.add(new Group(dicePane.getPane()), 1, 1);
 		GridPane.setHalignment(dicePane.getPane(), HPos.CENTER);
 		GridPane.setValignment(dicePane.getPane(), VPos.CENTER);
 
 		switch (boards.size()) {
-
 		case 2:
 			// Boards oben mittig und unten
-			for (GameBoardUI board : boards) {
-				Group group = new Group(board.getPane());
-				if (board.getPlayer() instanceof Human) {
-					gamePane.add(group, 1, 2);
-					GridPane.setHalignment(group, HPos.CENTER);
-				} else {
-					gamePane.add(group, 1, 0);
-					GridPane.setHalignment(group, HPos.CENTER);
-				}
-			}
+			positionTwoGameBoards();
 			break;
 		case 3:
 			// Boards links, rechts und unten
-			int index = 0;
-			for (GameBoardUI board : boards) {
-				Group group = new Group(board.getPane());
-				if (board.getPlayer() instanceof Human) {
-					gamePane.add(group, 1, 2);
-					GridPane.setHalignment(group, HPos.CENTER);
-				} else {
-					if (index == 0) {
-						gamePane.add(group, 0, 1);
-					} else {
-						gamePane.add(group, 2, 1);
-					}
-					index++;
-				}
-			}
+			positionThreeGameBoards();
 			break;
 		case 4:
 			// Boards oben mittig, links, rechts und unten
-			index = 0;
-			for (GameBoardUI board : boards) {
-				Group group = new Group(board.getPane());
-				if (board.getPlayer() instanceof Human) {
-					gamePane.add(group, 1, 2);
-					GridPane.setHalignment(group, HPos.CENTER);
-				} else {
-					if (index == 0) {
-						gamePane.add(group, 0, 1);
-					} else if (index == 1) {
-						gamePane.add(group, 1, 0);
-						GridPane.setHalignment(group, HPos.CENTER);
-					} else {
-						gamePane.add(group, 2, 1);
-					}
-					index++;
-				}
-			}
+			positionFourGameBoards();
 			break;
 		case 5:
 			// Boards oben links, oben rechts, links, rechts und unten
-			index = 0;
-			for (GameBoardUI board : boards) {
-				Group group = new Group(board.getPane());
-				if (board.getPlayer() instanceof Human) {
-					gamePane.add(group, 1, 2);
-					GridPane.setHalignment(group, HPos.CENTER);
-				} else {
-					if (index == 0) {
-						gamePane.add(group, 0, 1);
-					} else if (index == 1) {
-						gamePane.add(group, 0, 0, 2, 1);
-						GridPane.setHalignment(group, HPos.CENTER);
-					} else if (index == 2) {
-						gamePane.add(group, 1, 0, 2, 1);
-						GridPane.setHalignment(group, HPos.CENTER);
-					} else {
-						gamePane.add(group, 2, 1);
-					}
-					index++;
-				}
-			}
+			positionFiveGameBoards();
 			break;
 		default:
 			throw new IllegalArgumentException(
 					"Ungültige Anzahl an Spielbrettern! Min: 2; Max: 5; Current: " + boards.size());
 		}
 
+	}
+
+	private void positionTwoGameBoards() {
+		for (GameBoardUI board : boards) {
+			if (board.getPlayer() instanceof Human) {
+				addGameBoard(board, 1, 2);
+			} else {
+				addGameBoard(board, 1, 0);
+			}
+		}
+	}
+
+	private void positionThreeGameBoards() {
+		int index = 0;
+		for (GameBoardUI board : boards) {
+			if (board.getPlayer() instanceof Human) {
+				addGameBoard(board, 1, 2);
+			} else {
+				if (index == 0) {
+					addGameBoard(board, 0, 1);
+				} else {
+					addGameBoard(board, 2, 1);
+				}
+				index++;
+			}
+		}
+	}
+
+	private void positionFourGameBoards() {
+		int computerBoardCount = 0;
+		for (GameBoardUI board : boards) {
+			if (board.getPlayer() instanceof Human) {
+				addGameBoard(board, 1, 2);
+			} else {
+				if (computerBoardCount == 0) {
+					addGameBoard(board, 0, 1);
+				} else if (computerBoardCount == 1) {
+					addGameBoard(board, 1, 0);
+				} else {
+					addGameBoard(board, 2, 1);
+				}
+				computerBoardCount++;
+			}
+		}
+	}
+
+	private void positionFiveGameBoards() {
+		int computerBoardCount = 0;
+		for (GameBoardUI board : boards) {
+			if (board.getPlayer() instanceof Human) {
+				addGameBoard(board, 1, 2);
+			} else {
+				if (computerBoardCount == 0) {
+					addGameBoard(board, 0, 1);
+				} else if (computerBoardCount == 1) {
+					addGameBoard(board, 0, 0, 2, 1);
+				} else if (computerBoardCount == 2) {
+					addGameBoard(board, 1, 0, 2, 1);
+				} else {
+					addGameBoard(board, 2, 1);
+				}
+				computerBoardCount++;
+			}
+		}
+	}
+
+	private void addGameBoard(GameBoardUI board, int column, int row) {
+		addGameBoard(board, column, row, 1, 1);
+	}
+
+	private void addGameBoard(GameBoardUI board, int column, int row, int colSpan, int rowSpan) {
+		Group boardGroup = new Group(board.getPane()); // group for scaling board and fit into place
+		gamePane.add(boardGroup, column, row, colSpan, rowSpan);
+		GridPane.setHalignment(boardGroup, HPos.CENTER);
 	}
 
 	public List<GameBoardUI> getPlayerGameBoards() {
@@ -184,8 +202,8 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 			boardUI.getPane().setScaleX(scale);
 			boardUI.getPane().setScaleY(scale);
 		});
-//		dicePane.getPane().setScaleX(scale);
-//		dicePane.getPane().setScaleY(scale);
+		dicePane.getPane().setScaleX(scale);
+		dicePane.getPane().setScaleY(scale);
 	}
 
 	@Override
@@ -205,7 +223,7 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 		dialog.setOnDialogClosed(e -> {
 			System.out.println("Should exit...");
 		});
-		Platform.runLater(() -> dialog.show());
+		Platform.runLater(dialog::show);
 	}
 
 }
