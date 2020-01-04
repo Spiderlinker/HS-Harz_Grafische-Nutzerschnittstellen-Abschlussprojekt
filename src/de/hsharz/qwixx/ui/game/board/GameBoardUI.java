@@ -25,14 +25,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public abstract class GameBoardUI extends AbstractPane<VBox>
-		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener {
+		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener, MissFieldListener {
 
 	protected IPlayer player;
 	private Label lblName;
 
 	protected Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
-	private ScoreLegend scoreLegend;
-	private UserScoreUI userScore;
+	protected ScoreLegend scoreLegend;
+	protected UserScoreUI userScore;
 
 	protected IPlayer playerWaitingForInput;
 	protected DicesSum humanInput;
@@ -78,6 +78,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	private void setupInteractions() {
 		rows.values().forEach(r -> r.addFieldCrossedListener(this));
+		scoreLegend.getMissFields().forEach(f -> f.addListener(this));
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
 				doInput(DicesSum.EMPTY);
@@ -126,7 +127,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
 		for (NumberFieldUI btn : rowToCrossUI.getButtons()) {
 			if (btn.getValue() == fieldToCross.getValue()) {
-				System.out.println("Button found to enable");
 				btn.setLocked(true);
 				btn.setDisabled(true);
 				btn.getButton().setSelected(true);
@@ -144,6 +144,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	@Override
+	public void userCrossedMiss() {
+		getPlayer().getGameBoard().crossMiss();
+	}
+
+	@Override
 	public void missCrossed() {
 		for (int i = 0; i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses(); i++) {
 			MissField missField = scoreLegend.getMissFields().get(i);
@@ -153,7 +158,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 		Platform.runLater(() -> userScore.updateScore());
 	}
-	
+
 	@Override
 	public void askForInput(IPlayer player, List<DicesSum> dices) {
 		playerWaitingForInput = player;
