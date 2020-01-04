@@ -10,6 +10,8 @@ import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.pair.DicePair;
+import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
@@ -35,7 +37,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	protected UserScoreUI userScore;
 
 	protected IPlayer playerWaitingForInput;
-	protected DicesSum humanInput;
+//	protected Pair<DicesSum> humanInput;
+
+	private DicesSum firstSelection;
+	private DicesSum secondSelection;
+	private int maxSelection;
 
 	private DropShadow glowEffect;
 
@@ -79,12 +85,27 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	private void setupInteractions() {
 		rows.values().forEach(r -> r.addFieldCrossedListener(this));
 		scoreLegend.getMissFields().forEach(f -> f.addListener(this));
+
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
-				doInput(DicesSum.EMPTY);
-
+				playerSelectedDice(DicesSum.EMPTY);
 			}
 		});
+	}
+
+	private void playerSelectedDice(DicesSum dice) {
+		if (firstSelection == null) {
+			firstSelection = new DicesSum(dice.getColor(), dice.getSum());
+		} else if (secondSelection == null) {
+			secondSelection = new DicesSum(dice.getColor(), dice.getSum());
+		}
+
+		if ((maxSelection == 1 && firstSelection != null) //
+				|| (maxSelection == 2 && secondSelection != null)) {
+			synchronized (playerWaitingForInput) {
+				playerWaitingForInput.notify();
+			}
+		}
 	}
 
 	private void addWidgets() {
@@ -96,27 +117,15 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	}
 
-	private void doInput(DicesSum input) {
-		humanInput = input;
-
-		disableAllButtons();
-
-		if (playerWaitingForInput != null) {
-			synchronized (playerWaitingForInput) {
-				playerWaitingForInput.notify();
-			}
-		}
-	}
-
 	@Override
-	public DicesSum getHumanInput() {
-		return humanInput;
+	public Pair<DicesSum> getHumanInput() {
+		return new DicePair(firstSelection, secondSelection);
 	}
 
 	@Override
 	public void userCrossedField(RowUI ui, NumberFieldUI btn) {
 		System.out.println("User crossed field: " + btn);
-		doInput(new DicesSum(ui.getRow().getColor(), btn.getValue()));
+		playerSelectedDice(new DicesSum(ui.getRow().getColor(), btn.getValue()));
 		// Fehlerbehandlung bei falschem Input
 	}
 
@@ -145,23 +154,29 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void userCrossedMiss() {
-		getPlayer().getGameBoard().crossMiss();
+		// remove selected dices and notify player to continue
+		firstSelection = DicesSum.EMPTY;
+		playerSelectedDice(DicesSum.EMPTY);
 	}
 
 	@Override
 	public void missCrossed() {
-		for (int i = 0; i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses(); i++) {
+		for (int i = 0; i < scoreLegend.getMissFields().size(); i++) {
 			MissField missField = scoreLegend.getMissFields().get(i);
-			missField.setSelected(true);
-			missField.setDisabled(true);
+			missField.setSelected(i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses());
+			missField.setDisabled(i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses());
 		}
 
 		Platform.runLater(() -> userScore.updateScore());
 	}
 
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices) {
+	public void askForInput(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
 		playerWaitingForInput = player;
+		maxSelection = maxDices;
+		firstSelection = null;
+		secondSelection = null;
+
 		disableAllButtons();
 	}
 
@@ -179,9 +194,15 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
 	}
 
+	private void enableMissFields(boolean enable) {
+		scoreLegend.getMissFields().forEach(f -> f.setDisabled(!enable));
+	}
+
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		highlightGameboard(player.equals(nextPlayer));
+		boolean currentPlayerIsNextPlayer = player.equals(nextPlayer);
+		highlightGameboard(currentPlayerIsNextPlayer);
+		enableMissFields(currentPlayerIsNextPlayer);
 	}
 
 	@Override

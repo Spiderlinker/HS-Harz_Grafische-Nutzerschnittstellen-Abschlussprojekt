@@ -13,8 +13,8 @@ public class GameBoardSimple extends GameBoardUI {
 	}
 
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices) {
-		super.askForInput(player, dices);
+	public void askForInput(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
+		super.askForInput(player, dices, minDices, maxDices);
 		highlightRemainingFields();
 	}
 
