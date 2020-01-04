@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.model.dice;
+package de.hsharz.qwixx.model.dice.pair;
 
 public class Pair<T> {
 
@@ -16,6 +16,10 @@ public class Pair<T> {
 
 	public T getSecond() {
 		return this.second;
+	}
+
+	public boolean isEmpty() {
+		return first == null && second == null;
 	}
 
 	@Override

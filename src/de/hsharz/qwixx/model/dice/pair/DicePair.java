@@ -1,17 +1,33 @@
-package de.hsharz.qwixx.model.dice;
+package de.hsharz.qwixx.model.dice.pair;
 
-public class DicePair extends Pair<IDice> {
+import de.hsharz.qwixx.model.dice.DicesSum;
 
-	public DicePair(IDice first, IDice second) {
+public class DicePair extends Pair<DicesSum> {
+
+	public DicePair(DicesSum first, DicesSum second) {
 		super(first, second);
 	}
 
-	public DiceColor getColor() {
-		return DiceColor.getDominantColor(getFirst().getColor(), getSecond().getColor());
+	@Override
+	public DicesSum getFirst() {
+		return getNotNullDicesSum(super.getFirst());
 	}
 
-	public int getSum() {
-		return getFirst().getCurrentValue() + getSecond().getCurrentValue();
+	@Override
+	public DicesSum getSecond() {
+		return getNotNullDicesSum(super.getSecond());
 	}
 
+	private DicesSum getNotNullDicesSum(DicesSum sum) {
+		return sum == null ? DicesSum.EMPTY : sum;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return super.isEmpty() || (DicesSum.EMPTY.equals(getFirst()) && DicesSum.EMPTY.equals(getSecond()));
+	}
+
+	public static DicePair of(DicesSum first, DicesSum second) {
+		return new DicePair(first, second);
+	}
 }
