@@ -86,10 +86,10 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 	private void addWidgets() {
 		root.getChildren().add(gamePane);
 
-//		gamePane.add(dicePane.getPane(), 1, 1);
-		gamePane.add(new Group(dicePane.getPane()), 1, 1);
-		GridPane.setHalignment(dicePane.getPane(), HPos.CENTER);
-		GridPane.setValignment(dicePane.getPane(), VPos.CENTER);
+		Group diceGroup = new Group(dicePane.getPane());
+		gamePane.add(diceGroup, 1, 1);
+		GridPane.setHalignment(diceGroup, HPos.CENTER);
+		GridPane.setValignment(diceGroup, VPos.CENTER);
 
 		switch (boards.size()) {
 		case 2:
