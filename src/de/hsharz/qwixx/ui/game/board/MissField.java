@@ -1,6 +1,8 @@
 package de.hsharz.qwixx.ui.game.board;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.image.ImageView;
@@ -13,11 +15,21 @@ public class MissField extends AbstractPane<StackPane> {
 	private boolean disabled = false;
 	private boolean selected = false;
 
+	private Set<MissFieldListener> listeners = new HashSet<>();
+
 	public MissField() {
 		super(new StackPane());
 
 		createWidgets();
 		setupBindings();
+	}
+
+	public void addListener(MissFieldListener l) {
+		this.listeners.add(l);
+	}
+
+	public void removeListener(MissFieldListener l) {
+		this.listeners.remove(l);
 	}
 
 	private void createWidgets() {
@@ -50,6 +62,7 @@ public class MissField extends AbstractPane<StackPane> {
 				selected = !selected;
 				imgView.setOpacity(1);
 				imgView.setVisible(selected);
+				listeners.forEach(MissFieldListener::userCrossedMiss);
 				event.consume();
 			}
 		});
