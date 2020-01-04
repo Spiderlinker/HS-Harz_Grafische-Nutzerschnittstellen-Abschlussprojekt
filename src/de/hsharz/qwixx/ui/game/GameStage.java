@@ -62,6 +62,7 @@ public class GameStage extends AbstractPane<StackPane> {
 
 		boxButtons = new HBox();
 		boxButtons.setPadding(new Insets(10));
+		boxButtons.setMouseTransparent(true);
 
 		btnExit = new JFXButton("Spiel beenden (Esc)");
 		btnExit.setStyle("-fx-background-color: white;");
