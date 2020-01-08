@@ -85,10 +85,11 @@ public class UserScoreUI extends AbstractPane<HBox> {
 	}
 
 	public void updateScore() {
-		lblScoreRedRow.setText(Integer.toString(userScore.getScoreRedRow()));
-		lblScoreYellowRow.setText(Integer.toString(userScore.getScoreYellowRow()));
-		lblScoreGreenRow.setText(Integer.toString(userScore.getScoreGreenRow()));
-		lblScoreBlueRow.setText(Integer.toString(userScore.getScoreBlueRow()));
+		
+		lblScoreRedRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.RED)));
+		lblScoreYellowRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.YELLOW)));
+		lblScoreGreenRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.GREEN)));
+		lblScoreBlueRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.BLUE)));
 
 		lblScoreMisses.setText(Integer.toString(userScore.getScoreMisses()));
 		lblScoreResult.setText(Integer.toString(userScore.getScoreComplete()));
