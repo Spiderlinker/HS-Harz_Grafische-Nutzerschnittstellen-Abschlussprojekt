@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialog.DialogTransition;
-
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
@@ -16,12 +13,10 @@ import de.hsharz.qwixx.ui.game.board.ComputerGameBoardUI;
 import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
-import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -31,7 +26,7 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-public class GameUI extends AbstractPane<StackPane> implements GameListener {
+public class GameUI extends AbstractPane<StackPane> {
 
 	private Game game;
 	private List<GameBoardUI> boards = new ArrayList<>();
@@ -42,7 +37,6 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 		super(new StackPane());
 
 		this.game = Objects.requireNonNull(game);
-		this.game.addGameListener(this);
 
 		createWidgets();
 		addWidgets();
@@ -204,26 +198,6 @@ public class GameUI extends AbstractPane<StackPane> implements GameListener {
 		});
 		dicePane.getPane().setScaleX(scale);
 		dicePane.getPane().setScaleY(scale);
-	}
-
-	@Override
-	public void nextPlayersTurn(IPlayer nextPlayer) {
-		// ignore
-	}
-
-	@Override
-	public void gameOver() {
-		showGameOverScreen();
-	}
-
-	private void showGameOverScreen() {
-		List<IPlayer> winningPlayer = game.getWinningPlayer();
-		JFXDialog dialog = new JFXDialog(getPane(), new Label(winningPlayer.toString()), DialogTransition.CENTER);
-		dialog.setOverlayClose(false);
-		dialog.setOnDialogClosed(e -> {
-			System.out.println("Should exit...");
-		});
-		Platform.runLater(dialog::show);
 	}
 
 }
