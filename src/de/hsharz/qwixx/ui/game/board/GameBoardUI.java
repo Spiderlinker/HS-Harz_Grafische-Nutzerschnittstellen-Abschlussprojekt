@@ -3,8 +3,10 @@ package de.hsharz.qwixx.ui.game.board;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
+import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.board.GameBoardListener;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
@@ -15,7 +17,6 @@ import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.game.GameListener;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
@@ -67,10 +68,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		lblName = new Label(player.getName());
 		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
 
-		rows.put(DiceColor.RED, new RowUI(player.getGameBoard().getRedRow()));
-		rows.put(DiceColor.YELLOW, new RowUI(player.getGameBoard().getYellowRow()));
-		rows.put(DiceColor.GREEN, new RowUI(player.getGameBoard().getGreenRow()));
-		rows.put(DiceColor.BLUE, new RowUI(player.getGameBoard().getBlueRow()));
+		// add for each Row a new RowUI
+		player.getGameBoard().getRows().entrySet().forEach(e -> rows.put(e.getKey(), new RowUI(e.getValue())));
 
 		scoreLegend = new ScoreLegend();
 		userScore = new UserScoreUI(player.getGameBoard().getScore());
@@ -126,7 +125,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	public void userCrossedField(RowUI ui, NumberFieldUI btn) {
 		System.out.println("User crossed field: " + btn);
 		playerSelectedDice(new DicesSum(ui.getRow().getColor(), btn.getValue()));
-		// Fehlerbehandlung bei falschem Input
 	}
 
 	@Override
@@ -163,8 +161,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	public void missCrossed() {
 		for (int i = 0; i < scoreLegend.getMissFields().size(); i++) {
 			MissField missField = scoreLegend.getMissFields().get(i);
-			missField.setSelected(i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses());
-			missField.setDisabled(i < scoreLegend.getMissFields().size() - player.getGameBoard().getRemainingMisses());
+
+			boolean isMissAlreadyUsed = i < (scoreLegend.getMissFields().size()
+					- player.getGameBoard().getRemainingMisses());
+			missField.setSelected(isMissAlreadyUsed);
+			missField.setDisabled(isMissAlreadyUsed);
 		}
 
 		Platform.runLater(() -> userScore.updateScore());
@@ -177,7 +178,19 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		firstSelection = null;
 		secondSelection = null;
 
+		checkCrossedButtons();
+
 		disableAllButtons();
+	}
+
+	private void checkCrossedButtons() {
+		for (Entry<DiceColor, RowUI> e : rows.entrySet()) {
+			for (int i = 0; i < e.getValue().getButtons().size(); i++) {
+				NumberFieldUI numberField = e.getValue().getButtons().get(i);
+				numberField.getButton()
+						.setSelected(player.getGameBoard().getRow(e.getKey()).getFields().get(i).isCrossed());
+			}
+		}
 	}
 
 	protected void disableAllButtons() {
@@ -200,9 +213,17 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		boolean currentPlayerIsNextPlayer = player.equals(nextPlayer);
+		boolean currentPlayerIsNextPlayer = isCurrentPlayer(nextPlayer);
 		highlightGameboard(currentPlayerIsNextPlayer);
 		enableMissFields(currentPlayerIsNextPlayer);
+	}
+
+	private boolean isCurrentPlayer(IPlayer playerToCheck) {
+		return player.equals(playerToCheck);
+	}
+
+	@Override
+	public void invalidDiceChoiceMade(IPlayer player, String msg) {
 	}
 
 	@Override
