@@ -6,12 +6,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.game.GameListener;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -86,6 +86,11 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 
 	@Override
 	public void gameOver() {
+		// ignore
+	}
+
+	@Override
+	public void invalidDiceChoiceMade(IPlayer player, String msg) {
 		// ignore
 	}
 }
