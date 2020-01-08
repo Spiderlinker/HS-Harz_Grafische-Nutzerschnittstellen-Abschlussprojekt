@@ -1,19 +1,29 @@
 package de.hsharz.qwixx.ui.game;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialog.DialogTransition;
 
 import de.hsharz.qwixx.model.Game;
+import de.hsharz.qwixx.model.GameListener;
+import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.notification.Notification;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -22,7 +32,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class GameStage extends AbstractPane<StackPane> {
+public class GameStage extends AbstractPane<StackPane> implements GameListener {
 
 	private Stage stage;
 	private Scene scene;
@@ -35,10 +45,14 @@ public class GameStage extends AbstractPane<StackPane> {
 	private JFXButton btnExit;
 	private JFXButton btnHelp;
 
+	private Notification notification;
+
 	public GameStage(Game game, Screen screen) {
 		super(new StackPane());
 		this.game = Objects.requireNonNull(game);
 		this.screen = Objects.requireNonNull(screen);
+
+		this.game.addGameListener(this);
 
 		gameUI = new GameUI(game);
 
@@ -62,18 +76,20 @@ public class GameStage extends AbstractPane<StackPane> {
 
 		boxButtons = new HBox();
 		boxButtons.setPadding(new Insets(10));
-		boxButtons.setMouseTransparent(true);
+		boxButtons.setMaxHeight(50);
+//		boxButtons.setMouseTransparent(true);
 
 		btnExit = new JFXButton("Spiel beenden (Esc)");
 		btnExit.setStyle("-fx-background-color: white;");
 		btnHelp = new JFXButton("Hilfe");
 		btnHelp.setStyle("-fx-background-color: white;");
+
+		notification = new Notification();
 	}
 
 	private void setupInteractions() {
 		stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> showExitGameScreen());
 		btnExit.setOnAction(e -> showExitGameScreen());
-
 	}
 
 	private void addWidgets() {
@@ -87,6 +103,11 @@ public class GameStage extends AbstractPane<StackPane> {
 		boxButtons.getChildren().add(btnExit);
 
 		root.getChildren().add(boxButtons);
+		root.getChildren().add(notification.getPane());
+
+		StackPane.setAlignment(boxButtons, Pos.TOP_CENTER);
+		StackPane.setAlignment(notification.getPane(), Pos.BOTTOM_LEFT);
+		StackPane.setMargin(notification.getPane(), new Insets(50));
 	}
 
 	private void scaleGameUI() {
@@ -133,6 +154,37 @@ public class GameStage extends AbstractPane<StackPane> {
 
 	public Game getGame() {
 		return game;
+	}
+
+	@Override
+	public void nextPlayersTurn(IPlayer nextPlayer) {
+		notification.show("Der nächste Spieler ist am Zug: " + nextPlayer.getName());
+	}
+
+	@Override
+	public void invalidDiceChoiceMade(IPlayer player, String msg) {
+		notification.show(
+				"Deine gesetzten Kreuze sind nicht erlaubt! Bitte konzentriere dich und versuche es noch einmal!");
+	}
+
+	@Override
+	public void gameOver() {
+		showGameOverScreen();
+	}
+
+	private void showGameOverScreen() {
+		List<IPlayer> winningPlayer = game.getWinningPlayer();
+		BorderPane pane = new BorderPane();
+		pane.setCenter(new Label(winningPlayer.toString()));
+		Button btn = new Button("Beenden");
+		pane.setBottom(btn);
+		JFXDialog dialog = new JFXDialog(getPane(), pane, DialogTransition.CENTER);
+
+		btn.setOnAction(e -> dialog.close());
+
+		dialog.setOverlayClose(false);
+		dialog.setOnDialogClosed(e -> stage.hide());
+		Platform.runLater(dialog::show);
 	}
 
 }
