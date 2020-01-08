@@ -18,8 +18,8 @@ import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.IPlayer;
-import de.hsharz.qwixx.ui.game.GameListener;
 import de.hsharz.qwixx.ui.game.dice.DiceListener;
+import de.hsharz.qwixx.utils.GameUtils;
 
 public class Game implements RowsClosedSupplier {
 
@@ -131,15 +131,7 @@ public class Game implements RowsClosedSupplier {
 					letOtherPlayerChooseWhiteDices(getWhiteDicesSums(), currentPlayer);
 
 					System.out.println("Let Player choose 1 - 2 Dices");
-					Pair<DicesSum> selectedDices = currentPlayer.chooseDices(dicesSums, 1, 2);
-
-					// Check if player selected any dice
-					if (selectedDices.isEmpty()) {
-						// player did not select any dice, cross miss
-						currentPlayer.getGameBoard().crossMiss();
-					} else {
-						validatePlayerCrosses(currentPlayer, selectedDices, 1, 2);
-					}
+					letPlayerSelectDice(currentPlayer, dicesSums, 1, 2);
 
 					closeQueuedRows();
 					if (isGameOver()) {
@@ -185,13 +177,37 @@ public class Game implements RowsClosedSupplier {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
 				System.out.println("Let other player choose 0 - 1 dices");
-				Pair<DicesSum> selectedDices = p.chooseDices(dices, 0, 1);
-				validatePlayerCrosses(p, selectedDices, 0, 1);
+				letPlayerSelectDice(p, dices, 0, 1);
 			}
 		});
 	}
 
-	private void validatePlayerCrosses(IPlayer player, Pair<DicesSum> dices, int minDices, int maxDices) {
+	private void letPlayerSelectDice(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
+
+		boolean selectedDicesValid = false;
+		while (!selectedDicesValid) {
+			Pair<DicesSum> selectedDices = player.chooseDices(dices, minDices, maxDices);
+
+			// Check if player selected any dice
+			if (selectedDices.isEmpty() && minDices == 1) {
+				// player did not select any dice, cross miss
+				player.getGameBoard().crossMiss();
+				selectedDicesValid = true;
+			} else {
+				try {
+					validatePlayerCrosses(player, selectedDices, dices, minDices, maxDices);
+					selectedDicesValid = true;
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
+				}
+			}
+		}
+
+	}
+
+	private void validatePlayerCrosses(IPlayer player, Pair<DicesSum> dices, List<DicesSum> allDices, int minDices,
+			int maxDices) {
 		DicesSum first = dices.getFirst();
 		DicesSum second = dices.getSecond();
 
@@ -199,30 +215,7 @@ public class Game implements RowsClosedSupplier {
 		System.out.println(
 				"Validating Cross of Player: " + player + " (Dices: " + dices + ") - " + minDices + "/" + maxDices);
 
-		// Auf zu wenige Würfel prüfen
-		if (minDices == 1 && dices.isEmpty()) {
-			throw new IllegalArgumentException("Keine Würfel ausgewählt. Min: " + minDices);
-		}
-
-		// Auf zu viele Würfel prüfen
-		if (maxDices == 1 && !first.equals(DicesSum.EMPTY) && !second.equals(DicesSum.EMPTY)) {
-			throw new IllegalArgumentException("Zu viele Würfel ausgewählt. Max: " + maxDices + "; Selected: 2");
-		}
-
-		if (!isEmptyDice(first) && !isEmptyDice(second)) { // zwei
-
-			// Prüfen, ob Weiß- vor Farbwürfel gewählt wurde
-			if (DiceColor.WHITE.equals(second.getColor())) {
-				throw new IllegalArgumentException("Die weißen Würfel müssen zuerst ausgewählt werden!");
-			}
-
-			// An zweiter Stelle muss nun ein Farbwürfel sein, da es kein weißer sein kann
-
-			// Prüfen, dass nur einmal Farbwürfel verwendet wurden
-			if (!DiceColor.WHITE.equals(first.getColor())) {
-				throw new IllegalArgumentException("Farbwürfel dürfen nur 1x verwendet werden!");
-			}
-		}
+		GameUtils.checkDiceSelection(dices, allDices, minDices, maxDices);
 
 		if (!isEmptyDice(first)) {
 			player.getGameBoard().crossField(first.getColor(), first.getSum());

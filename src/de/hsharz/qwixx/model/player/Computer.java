@@ -83,38 +83,22 @@ public class Computer extends Player {
 	private Map<DicesSum, Integer> getDistancesForDices(List<DicesSum> dices) {
 		Map<DicesSum, Integer> distances = new HashMap<>();
 		for (DicesSum dice : dices) {
-			if (DicesSum.EMPTY.equals(dice)) {
+			if (DicesSum.EMPTY.equals(dice) || DiceColor.WHITE.equals(dice.getColor())) { // TODO white dices müssen für alle Reihen berücksichtigt werden
 				continue;
 			}
-
-			int distance = Integer.MAX_VALUE;
-			int lastCrossedValue = -1;
-
-			switch (dice.getColor()) {
-			case RED:
-				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getRedRow());
-				distance = getDistanceAsc(dice.getSum(), lastCrossedValue);
-				break;
-			case YELLOW:
-				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getYellowRow());
-				distance = getDistanceAsc(dice.getSum(), lastCrossedValue);
-				break;
-			case GREEN:
-				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getGreenRow());
-				getDistanceDesc(dice.getSum(), lastCrossedValue);
-				break;
-			case BLUE:
-				lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getBlueRow());
-				getDistanceDesc(dice.getSum(), lastCrossedValue);
-				break;
-			default:
-//				lastCrossedFieldOfRow = getLastCrossedFieldOfRow(getGameBoard().getRedRow());
-			}
-
-			distances.put(dice, distance);
+			distances.put(dice, getDistance(dice));
 		}
 
 		return distances;
+	}
+
+	private int getDistance(DicesSum dice) {
+		int lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getRow(dice.getColor()));
+		if (DiceColor.RED.equals(dice.getColor()) || DiceColor.YELLOW.equals(dice.getColor())) {
+			return getDistanceAsc(dice.getSum(), lastCrossedValue);
+		} else {
+			return getDistanceDesc(dice.getSum(), lastCrossedValue);
+		}
 	}
 
 	private int getDistanceAsc(int diceSum, int lastCrossedValue) {
