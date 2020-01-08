@@ -65,9 +65,7 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 
 		root.setOnMousePressed(event -> {
 			if (!locked && !disabled && MouseButton.PRIMARY == event.getButton()) {
-				btn.setSelected(!btn.isSelected());
-				imgView.setOpacity(1);
-				imgView.setVisible(btn.isSelected());
+				setSelected(!btn.isSelected());
 				event.consume();
 			}
 		});
@@ -95,13 +93,14 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 		return disabled;
 	}
 
-	public ToggleButton getButton() {
-		return this.btn;
+	public void setSelected(boolean selected) {
+		btn.setSelected(selected);
+		imgView.setOpacity(1);
+		imgView.setVisible(btn.isSelected());
 	}
 
-	public void showCrossImage() {
-		imgView.setOpacity(1);
-		imgView.setVisible(true);
+	public ToggleButton getButton() {
+		return btn;
 	}
 
 	public int getValue() {

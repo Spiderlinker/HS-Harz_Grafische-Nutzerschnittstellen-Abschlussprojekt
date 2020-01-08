@@ -136,8 +136,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 			if (btn.getValue() == fieldToCross.getValue()) {
 				btn.setLocked(true);
 				btn.setDisabled(true);
-				btn.getButton().setSelected(true);
-				btn.showCrossImage();
+				btn.setSelected(true);
 				break;
 			}
 		}
@@ -187,8 +186,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		for (Entry<DiceColor, RowUI> e : rows.entrySet()) {
 			for (int i = 0; i < e.getValue().getButtons().size(); i++) {
 				NumberFieldUI numberField = e.getValue().getButtons().get(i);
-				numberField.getButton()
-						.setSelected(player.getGameBoard().getRow(e.getKey()).getFields().get(i).isCrossed());
+				numberField.setSelected(player.getGameBoard().getRow(e.getKey()).getFields().get(i).isCrossed());
 			}
 		}
 	}
