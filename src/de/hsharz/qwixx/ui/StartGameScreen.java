@@ -21,7 +21,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -181,7 +180,7 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		}
 
 		Screen screen = screensForRectangle.get(0);
-		
+
 		Task<GameStage> createUITask = new Task<GameStage>() {
 			@Override
 			protected GameStage call() throws Exception {
