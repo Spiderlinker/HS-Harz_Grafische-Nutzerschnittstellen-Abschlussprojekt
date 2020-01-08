@@ -1,7 +1,9 @@
 package de.hsharz.qwixx.model.board;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hsharz.qwixx.model.board.row.Order;
 import de.hsharz.qwixx.model.board.row.Row;
@@ -15,11 +17,7 @@ public class GameBoard {
 	private static final int AMOUNT_MISSES = 4;
 
 	private RowsClosedSupplier rowClosedSupplier;
-
-	private Row redRow = new Row(DiceColor.RED, Order.ASC);
-	private Row yellowRow = new Row(DiceColor.YELLOW, Order.ASC);
-	private Row greenRow = new Row(DiceColor.GREEN, Order.DESC);
-	private Row blueRow = new Row(DiceColor.BLUE, Order.DESC);
+	private Map<DiceColor, Row> rows = new EnumMap<>(DiceColor.class);
 
 	private int remainingMisses = AMOUNT_MISSES;
 
@@ -29,6 +27,15 @@ public class GameBoard {
 
 	public GameBoard() {
 		userScore = new UserScore();
+
+		createRows();
+	}
+
+	private void createRows() {
+		rows.put(DiceColor.RED, new Row(DiceColor.RED, Order.ASC));
+		rows.put(DiceColor.YELLOW, new Row(DiceColor.YELLOW, Order.ASC));
+		rows.put(DiceColor.GREEN, new Row(DiceColor.GREEN, Order.DESC));
+		rows.put(DiceColor.BLUE, new Row(DiceColor.BLUE, Order.DESC));
 	}
 
 	public void addListener(GameBoardListener l) {
@@ -43,20 +50,12 @@ public class GameBoard {
 		this.rowClosedSupplier = supplier;
 	}
 
-	public Row getRedRow() {
-		return redRow;
+	public Map<DiceColor, Row> getRows() {
+		return rows;
 	}
 
-	public Row getYellowRow() {
-		return yellowRow;
-	}
-
-	public Row getGreenRow() {
-		return greenRow;
-	}
-
-	public Row getBlueRow() {
-		return blueRow;
+	public Row getRow(DiceColor color) {
+		return rows.get(color);
 	}
 
 	public int getRemainingMisses() {
@@ -78,22 +77,7 @@ public class GameBoard {
 
 	public void crossField(DiceColor colorToCross, int numberToCross) {
 		System.out.println("Should cross " + colorToCross + " : " + numberToCross);
-		switch (colorToCross) {
-		case RED:
-			validateCross(redRow, numberToCross);
-			break;
-		case YELLOW:
-			validateCross(yellowRow, numberToCross);
-			break;
-		case GREEN:
-			validateCross(greenRow, numberToCross);
-			break;
-		case BLUE:
-			validateCross(blueRow, numberToCross);
-			break;
-		default:
-			throw new IllegalArgumentException("No valid color: " + colorToCross);
-		}
+		validateCross(rows.get(colorToCross), numberToCross);
 	}
 
 	private void validateCross(Row rowToCross, int numberToCross) {
@@ -166,12 +150,13 @@ public class GameBoard {
 	}
 
 	private void updateScore() {
-		userScore.setScoreRedRow((int) redRow.getFields().stream().filter(Field::isCrossed).count());
-		userScore.setScoreYellowRow((int) yellowRow.getFields().stream().filter(Field::isCrossed).count());
-		userScore.setScoreGreenRow((int) greenRow.getFields().stream().filter(Field::isCrossed).count());
-		userScore.setScoreBlueRow((int) blueRow.getFields().stream().filter(Field::isCrossed).count());
-
+		// Update score field of all rows
+		rows.entrySet().forEach(e -> userScore.setScoreOfRow(e.getKey(), getAmountCrossedFieldsOfRow(e.getValue())));
 		userScore.setScoreMisses(AMOUNT_MISSES - remainingMisses);
+	}
+
+	private int getAmountCrossedFieldsOfRow(Row row) {
+		return (int) row.getFields().stream().filter(Field::isCrossed).count();
 	}
 
 	public RowsClosedSupplier getRowClosedSupplier() {
