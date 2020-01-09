@@ -30,6 +30,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -178,8 +179,39 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	private void showGameOverScreen() {
 		List<IPlayer> winningPlayer = game.getWinningPlayer();
 		BorderPane pane = new BorderPane();
-		pane.setCenter(new Label(winningPlayer.toString()));
+		pane.setPadding(new Insets(20));
+		pane.setStyle("-fx-background-color: white; ");
+
+		Label gameOver = new Label("Game over");
+		gameOver.setStyle("-fx-font-size: 50pt; -fx-font-family: Gabriola; ");
+
+		StringBuilder winningPlayerText = new StringBuilder();
+		if (winningPlayer.size() == 1) {
+			IPlayer player = winningPlayer.get(0);
+			if (player instanceof Human) {
+				winningPlayerText.append("Du hast gewonnen!");
+			} else {
+				winningPlayerText.append("Der Spieler " + player.getName() + " hat gewonnen!");
+			}
+		} else {
+			winningPlayerText.append("Die Spieler:\n");
+			for (IPlayer p : winningPlayer) {
+				winningPlayerText.append(p.getName() + "\n");
+			}
+			winningPlayerText.append(" haben gewonnen!");
+		}
+
+		Text lbl = new Text(winningPlayerText.toString());
+		lbl.setStyle("-fx-font-size: 16pt;");
+
+		pane.setTop(gameOver);
+		pane.setCenter(lbl);
+
+		BorderPane.setAlignment(gameOver, Pos.CENTER);
+		BorderPane.setMargin(lbl, new Insets(10, 0, 10, 0));
+
 		Button btn = new Button("Beenden");
+		BorderPane.setAlignment(btn, Pos.BOTTOM_RIGHT);
 		pane.setBottom(btn);
 		JFXDialog dialog = new JFXDialog(getPane(), pane, DialogTransition.CENTER);
 
