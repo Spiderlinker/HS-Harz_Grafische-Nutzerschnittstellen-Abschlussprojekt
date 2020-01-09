@@ -178,55 +178,55 @@ public class Game implements RowsClosedSupplier {
 	private void letOtherPlayerChooseWhiteDices(List<DicesSum> whiteDices, IPlayer currentPlayer) {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
-
-				boolean selectedDicesValid = false;
-				while (!selectedDicesValid) {
-					try {
-						DicesSum selectedWhiteDice = p.chooseWhiteDices(whiteDices);
-						crossSelectedDice(p, selectedWhiteDice, whiteDices);
-						selectedDicesValid = true;
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-						gameListeners.forEach(l -> l.invalidDiceChoiceMade(p, e.getMessage()));
-					}
-				}
+				letPlayerSelectWhiteDice(p, whiteDices);
 			}
 		});
 	}
 
 	private void letPlayerSelectDice(IPlayer player, List<DicesSum> whiteDices, List<DicesSum> colorDices) {
 
-		boolean selectedDicesValid = false;
-		while (!selectedDicesValid) {
+		DicesSum selectedWhiteDice = letPlayerSelectWhiteDice(player, whiteDices);
 
-			System.out.println("---------- Current Player choosing dices");
+		closeQueuedRows();
+		if (isGameOver()) {
+			isPlaying = false;
+			return;
+		}
 
+		DicesSum selectedColorDice = letPlayerSelectColorDice(player, colorDices);
+
+		// Check if player selected any dice
+		if (isEmptyDice(selectedWhiteDice) && isEmptyDice(selectedColorDice)) {
+			// player did not select any dice, cross miss
+			player.getGameBoard().crossMiss();
+		}
+
+	}
+
+	private DicesSum letPlayerSelectWhiteDice(IPlayer player, List<DicesSum> whiteDices) {
+		while (true) {
 			try {
 				DicesSum selectedWhiteDice = player.chooseWhiteDices(whiteDices);
 				crossSelectedDice(player, selectedWhiteDice, whiteDices);
-
-				closeQueuedRows();
-				if (isGameOver()) {
-					isPlaying = false;
-					return;
-				}
-
-				DicesSum selectedColorDice = player.chooseColorDices(colorDices);
-				crossSelectedDice(player, selectedColorDice, colorDices);
-
-				// Check if player selected any dice
-				if (isEmptyDice(selectedWhiteDice) && isEmptyDice(selectedColorDice)) {
-					// player did not select any dice, cross miss
-					player.getGameBoard().crossMiss();
-				}
-
-				selectedDicesValid = true;
+				return selectedWhiteDice;
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
 			}
 		}
+	}
 
+	private DicesSum letPlayerSelectColorDice(IPlayer player, List<DicesSum> colorDices) {
+		while (true) {
+			try {
+				DicesSum selectedColorDice = player.chooseColorDices(colorDices);
+				crossSelectedDice(player, selectedColorDice, colorDices);
+				return selectedColorDice;
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
+			}
+		}
 	}
 
 	private void crossSelectedDice(IPlayer player, DicesSum selectedDice, List<DicesSum> dices) {
