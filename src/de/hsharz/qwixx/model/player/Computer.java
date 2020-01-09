@@ -6,16 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
-import de.hsharz.qwixx.model.dice.pair.DicePair;
-import de.hsharz.qwixx.model.dice.pair.Pair;
 
 public class Computer extends Player {
 
@@ -24,22 +20,13 @@ public class Computer extends Player {
 	}
 
 	@Override
-	public Pair<DicesSum> chooseDices(List<DicesSum> dices, int minDices, int maxDices) {
-		System.out.println("Choosing color dice");
+	public DicesSum chooseWhiteDices(List<DicesSum> dices) {
+		return getBestWhiteDicesSum(dices);
+	}
 
-		DicesSum firstSelection = null;
-		DicesSum secondSelection = null;
-
-		if (maxDices == 1) {
-			firstSelection = getBestDicesSum(dices);
-			secondSelection = DicesSum.EMPTY;
-		} else {
-			Predicate<DicesSum> isWhiteDice = dice -> DiceColor.WHITE.equals(dice.getColor());
-			firstSelection = getBestWhiteDicesSum(dices.stream().filter(isWhiteDice).collect(Collectors.toList()));
-			secondSelection = getBestDicesSum(dices.stream().filter(isWhiteDice.negate()).collect(Collectors.toList()));
-		}
-
-		return new DicePair(firstSelection, secondSelection);
+	@Override
+	public DicesSum chooseColorDices(List<DicesSum> dices) {
+		return getBestDicesSum(dices);
 	}
 
 	private DicesSum getBestWhiteDicesSum(List<DicesSum> whiteDices) {
@@ -83,9 +70,10 @@ public class Computer extends Player {
 	private Map<DicesSum, Integer> getDistancesForDices(List<DicesSum> dices) {
 		Map<DicesSum, Integer> distances = new HashMap<>();
 		for (DicesSum dice : dices) {
-			if (DicesSum.EMPTY.equals(dice) || DiceColor.WHITE.equals(dice.getColor())) { // TODO white dices müssen für alle Reihen berücksichtigt werden
+			if (DicesSum.EMPTY.equals(dice)) {
 				continue;
 			}
+
 			distances.put(dice, getDistance(dice));
 		}
 

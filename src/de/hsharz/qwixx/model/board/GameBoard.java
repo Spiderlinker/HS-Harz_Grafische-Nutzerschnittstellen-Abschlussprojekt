@@ -82,10 +82,22 @@ public class GameBoard {
 
 	private void validateCross(Row rowToCross, int numberToCross) {
 
-		if (rowClosedSupplier.isRowClosed(rowToCross.getColor())) {
-			throw new IllegalAccessError("Row already closed: " + rowToCross.getColor());
-		}
+		int fieldToCrossIndex = getFieldToCrossIndex(rowToCross, numberToCross);
 
+		checkCrossForValidity(rowToCross, numberToCross, fieldToCrossIndex);
+
+		Field fieldToCross = rowToCross.getFields().get(fieldToCrossIndex);
+		fieldToCross.setCrossed(true);
+
+		checkIfCrossedFieldWasLastInRow(rowToCross, fieldToCross);
+		updateScore();
+
+		for (GameBoardListener listener : listeners) {
+			listener.fieldCrossed(rowToCross, fieldToCross);
+		}
+	}
+
+	private int getFieldToCrossIndex(Row rowToCross, int numberToCross) {
 		int fieldToCrossIndex = -1;
 		for (int i = 0; i < rowToCross.getFields().size(); i++) {
 			Field field = rowToCross.getFields().get(i);
@@ -94,6 +106,13 @@ public class GameBoard {
 				// abgekreuzt sind
 				fieldToCrossIndex = i;
 			}
+		}
+		return fieldToCrossIndex;
+	}
+
+	public void checkCrossForValidity(Row rowToCross, int numberToCross, int fieldToCrossIndex) {
+		if (rowClosedSupplier.isRowClosed(rowToCross.getColor())) {
+			throw new IllegalAccessError("Row already closed: " + rowToCross.getColor());
 		}
 
 		boolean fieldsInFrontNotCrossed = true;
@@ -111,17 +130,6 @@ public class GameBoard {
 		if (!fieldsInFrontNotCrossed) {
 			throw new IllegalAccessError("Es sind bereits Felder abgekreuzt.");
 		}
-
-		Field fieldToCross = rowToCross.getFields().get(fieldToCrossIndex);
-		fieldToCross.setCrossed(true);
-
-		checkIfCrossedFieldWasLastInRow(rowToCross, fieldToCross);
-		updateScore();
-
-		for (GameBoardListener listener : listeners) {
-			listener.fieldCrossed(rowToCross, fieldToCross);
-		}
-
 	}
 
 	private void checkIfCrossedFieldWasLastInRow(Row rowOfField, Field crossedField) {

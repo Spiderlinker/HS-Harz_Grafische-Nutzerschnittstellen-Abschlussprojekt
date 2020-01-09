@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.dice.DicesSum;
-import de.hsharz.qwixx.model.dice.pair.Pair;
 
 public class Human extends Player {
 
@@ -20,13 +19,22 @@ public class Human extends Player {
 	}
 
 	@Override
-	public Pair<DicesSum> chooseDices(List<DicesSum> dices, int minDices, int maxDices) {
-		Pair<DicesSum> selection = null;
+	public DicesSum chooseWhiteDices(List<DicesSum> dices) {
+		return waitForSelectionAndCrossField(dices);
+	}
+
+	@Override
+	public DicesSum chooseColorDices(List<DicesSum> dices) {
+		return waitForSelectionAndCrossField(dices);
+	}
+
+	private DicesSum waitForSelectionAndCrossField(List<DicesSum> dices) {
+		DicesSum selection = null;
 		synchronized (this) {
 			try {
 
 				System.out.println("Waiting for human to make input: " + dices);
-				inputSupplier.askForInput(this, dices, minDices, maxDices);
+				inputSupplier.askForInput(dices);
 				this.wait();
 				selection = inputSupplier.getHumanInput();
 
@@ -37,5 +45,4 @@ public class Human extends Player {
 
 		return selection;
 	}
-
 }

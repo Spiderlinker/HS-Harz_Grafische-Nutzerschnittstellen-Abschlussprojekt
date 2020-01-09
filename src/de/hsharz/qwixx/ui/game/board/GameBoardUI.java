@@ -12,8 +12,6 @@ import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
-import de.hsharz.qwixx.model.dice.pair.DicePair;
-import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
@@ -24,6 +22,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -32,17 +31,14 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	protected IPlayer player;
 	private Label lblName;
+	private Label lblHint;
 
 	protected Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
 	protected ScoreLegend scoreLegend;
 	protected UserScoreUI userScore;
 
-	protected IPlayer playerWaitingForInput;
-//	protected Pair<DicesSum> humanInput;
-
-	private DicesSum firstSelection;
-	private DicesSum secondSelection;
-	private int maxSelection;
+	protected boolean shouldNotify = false;
+	private DicesSum humanInput;
 
 	private DropShadow glowEffect;
 
@@ -67,6 +63,9 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 		lblName = new Label(player.getName());
 		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
+
+		lblHint = new Label();
+		lblHint.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
 
 		// add for each Row a new RowUI
 		player.getGameBoard().getRows().entrySet().forEach(e -> rows.put(e.getKey(), new RowUI(e.getValue())));
@@ -93,32 +92,30 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	private void playerSelectedDice(DicesSum dice) {
-		if (firstSelection == null) {
-			firstSelection = new DicesSum(dice.getColor(), dice.getSum());
-		} else if (secondSelection == null) {
-			secondSelection = new DicesSum(dice.getColor(), dice.getSum());
-		}
+		humanInput = dice;
 
-		if ((maxSelection == 1 && firstSelection != null) //
-				|| (maxSelection == 2 && secondSelection != null)) {
-			synchronized (playerWaitingForInput) {
-				playerWaitingForInput.notify();
+		if (shouldNotify) {
+			synchronized (player) {
+				player.notify();
 			}
 		}
 	}
 
 	private void addWidgets() {
+		HBox descriptionBox = new HBox();
+		descriptionBox.getChildren().add(lblName);
+		descriptionBox.getChildren().add(lblHint);
+
 		root.getChildren().add(lblName);
 		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
 
 		root.getChildren().add(scoreLegend.getPane());
 		root.getChildren().add(userScore.getPane());
-
 	}
 
 	@Override
-	public Pair<DicesSum> getHumanInput() {
-		return new DicePair(firstSelection, secondSelection);
+	public DicesSum getHumanInput() {
+		return humanInput;
 	}
 
 	@Override
@@ -152,7 +149,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	@Override
 	public void userCrossedMiss() {
 		// remove selected dices and notify player to continue
-		firstSelection = DicesSum.EMPTY;
 		playerSelectedDice(DicesSum.EMPTY);
 	}
 
@@ -171,14 +167,10 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
-		playerWaitingForInput = player;
-		maxSelection = maxDices;
-		firstSelection = null;
-		secondSelection = null;
+	public void askForInput(List<DicesSum> dices) {
+		this.shouldNotify = true;
 
 		checkCrossedButtons();
-
 		disableAllButtons();
 	}
 
@@ -222,6 +214,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void invalidDiceChoiceMade(IPlayer player, String msg) {
+
 	}
 
 	@Override

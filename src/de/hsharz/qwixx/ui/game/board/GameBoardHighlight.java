@@ -15,8 +15,8 @@ public class GameBoardHighlight extends GameBoardUI {
 	}
 
 	@Override
-	public void askForInput(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
-		super.askForInput(player, dices, minDices, maxDices);
+	public void askForInput(List<DicesSum> dices) {
+		super.askForInput(dices);
 		highlightButtonsOfDices(dices);
 	}
 

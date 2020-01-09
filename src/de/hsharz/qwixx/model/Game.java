@@ -16,10 +16,8 @@ import de.hsharz.qwixx.model.dice.Dice;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicesSum;
 import de.hsharz.qwixx.model.dice.IDice;
-import de.hsharz.qwixx.model.dice.pair.Pair;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.game.dice.DiceListener;
-import de.hsharz.qwixx.utils.GameUtils;
 
 public class Game implements RowsClosedSupplier {
 
@@ -126,12 +124,14 @@ public class Game implements RowsClosedSupplier {
 					gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
 
 					rollDices();
-					List<DicesSum> dicesSums = getDicesSums();
+					List<DicesSum> whiteDices = getWhiteDicesSums();
+					List<DicesSum> colorDices = getColorDicesSums();
 
-					letOtherPlayerChooseWhiteDices(getWhiteDicesSums(), currentPlayer);
+					System.out.println("---------- Other Player choosing dices");
+					letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
-					System.out.println("Let Player choose 1 - 2 Dices");
-					letPlayerSelectDice(currentPlayer, dicesSums, 1, 2);
+					System.out.println("---------- Current Player choosing dices");
+					letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
 
 					closeQueuedRows();
 					if (isGameOver()) {
@@ -153,10 +153,17 @@ public class Game implements RowsClosedSupplier {
 		diceListeners.forEach(DiceListener::dicesRolled);
 	}
 
-	public List<DicesSum> getDicesSums() {
-		return Arrays.asList(DicesSum.EMPTY,
-				new DicesSum(DiceColor.WHITE, diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue()),
+	private List<DicesSum> getWhiteDicesSums() {
+		int sum = diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue();
+		return Arrays.asList(DicesSum.EMPTY, //
+				new DicesSum(DiceColor.RED, sum), //
+				new DicesSum(DiceColor.YELLOW, sum), //
+				new DicesSum(DiceColor.GREEN, sum), //
+				new DicesSum(DiceColor.BLUE, sum));
+	}
 
+	private List<DicesSum> getColorDicesSums() {
+		return Arrays.asList(DicesSum.EMPTY,
 				new DicesSum(DiceColor.RED, diceWhite1.getCurrentValue() + diceRed.getCurrentValue()),
 				new DicesSum(DiceColor.YELLOW, diceWhite1.getCurrentValue() + diceYellow.getCurrentValue()),
 				new DicesSum(DiceColor.GREEN, diceWhite1.getCurrentValue() + diceGreen.getCurrentValue()),
@@ -168,69 +175,75 @@ public class Game implements RowsClosedSupplier {
 				new DicesSum(DiceColor.BLUE, diceBlue.getCurrentValue() + diceWhite2.getCurrentValue()));
 	}
 
-	private List<DicesSum> getWhiteDicesSums() {
-		return Arrays.asList(DicesSum.EMPTY,
-				new DicesSum(DiceColor.WHITE, diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue()));
-	}
-
-	private void letOtherPlayerChooseWhiteDices(List<DicesSum> dices, IPlayer currentPlayer) {
+	private void letOtherPlayerChooseWhiteDices(List<DicesSum> whiteDices, IPlayer currentPlayer) {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
-				System.out.println("Let other player choose 0 - 1 dices");
-				letPlayerSelectDice(p, dices, 0, 1);
+
+				boolean selectedDicesValid = false;
+				while (!selectedDicesValid) {
+					try {
+						DicesSum selectedWhiteDice = p.chooseWhiteDices(whiteDices);
+						crossSelectedDice(p, selectedWhiteDice, whiteDices);
+						selectedDicesValid = true;
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+						gameListeners.forEach(l -> l.invalidDiceChoiceMade(p, e.getMessage()));
+					}
+				}
 			}
 		});
 	}
 
-	private void letPlayerSelectDice(IPlayer player, List<DicesSum> dices, int minDices, int maxDices) {
+	private void letPlayerSelectDice(IPlayer player, List<DicesSum> whiteDices, List<DicesSum> colorDices) {
 
 		boolean selectedDicesValid = false;
 		while (!selectedDicesValid) {
-			Pair<DicesSum> selectedDices = player.chooseDices(dices, minDices, maxDices);
 
-			// Check if player selected any dice
-			if (selectedDices.isEmpty() && minDices == 1) {
-				// player did not select any dice, cross miss
-				player.getGameBoard().crossMiss();
-				selectedDicesValid = true;
-			} else {
-				try {
-					validatePlayerCrosses(player, selectedDices, dices, minDices, maxDices);
-					selectedDicesValid = true;
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
+			System.out.println("---------- Current Player choosing dices");
+
+			try {
+				DicesSum selectedWhiteDice = player.chooseWhiteDices(whiteDices);
+				crossSelectedDice(player, selectedWhiteDice, whiteDices);
+
+				closeQueuedRows();
+				if (isGameOver()) {
+					isPlaying = false;
+					return;
 				}
+
+				DicesSum selectedColorDice = player.chooseColorDices(colorDices);
+				crossSelectedDice(player, selectedColorDice, colorDices);
+
+				// Check if player selected any dice
+				if (isEmptyDice(selectedWhiteDice) && isEmptyDice(selectedColorDice)) {
+					// player did not select any dice, cross miss
+					player.getGameBoard().crossMiss();
+				}
+
+				selectedDicesValid = true;
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
 			}
 		}
 
 	}
 
-	private void validatePlayerCrosses(IPlayer player, Pair<DicesSum> dices, List<DicesSum> allDices, int minDices,
-			int maxDices) {
-		DicesSum first = dices.getFirst();
-		DicesSum second = dices.getSecond();
-
-		System.out.println("-------------------------");
-		System.out.println(
-				"Validating Cross of Player: " + player + " (Dices: " + dices + ") - " + minDices + "/" + maxDices);
-
-		GameUtils.checkDiceSelection(dices, allDices, minDices, maxDices);
-
-		if (!isEmptyDice(first)) {
-			player.getGameBoard().crossField(first.getColor(), first.getSum());
+	private void crossSelectedDice(IPlayer player, DicesSum selectedDice, List<DicesSum> dices) {
+		if (isEmptyDice(selectedDice)) {
+			return;
 		}
 
-		if (!isEmptyDice(second)) {
-			player.getGameBoard().crossField(second.getColor(), second.getSum());
+		if (!dices.contains(selectedDice)) {
+			throw new IllegalArgumentException(
+					"Diese Würfelsumme wurde nicht geworfen: " + selectedDice + " [" + dices + "]");
 		}
 
-		System.out.println("Validation finished");
-		System.out.println("-------------------------");
+		player.getGameBoard().crossField(selectedDice.getColor(), selectedDice.getSum());
 	}
 
 	private boolean isEmptyDice(DicesSum sum) {
-		return DicesSum.EMPTY.equals(sum);
+		return sum == null || sum.equals(DicesSum.EMPTY);
 	}
 
 	private void closeQueuedRows() {
