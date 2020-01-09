@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXDialog.DialogTransition;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.GameListener;
+import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.notification.Notification;
@@ -158,13 +159,15 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		notification.show("Der nächste Spieler ist am Zug: " + nextPlayer.getName());
+		if (nextPlayer instanceof Human) {
+			notification.show("Du bist am Zug!\nBitte wähle zuerst aus den weißen, dann aus den farbigen Würfeln.");
+		}
 	}
 
 	@Override
 	public void invalidDiceChoiceMade(IPlayer player, String msg) {
-		notification.show(
-				"Deine gesetzten Kreuze sind nicht erlaubt! Bitte konzentriere dich und versuche es noch einmal!");
+		notification
+				.show("Dein gesetztes Kreuz ist nicht erlaubt!\nBitte konzentriere dich und versuche es noch einmal!");
 	}
 
 	@Override
