@@ -17,10 +17,10 @@ public class Qwixx extends Application {
 			primaryStage.hide();
 			System.exit(0);
 		});
+
 		primaryStage.setTitle("Qwixx");
 		primaryStage.setScene(new Scene(root, 440, 500));
 		primaryStage.show();
-
 	}
 
 	public static void main(String[] args) {
