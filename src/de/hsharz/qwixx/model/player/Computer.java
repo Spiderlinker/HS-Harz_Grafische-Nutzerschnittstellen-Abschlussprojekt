@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowUtils;
 import de.hsharz.qwixx.model.dice.DiceColor;
-import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.DicePair;
 
 public class Computer extends Player {
 
@@ -20,36 +21,34 @@ public class Computer extends Player {
 	}
 
 	@Override
-	public DicesSum chooseWhiteDices(List<DicesSum> dices) {
+	public DicePair chooseWhiteDices(List<DicePair> dices) {
 		return getBestWhiteDicesSum(dices);
 	}
 
 	@Override
-	public DicesSum chooseColorDices(List<DicesSum> dices) {
+	public DicePair chooseColorDices(List<DicePair> dices) {
 		return getBestDicesSum(dices);
 	}
 
-	private DicesSum getBestWhiteDicesSum(List<DicesSum> whiteDices) {
+	private DicePair getBestWhiteDicesSum(List<DicePair> whiteDices) {
 
-		List<DicesSum> mappedDices = new ArrayList<>();
+		List<DicePair> mappedDices = new ArrayList<>();
 
-		for (DicesSum whiteDice : whiteDices) {
-			if (!DicesSum.EMPTY.equals(whiteDice)) {
-				mappedDices.add(new DicesSum(DiceColor.RED, whiteDice.getSum()));
-				mappedDices.add(new DicesSum(DiceColor.YELLOW, whiteDice.getSum()));
-				mappedDices.add(new DicesSum(DiceColor.GREEN, whiteDice.getSum()));
-				mappedDices.add(new DicesSum(DiceColor.BLUE, whiteDice.getSum()));
-			}
+		for (DicePair whiteDice : whiteDices) {
+			mappedDices.add(new DicePair(DiceColor.RED, whiteDice.getSum()));
+			mappedDices.add(new DicePair(DiceColor.YELLOW, whiteDice.getSum()));
+			mappedDices.add(new DicePair(DiceColor.GREEN, whiteDice.getSum()));
+			mappedDices.add(new DicePair(DiceColor.BLUE, whiteDice.getSum()));
 		}
 
 		return getBestDicesSum(mappedDices);
 	}
 
-	private DicesSum getBestDicesSum(List<DicesSum> dices) {
-		DicesSum bestDices = null;
+	private DicePair getBestDicesSum(List<DicePair> dices) {
+		DicePair bestDices = null;
 
-		Map<DicesSum, Integer> distance = getDistancesForDices(dices);
-		Optional<Entry<DicesSum, Integer>> shortestDistance = distance.entrySet().stream()//
+		Map<DicePair, Integer> distance = getDistancesForDices(dices);
+		Optional<Entry<DicePair, Integer>> shortestDistance = distance.entrySet().stream()//
 				.filter(e -> !getGameBoard().getRowClosedSupplier().isRowClosed(e.getKey().getColor())) //
 				.filter(e -> e.getValue() >= 0)//
 				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second);
@@ -60,27 +59,20 @@ public class Computer extends Player {
 			System.out.println("Found dices <= 2 " + shortestDistance);
 			bestDices = shortestDistance.get().getKey();
 		} else {
-			bestDices = DicesSum.EMPTY;
+			bestDices = DicePair.EMPTY;
 			System.out.println("No dice found");
 		}
 
 		return bestDices;
 	}
 
-	private Map<DicesSum, Integer> getDistancesForDices(List<DicesSum> dices) {
-		Map<DicesSum, Integer> distances = new HashMap<>();
-		for (DicesSum dice : dices) {
-			if (DicesSum.EMPTY.equals(dice)) {
-				continue;
-			}
-
-			distances.put(dice, getDistance(dice));
-		}
-
-		return distances;
+	private Map<DicePair, Integer> getDistancesForDices(List<DicePair> dices) {
+		// Für jedes DicePair die Distanz berechnen und als Map (Dice, Distance)
+		// zurückgeben
+		return dices.stream().collect(Collectors.toMap(dice -> dice, this::getDistance));
 	}
 
-	private int getDistance(DicesSum dice) {
+	private int getDistance(DicePair dice) {
 		int lastCrossedValue = RowUtils.getLastCrossedValue(getGameBoard().getRow(dice.getColor()));
 		if (DiceColor.RED.equals(dice.getColor()) || DiceColor.YELLOW.equals(dice.getColor())) {
 			return getDistanceAsc(dice.getSum(), lastCrossedValue);

@@ -2,7 +2,8 @@ package de.hsharz.qwixx.ui.game.board;
 
 import java.util.List;
 
-import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.DicePair;
+import de.hsharz.qwixx.model.player.DiceSelectionType;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 
@@ -13,8 +14,8 @@ public class GameBoardSimple extends GameBoardUI {
 	}
 
 	@Override
-	public void askForInput(List<DicesSum> dices) {
-		super.askForInput(dices);
+	public void askForInput(List<DicePair> dices, DiceSelectionType selectionType) {
+		super.askForInput(dices, selectionType);
 		highlightRemainingFields();
 	}
 

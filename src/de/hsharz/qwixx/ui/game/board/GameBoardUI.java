@@ -11,7 +11,8 @@ import de.hsharz.qwixx.model.board.GameBoardListener;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
-import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.DicePair;
+import de.hsharz.qwixx.model.player.DiceSelectionType;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
@@ -23,6 +24,8 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -38,7 +41,9 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	protected UserScoreUI userScore;
 
 	protected boolean shouldNotify = false;
-	private DicesSum humanInput;
+	private DicePair humanInput;
+	private boolean isCurrentPlayersTurn = false;
+	private DiceSelectionType selectionType;
 
 	private DropShadow glowEffect;
 
@@ -86,12 +91,47 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
-				playerSelectedDice(DicesSum.EMPTY);
+				playerSelectedDice(DicePair.EMPTY);
 			}
 		});
 	}
 
-	private void playerSelectedDice(DicesSum dice) {
+	private void addWidgets() {
+		HBox descriptionBox = new HBox();
+		descriptionBox.getChildren().add(lblName);
+		descriptionBox.getChildren().add(getHBoxSpacer());
+		descriptionBox.getChildren().add(lblHint);
+
+		root.getChildren().add(descriptionBox);
+		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
+
+		root.getChildren().add(scoreLegend.getPane());
+		root.getChildren().add(userScore.getPane());
+	}
+
+	private Region getHBoxSpacer() {
+		Region spacer = new Region();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
+		return spacer;
+	}
+
+	@Override
+	public void askForInput(List<DicePair> dices, DiceSelectionType selectionType) {
+		this.shouldNotify = true;
+		this.selectionType = selectionType;
+
+		checkCrossedButtons();
+		disableAllButtons();
+
+		setMissFieldsDisabled(!isFirstDiceSelection());
+		updateHintLabel();
+	}
+
+	private boolean isFirstDiceSelection() {
+		return isCurrentPlayersTurn && humanInput == null;
+	}
+
+	private void playerSelectedDice(DicePair dice) {
 		humanInput = dice;
 
 		if (shouldNotify) {
@@ -101,27 +141,15 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		}
 	}
 
-	private void addWidgets() {
-		HBox descriptionBox = new HBox();
-		descriptionBox.getChildren().add(lblName);
-		descriptionBox.getChildren().add(lblHint);
-
-		root.getChildren().add(lblName);
-		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
-
-		root.getChildren().add(scoreLegend.getPane());
-		root.getChildren().add(userScore.getPane());
-	}
-
 	@Override
-	public DicesSum getHumanInput() {
+	public DicePair getHumanInput() {
 		return humanInput;
 	}
 
 	@Override
 	public void userCrossedField(RowUI ui, NumberFieldUI btn) {
 		System.out.println("User crossed field: " + btn);
-		playerSelectedDice(new DicesSum(ui.getRow().getColor(), btn.getValue()));
+		playerSelectedDice(new DicePair(ui.getRow().getColor(), btn.getValue()));
 	}
 
 	@Override
@@ -131,13 +159,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
 		for (NumberFieldUI btn : rowToCrossUI.getButtons()) {
 			if (btn.getValue() == fieldToCross.getValue()) {
-				btn.setLocked(true);
 				btn.setDisabled(true);
 				btn.setSelected(true);
 				break;
 			}
 		}
-
 		Platform.runLater(() -> userScore.updateScore());
 	}
 
@@ -149,7 +175,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	@Override
 	public void userCrossedMiss() {
 		// remove selected dices and notify player to continue
-		playerSelectedDice(DicesSum.EMPTY);
+		playerSelectedDice(DicePair.MISS);
 	}
 
 	@Override
@@ -166,14 +192,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		Platform.runLater(() -> userScore.updateScore());
 	}
 
-	@Override
-	public void askForInput(List<DicesSum> dices) {
-		this.shouldNotify = true;
-
-		checkCrossedButtons();
-		disableAllButtons();
-	}
-
 	private void checkCrossedButtons() {
 		for (Entry<DiceColor, RowUI> e : rows.entrySet()) {
 			for (int i = 0; i < e.getValue().getButtons().size(); i++) {
@@ -188,7 +206,9 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	private void disableButtonsOfRow(RowUI row) {
+//		System.out.println("Disabling Row: " + row.getRow().getColor());
 		for (NumberFieldUI btn : row.getButtons()) {
+//			System.out.println("Disabling " + btn.getValue());
 			btn.setDisabled(true);
 		}
 	}
@@ -197,15 +217,21 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
 	}
 
-	private void enableMissFields(boolean enable) {
-		scoreLegend.getMissFields().forEach(f -> f.setDisabled(!enable));
+	private void setMissFieldsDisabled(boolean disabled) {
+		scoreLegend.getMissFields().forEach(f -> f.setDisabled(disabled));
+	}
+
+	private void updateHintLabel() {
+		Platform.runLater(() -> lblHint.setText(
+				(DiceSelectionType.COLOR_DICE.equals(selectionType) ? "Farbwürfel" : "Weißen Würfel") + " wählen"));
 	}
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		boolean currentPlayerIsNextPlayer = isCurrentPlayer(nextPlayer);
-		highlightGameboard(currentPlayerIsNextPlayer);
-		enableMissFields(currentPlayerIsNextPlayer);
+		isCurrentPlayersTurn = isCurrentPlayer(nextPlayer);
+		highlightGameboard(isCurrentPlayersTurn);
+
+		humanInput = null;
 	}
 
 	private boolean isCurrentPlayer(IPlayer playerToCheck) {
@@ -214,7 +240,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void invalidDiceChoiceMade(IPlayer player, String msg) {
-
+		humanInput = null;
 	}
 
 	@Override

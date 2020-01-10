@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.GameBoard;
-import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.DicePair;
 
 public class Human extends Player {
 
@@ -19,22 +19,22 @@ public class Human extends Player {
 	}
 
 	@Override
-	public DicesSum chooseWhiteDices(List<DicesSum> dices) {
-		return waitForSelectionAndCrossField(dices);
+	public DicePair chooseWhiteDices(List<DicePair> dices) {
+		return waitForSelectionAndCrossField(dices, DiceSelectionType.WHITE_DICE);
 	}
 
 	@Override
-	public DicesSum chooseColorDices(List<DicesSum> dices) {
-		return waitForSelectionAndCrossField(dices);
+	public DicePair chooseColorDices(List<DicePair> dices) {
+		return waitForSelectionAndCrossField(dices, DiceSelectionType.COLOR_DICE);
 	}
 
-	private DicesSum waitForSelectionAndCrossField(List<DicesSum> dices) {
-		DicesSum selection = null;
+	private DicePair waitForSelectionAndCrossField(List<DicePair> dices, DiceSelectionType selectionType) {
+		DicePair selection = null;
 		synchronized (this) {
 			try {
 
 				System.out.println("Waiting for human to make input: " + dices);
-				inputSupplier.askForInput(dices);
+				inputSupplier.askForInput(dices, selectionType);
 				this.wait();
 				selection = inputSupplier.getHumanInput();
 
