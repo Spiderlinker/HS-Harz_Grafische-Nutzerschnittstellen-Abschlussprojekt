@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.hsharz.qwixx.model.board.row.Order;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.model.dice.DicePair;
 
 public class GameBoard {
 
@@ -75,9 +77,23 @@ public class GameBoard {
 		}
 	}
 
-	public void crossField(DiceColor colorToCross, int numberToCross) {
-		System.out.println("Should cross " + colorToCross + " : " + numberToCross);
-		validateCross(rows.get(colorToCross), numberToCross);
+	public void crossField(DicePair pair) {
+		System.out.println("Should cross " + pair);
+		Objects.requireNonNull(pair);
+
+		// Wenn DicePair EMPTY ist, kann nichts angekreuzt werden
+		if (pair.equals(DicePair.EMPTY)) {
+			return;
+		}
+
+		// Falls DicePair ein MISS ist, dann soll ein Miss angekreuzt werden
+		if (pair.equals(DicePair.MISS)) {
+			crossMiss();
+			return;
+		}
+
+		// Ansonsten das DicePair ankreuzen
+		validateCross(rows.get(pair.getColor()), pair.getSum());
 	}
 
 	private void validateCross(Row rowToCross, int numberToCross) {

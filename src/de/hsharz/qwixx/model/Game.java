@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.dice.Dice;
 import de.hsharz.qwixx.model.dice.DiceColor;
-import de.hsharz.qwixx.model.dice.DicesSum;
+import de.hsharz.qwixx.model.dice.DicePair;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.game.dice.DiceListener;
@@ -124,8 +124,8 @@ public class Game implements RowsClosedSupplier {
 					gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
 
 					rollDices();
-					List<DicesSum> whiteDices = getWhiteDicesSums();
-					List<DicesSum> colorDices = getColorDicesSums();
+					List<DicePair> whiteDices = getWhiteDicesSums();
+					List<DicePair> colorDices = getColorDicesSums();
 
 					System.out.println("---------- Other Player choosing dices");
 					letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
@@ -153,29 +153,27 @@ public class Game implements RowsClosedSupplier {
 		diceListeners.forEach(DiceListener::dicesRolled);
 	}
 
-	private List<DicesSum> getWhiteDicesSums() {
+	private List<DicePair> getWhiteDicesSums() {
 		int sum = diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue();
-		return Arrays.asList(DicesSum.EMPTY, //
-				new DicesSum(DiceColor.RED, sum), //
-				new DicesSum(DiceColor.YELLOW, sum), //
-				new DicesSum(DiceColor.GREEN, sum), //
-				new DicesSum(DiceColor.BLUE, sum));
+		return Arrays.asList(new DicePair(DiceColor.RED, sum), //
+				new DicePair(DiceColor.YELLOW, sum), //
+				new DicePair(DiceColor.GREEN, sum), //
+				new DicePair(DiceColor.BLUE, sum));
 	}
 
-	private List<DicesSum> getColorDicesSums() {
-		return Arrays.asList(DicesSum.EMPTY,
-				new DicesSum(DiceColor.RED, diceWhite1.getCurrentValue() + diceRed.getCurrentValue()),
-				new DicesSum(DiceColor.YELLOW, diceWhite1.getCurrentValue() + diceYellow.getCurrentValue()),
-				new DicesSum(DiceColor.GREEN, diceWhite1.getCurrentValue() + diceGreen.getCurrentValue()),
-				new DicesSum(DiceColor.BLUE, diceWhite1.getCurrentValue() + diceBlue.getCurrentValue()),
+	private List<DicePair> getColorDicesSums() {
+		return Arrays.asList(new DicePair(DiceColor.RED, diceWhite1.getCurrentValue() + diceRed.getCurrentValue()),
+				new DicePair(DiceColor.YELLOW, diceWhite1.getCurrentValue() + diceYellow.getCurrentValue()),
+				new DicePair(DiceColor.GREEN, diceWhite1.getCurrentValue() + diceGreen.getCurrentValue()),
+				new DicePair(DiceColor.BLUE, diceWhite1.getCurrentValue() + diceBlue.getCurrentValue()),
 
-				new DicesSum(DiceColor.RED, diceRed.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicesSum(DiceColor.YELLOW, diceYellow.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicesSum(DiceColor.GREEN, diceGreen.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicesSum(DiceColor.BLUE, diceBlue.getCurrentValue() + diceWhite2.getCurrentValue()));
+				new DicePair(DiceColor.RED, diceRed.getCurrentValue() + diceWhite2.getCurrentValue()),
+				new DicePair(DiceColor.YELLOW, diceYellow.getCurrentValue() + diceWhite2.getCurrentValue()),
+				new DicePair(DiceColor.GREEN, diceGreen.getCurrentValue() + diceWhite2.getCurrentValue()),
+				new DicePair(DiceColor.BLUE, diceBlue.getCurrentValue() + diceWhite2.getCurrentValue()));
 	}
 
-	private void letOtherPlayerChooseWhiteDices(List<DicesSum> whiteDices, IPlayer currentPlayer) {
+	private void letOtherPlayerChooseWhiteDices(List<DicePair> whiteDices, IPlayer currentPlayer) {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
 				letPlayerSelectWhiteDice(p, whiteDices);
@@ -183,9 +181,15 @@ public class Game implements RowsClosedSupplier {
 		});
 	}
 
-	private void letPlayerSelectDice(IPlayer player, List<DicesSum> whiteDices, List<DicesSum> colorDices) {
+	private void letPlayerSelectDice(IPlayer player, List<DicePair> whiteDices, List<DicePair> colorDices) {
 
-		DicesSum selectedWhiteDice = letPlayerSelectWhiteDice(player, whiteDices);
+		DicePair selectedWhiteDice = letPlayerSelectWhiteDice(player, whiteDices);
+
+		if (selectedWhiteDice.equals(DicePair.MISS)) {
+			// User crossed MissField
+			// prevent user to cross second dice
+			return;
+		}
 
 		closeQueuedRows();
 		if (isGameOver()) {
@@ -193,20 +197,21 @@ public class Game implements RowsClosedSupplier {
 			return;
 		}
 
-		DicesSum selectedColorDice = letPlayerSelectColorDice(player, colorDices);
+		DicePair selectedColorDice = letPlayerSelectColorDice(player, colorDices);
 
-		// Check if player selected any dice
-		if (isEmptyDice(selectedWhiteDice) && isEmptyDice(selectedColorDice)) {
-			// player did not select any dice, cross miss
+		// Prüfen, ob der Player 2x keinen Würfel ausgewählt hat
+		// -> Dies ist gleichbedeutend mit einem Fehlwurf
+		if (isEmpty(selectedWhiteDice) && isEmpty(selectedColorDice)) {
+			// Fehlwurf ankreuzen
 			player.getGameBoard().crossMiss();
 		}
 
 	}
 
-	private DicesSum letPlayerSelectWhiteDice(IPlayer player, List<DicesSum> whiteDices) {
+	private DicePair letPlayerSelectWhiteDice(IPlayer player, List<DicePair> whiteDices) {
 		while (true) {
 			try {
-				DicesSum selectedWhiteDice = player.chooseWhiteDices(whiteDices);
+				DicePair selectedWhiteDice = player.chooseWhiteDices(whiteDices);
 				crossSelectedDice(player, selectedWhiteDice, whiteDices);
 				return selectedWhiteDice;
 			} catch (IllegalArgumentException e) {
@@ -216,10 +221,10 @@ public class Game implements RowsClosedSupplier {
 		}
 	}
 
-	private DicesSum letPlayerSelectColorDice(IPlayer player, List<DicesSum> colorDices) {
+	private DicePair letPlayerSelectColorDice(IPlayer player, List<DicePair> colorDices) {
 		while (true) {
 			try {
-				DicesSum selectedColorDice = player.chooseColorDices(colorDices);
+				DicePair selectedColorDice = player.chooseColorDices(colorDices);
 				crossSelectedDice(player, selectedColorDice, colorDices);
 				return selectedColorDice;
 			} catch (IllegalArgumentException e) {
@@ -229,21 +234,21 @@ public class Game implements RowsClosedSupplier {
 		}
 	}
 
-	private void crossSelectedDice(IPlayer player, DicesSum selectedDice, List<DicesSum> dices) {
-		if (isEmptyDice(selectedDice)) {
-			return;
-		}
-
-		if (!dices.contains(selectedDice)) {
+	private void crossSelectedDice(IPlayer player, DicePair selectedDice, List<DicePair> dices) {
+		if (!isEmptyOrMiss(selectedDice) && !dices.contains(selectedDice)) {
 			throw new IllegalArgumentException(
 					"Diese Würfelsumme wurde nicht geworfen: " + selectedDice + " [" + dices + "]");
 		}
 
-		player.getGameBoard().crossField(selectedDice.getColor(), selectedDice.getSum());
+		player.getGameBoard().crossField(selectedDice);
 	}
 
-	private boolean isEmptyDice(DicesSum sum) {
-		return sum == null || sum.equals(DicesSum.EMPTY);
+	private boolean isEmptyOrMiss(DicePair dice) {
+		return isEmpty(dice) || dice.equals(DicePair.MISS);
+	}
+
+	private boolean isEmpty(DicePair dice) {
+		return dice == null || dice.equals(DicePair.EMPTY);
 	}
 
 	private void closeQueuedRows() {
