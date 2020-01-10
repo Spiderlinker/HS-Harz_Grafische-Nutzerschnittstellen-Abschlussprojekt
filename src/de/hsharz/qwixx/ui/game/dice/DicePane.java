@@ -69,7 +69,7 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	}
 
 	public void refreshDices() {
-		Platform.runLater(() -> dicesUI.forEach(DiceUI::refreshDice));
+		dicesUI.forEach(DiceUI::refreshDice);
 	}
 
 	@Override
