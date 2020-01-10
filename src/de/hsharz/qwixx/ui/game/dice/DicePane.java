@@ -12,7 +12,6 @@ import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
