@@ -1,11 +1,8 @@
 package de.hsharz.qwixx.ui.game;
 
-import java.util.List;
 import java.util.Objects;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialog.DialogTransition;
 
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.GameListener;
@@ -19,18 +16,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -47,6 +40,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	private JFXButton btnExit;
 	private JFXButton btnHelp;
 
+	private GameOverDialog dialogGameOver;
 	private Notification notification;
 
 	public GameStage(Game game, Screen screen) {
@@ -87,11 +81,13 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 		btnHelp.setStyle("-fx-background-color: white;");
 
 		notification = new Notification();
+		dialogGameOver = new GameOverDialog(getPane());
 	}
 
 	private void setupInteractions() {
 		stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> showExitGameScreen());
 		btnExit.setOnAction(e -> showExitGameScreen());
+		dialogGameOver.getDialog().setOnDialogClosed(e -> stage.hide());
 	}
 
 	private void addWidgets() {
@@ -177,49 +173,8 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	}
 
 	private void showGameOverScreen() {
-		List<IPlayer> winningPlayer = game.getWinningPlayer();
-		BorderPane pane = new BorderPane();
-		pane.setPadding(new Insets(20));
-		pane.setStyle("-fx-background-color: white; ");
-
-		Label gameOver = new Label("Game over");
-		gameOver.setStyle("-fx-font-size: 50pt; -fx-font-family: Gabriola; ");
-
-		StringBuilder winningPlayerText = new StringBuilder();
-		if (winningPlayer.size() == 1) {
-			IPlayer player = winningPlayer.get(0);
-			if (player instanceof Human) {
-				winningPlayerText.append("Du hast gewonnen!");
-			} else {
-				winningPlayerText.append("Der Spieler " + player.getName() + " hat gewonnen!");
-			}
-		} else {
-			winningPlayerText.append("Die Spieler:\n");
-			for (IPlayer p : winningPlayer) {
-				winningPlayerText.append(p.getName() + "\n");
-			}
-			winningPlayerText.append(" haben gewonnen!");
-		}
-
-		Text lbl = new Text(winningPlayerText.toString());
-		lbl.setStyle("-fx-font-size: 16pt;");
-
-		pane.setTop(gameOver);
-		pane.setCenter(lbl);
-
-		BorderPane.setAlignment(gameOver, Pos.CENTER);
-		BorderPane.setMargin(lbl, new Insets(10, 0, 10, 0));
-
-		Button btn = new Button("Beenden");
-		BorderPane.setAlignment(btn, Pos.BOTTOM_RIGHT);
-		pane.setBottom(btn);
-		JFXDialog dialog = new JFXDialog(getPane(), pane, DialogTransition.CENTER);
-
-		btn.setOnAction(e -> dialog.close());
-
-		dialog.setOverlayClose(false);
-		dialog.setOnDialogClosed(e -> stage.hide());
-		Platform.runLater(dialog::show);
+		dialogGameOver.updateWinningPlayer(game.getWinningPlayer());
+		Platform.runLater(() -> dialogGameOver.getDialog().show());
 	}
 
 }
