@@ -19,7 +19,6 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 	private ImageView imgView;
 
 	private boolean disabled = false;
-	private boolean locked = false;
 
 	public NumberFieldUI(int value, DiceColor textColor) {
 		super(new StackPane());
@@ -52,19 +51,19 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 
 	private void setupBindings() {
 		root.setOnMouseEntered(event -> {
-			if (!locked && !disabled && !btn.isSelected()) {
+			if (!disabled && !btn.isSelected()) {
 				imgView.setOpacity(0.6);
 				imgView.setVisible(true);
 			}
 		});
 		root.setOnMouseExited(event -> {
-			if (!locked && !btn.isSelected()) {
+			if (!btn.isSelected()) {
 				imgView.setVisible(false);
 			}
 		});
 
 		root.setOnMousePressed(event -> {
-			if (!locked && !disabled && MouseButton.PRIMARY == event.getButton()) {
+			if (!disabled && MouseButton.PRIMARY == event.getButton()) {
 				setSelected(!btn.isSelected());
 				event.consume();
 			}
@@ -79,14 +78,6 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 		} else {
 			root.setOpacity(1);
 		}
-	}
-
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
-
-	public boolean isLocked() {
-		return isLocked();
 	}
 
 	public boolean isDiabled() {
