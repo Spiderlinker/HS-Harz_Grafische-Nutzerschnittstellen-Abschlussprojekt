@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.dice.DiceColor;
+import de.hsharz.qwixx.model.dice.DicePair;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -29,10 +30,11 @@ class GameBoardTest {
 		});
 
 		for (int v = Row.ASC_FIRST_VALUE; v <= Row.ASC_LAST_VALUE; v++) {
-			board.crossField(colorToTest, v);
+			board.crossField(new DicePair(colorToTest, v));
 			for (int i = v - 1; i >= Row.ASC_FIRST_VALUE; i--) {
 				final int valueToCross = i;
-				Assertions.assertThrows(IllegalAccessError.class, () -> board.crossField(colorToTest, valueToCross));
+				Assertions.assertThrows(IllegalAccessError.class,
+						() -> board.crossField(new DicePair(colorToTest, valueToCross)));
 			}
 		}
 
@@ -54,10 +56,11 @@ class GameBoardTest {
 		});
 
 		for (int v = Row.DESC_FIRST_VALUE; v >= Row.DESC_LAST_VALUE; v--) {
-			board.crossField(colorToTest, v);
+			board.crossField(new DicePair(colorToTest, v));
 			for (int i = v + 1; i <= Row.DESC_FIRST_VALUE; i++) {
 				final int valueToCross = i;
-				Assertions.assertThrows(IllegalAccessError.class, () -> board.crossField(colorToTest, valueToCross));
+				Assertions.assertThrows(IllegalAccessError.class,
+						() -> board.crossField(new DicePair(colorToTest, valueToCross)));
 			}
 		}
 	}
@@ -78,13 +81,14 @@ class GameBoardTest {
 			}
 		});
 
-		Assertions.assertThrows(IllegalAccessError.class, () -> board.crossField(color, 5));
+		Assertions.assertThrows(IllegalAccessError.class, () -> board.crossField(new DicePair(color, 5)));
 	}
 
 	@Test
 	void testInvalidColor() {
 		GameBoard board = new GameBoard();
-		Assertions.assertThrows(IllegalArgumentException.class, () -> board.crossField(DiceColor.WHITE, 5));
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> board.crossField(new DicePair(DiceColor.WHITE, 5)));
 	}
 
 	@ParameterizedTest
@@ -103,8 +107,10 @@ class GameBoardTest {
 			}
 		});
 
-		Assertions.assertThrows(IllegalArgumentException.class, () -> board.crossField(color, Row.ASC_FIRST_VALUE - 1));
-		Assertions.assertThrows(IllegalArgumentException.class, () -> board.crossField(color, Row.ASC_LAST_VALUE + 1));
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> board.crossField(new DicePair(color, Row.ASC_FIRST_VALUE - 1)));
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> board.crossField(new DicePair(color, Row.ASC_LAST_VALUE + 1)));
 	}
 
 	@ParameterizedTest
@@ -128,12 +134,12 @@ class GameBoardTest {
 			}
 		});
 
-		board.crossField(colorToTest, 2);
-		board.crossField(colorToTest, 3);
-		board.crossField(colorToTest, 4);
-		board.crossField(colorToTest, 5);
-		board.crossField(colorToTest, 6);
-		board.crossField(colorToTest, 12);
+		board.crossField(new DicePair(colorToTest, 2));
+		board.crossField(new DicePair(colorToTest, 3));
+		board.crossField(new DicePair(colorToTest, 4));
+		board.crossField(new DicePair(colorToTest, 5));
+		board.crossField(new DicePair(colorToTest, 6));
+		board.crossField(new DicePair(colorToTest, 12));
 
 		Assertions.assertTrue(rowClosed.get());
 	}
@@ -158,12 +164,12 @@ class GameBoardTest {
 			}
 		});
 
-		board.crossField(colorToTest, 12);
-		board.crossField(colorToTest, 6);
-		board.crossField(colorToTest, 5);
-		board.crossField(colorToTest, 4);
-		board.crossField(colorToTest, 3);
-		board.crossField(colorToTest, 2);
+		board.crossField(new DicePair(colorToTest, 12));
+		board.crossField(new DicePair(colorToTest, 6));
+		board.crossField(new DicePair(colorToTest, 5));
+		board.crossField(new DicePair(colorToTest, 4));
+		board.crossField(new DicePair(colorToTest, 3));
+		board.crossField(new DicePair(colorToTest, 2));
 
 		Assertions.assertTrue(rowClosed.get());
 	}
