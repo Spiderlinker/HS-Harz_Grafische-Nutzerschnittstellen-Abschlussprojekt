@@ -61,23 +61,19 @@ public class Notification extends AbstractPane<BorderPane> {
 			scheduledTask.cancel(true);
 		}
 
-		Platform.runLater(() -> {
-			lblMessage.setText(text);
+		Platform.runLater(() -> lblMessage.setText(text));
 
-			transition.setFromValue(0.0);
-			transition.setToValue(opacity);
-			transition.play();
+		transition.setFromValue(0.0);
+		transition.setToValue(opacity);
+		transition.play();
 
-			scheduledTask = displayTimer.schedule(this::hide, displayTime, TimeUnit.MILLISECONDS);
-		});
+		scheduledTask = displayTimer.schedule(this::hide, displayTime, TimeUnit.MILLISECONDS);
 	}
 
 	public void hide() {
-		Platform.runLater(() -> {
-			transition.setFromValue(root.getOpacity());
-			transition.setToValue(0.0);
-			transition.play();
-		});
+		transition.setFromValue(root.getOpacity());
+		transition.setToValue(0.0);
+		transition.play();
 	}
 
 }
