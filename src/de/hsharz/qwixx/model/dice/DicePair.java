@@ -1,13 +1,14 @@
 package de.hsharz.qwixx.model.dice;
 
-public class DicesSum {
+public class DicePair {
 
-	public static final DicesSum EMPTY = new DicesSum(null, -1);
+	public static final DicePair EMPTY = new DicePair(DiceColor.NONE, -1);
+	public static final DicePair MISS = new DicePair(DiceColor.NONE, -2);
 
 	private int sum;
 	private DiceColor color;
 
-	public DicesSum(DiceColor color, int sum) {
+	public DicePair(DiceColor color, int sum) {
 		this.sum = sum;
 		this.color = color;
 	}
@@ -22,8 +23,8 @@ public class DicesSum {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DicesSum) {
-			DicesSum dice = (DicesSum) obj;
+		if (obj instanceof DicePair) {
+			DicePair dice = (DicePair) obj;
 			return dice.getSum() == sum //
 					&& (color == dice.getColor() //
 							|| (color != null && color.equals(dice.getColor())));
