@@ -279,24 +279,26 @@ public class GameBoard {
 	 * @param fieldToCrossIndex Feld der gegebenen Zahl, die angekreuzt werden soll
 	 */
 	public void checkCrossForValidity(Row rowToCross, int numberToCross, int fieldToCrossIndex) {
+		// Falls die Reihe, in der das gegebene Feld angekreuzt werden soll, geschlossen
+		// ist, so darf das Feld nicht angekreuzt werden -> nicht zulässig
 		if (rowClosedSupplier.isRowClosed(rowToCross.getColor())) {
 			throw new IllegalAccessError("Row already closed: " + rowToCross.getColor());
 		}
 
-		boolean fieldsInFrontNotCrossed = true;
-		for (int i = fieldToCrossIndex + 1; i < rowToCross.getFields().size(); i++) {
-			// Prüfe, ob Feld bereits abgekreuzt
-			if (rowToCross.getFields().get(i).isCrossed()) {
-				fieldsInFrontNotCrossed = false;
-			}
-		}
-
+		// Falls gegebener Index == -1 ist, dann existiert die Nummer nicht
+		// -> nicht zulässig
 		if (fieldToCrossIndex == -1) {
 			throw new IllegalArgumentException("Nummer nicht gefunden: " + numberToCross);
 		}
 
-		if (!fieldsInFrontNotCrossed) {
-			throw new IllegalAccessError("Es sind bereits Felder abgekreuzt.");
+		// Prüfe, ob bereits Felder nach dem gegebenen Feld angekreuzt wurden
+		// Falls bereits Felder nach dem gegebenen Feld angekreuzt sind, dann
+		// ist das gegebene Feld nicht zulässig
+		for (int i = fieldToCrossIndex + 1; i < rowToCross.getFields().size(); i++) {
+			// Prüfe, ob Feld bereits abgekreuzt
+			if (rowToCross.getFields().get(i).isCrossed()) {
+				throw new IllegalAccessError("Es sind bereits Felder nach dem Zahl " + numberToCross + " angekreuzt.");
+			}
 		}
 	}
 
