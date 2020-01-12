@@ -1,8 +1,8 @@
 package de.hsharz.qwixx.ui.game.board;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.game.board.utils.BreakLabel;
@@ -16,15 +16,18 @@ import javafx.scene.layout.Priority;
 
 public class ScoreLegend extends AbstractPane<HBox> {
 
-	private static List<Integer> scoreLegend = Arrays.asList(1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78);
+	private List<Integer> score;
+	private int amountMisses;
 
 	private GridPane gridMisses;
 	private List<MissField> missFields = new LinkedList<>();
-
 	private List<BreakLabel> scoreLegendLabels = new LinkedList<>();
 
-	public ScoreLegend() {
+	public ScoreLegend(List<Integer> scoreLegend, int amountMisses) {
 		super(new HBox());
+
+		this.score = Objects.requireNonNull(scoreLegend);
+		this.amountMisses = amountMisses;
 
 		createWidgets();
 //		setupInteractions();
@@ -36,12 +39,12 @@ public class ScoreLegend extends AbstractPane<HBox> {
 		root.setPadding(new Insets(5, 0, 5, 0));
 		root.setAlignment(Pos.CENTER);
 
-		for (int i = 0; i < scoreLegend.size(); i++) {
-			BreakLabel lblScore = new BreakLabel((i + 1) + "x", Integer.toString(scoreLegend.get(i)));
+		for (int i = 0; i < score.size(); i++) {
+			BreakLabel lblScore = new BreakLabel((i + 1) + "x", Integer.toString(score.get(i)));
 			scoreLegendLabels.add(lblScore);
 		}
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < amountMisses; i++) {
 			missFields.add(new MissField());
 		}
 
