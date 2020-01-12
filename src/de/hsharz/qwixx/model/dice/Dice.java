@@ -2,15 +2,32 @@ package de.hsharz.qwixx.model.dice;
 
 import java.util.Random;
 
+/**
+ * Diese Klasse implementiert das Interface {@link IDice} und repräsentiert
+ * somit einen Würfel.
+ * 
+ * @author Oliver
+ */
 public class Dice implements IDice {
 
+	/** Minimaler (kleinster) Wert dieses Würfels, der geworfen werden kann */
 	private static final int MIN_VALUE = 1;
+	/** Maximaler (größter) Wert dieses Würfels, der geworfen werden kann */
 	private static final int MAX_VALUE = 6;
 
+	/** Zuletzt geworfener Wert */
 	private int currentValue = -1;
+	/** Farbe dieses Würfels */
 	private DiceColor color;
-	private Random dice = new Random();
 
+	/** Random zur Erzeugung einer zufälliger Zahl */
+	private Random numberGenerator = new Random();
+
+	/**
+	 * Erzeugt einen neuen Würfel mit der gegebenen Farbe {@code color}.
+	 * 
+	 * @param color Farbe dieses Würfels
+	 */
 	public Dice(DiceColor color) {
 		this.color = color;
 	}
@@ -22,7 +39,7 @@ public class Dice implements IDice {
 
 	@Override
 	public int rollDice() {
-		this.currentValue = MIN_VALUE + dice.nextInt(MAX_VALUE);
+		this.currentValue = MIN_VALUE + numberGenerator.nextInt(MAX_VALUE);
 		return currentValue;
 	}
 
