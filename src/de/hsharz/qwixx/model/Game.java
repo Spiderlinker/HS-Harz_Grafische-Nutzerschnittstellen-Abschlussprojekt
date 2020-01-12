@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
@@ -185,9 +186,10 @@ public class Game implements RowsClosedSupplier {
 
 		DicePair selectedWhiteDice = letPlayerSelectWhiteDice(player, whiteDices);
 
-		if (selectedWhiteDice.equals(DicePair.MISS)) {
+		if (DicePair.MISS.equals(selectedWhiteDice)) {
 			// User crossed MissField
 			// prevent user to cross second dice
+			player.getGameBoard().crossMiss();
 			return;
 		}
 
@@ -199,34 +201,34 @@ public class Game implements RowsClosedSupplier {
 
 		DicePair selectedColorDice = letPlayerSelectColorDice(player, colorDices);
 
-		// Prüfen, ob der Player 2x keinen Würfel ausgewählt hat
+		// Prüfen, ob der Player 2x keinen Würfel ausgewählt hat bzw.
+		// ob der Spieler beim ersten Mal keinen Würfel gewählt hat und beim zweiten Mal
+		// dann ein Fehlwurf angekreuzt hat
 		// -> Dies ist gleichbedeutend mit einem Fehlwurf
-		if (isEmpty(selectedWhiteDice) && isEmpty(selectedColorDice)) {
+		if (isEmpty(selectedWhiteDice) && isEmptyOrMiss(selectedColorDice)) {
 			// Fehlwurf ankreuzen
 			player.getGameBoard().crossMiss();
 		}
-
 	}
 
 	private DicePair letPlayerSelectWhiteDice(IPlayer player, List<DicePair> whiteDices) {
-		while (true) {
-			try {
-				DicePair selectedWhiteDice = player.chooseWhiteDices(whiteDices);
-				crossSelectedDice(player, selectedWhiteDice, whiteDices);
-				return selectedWhiteDice;
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
-			}
-		}
+		return letPlayerSelectDice((p, d) -> p.chooseWhiteDices(d), player, whiteDices);
 	}
 
 	private DicePair letPlayerSelectColorDice(IPlayer player, List<DicePair> colorDices) {
+		return letPlayerSelectDice((p, d) -> p.chooseColorDices(d), player, colorDices);
+	}
+
+	private DicePair letPlayerSelectDice(BiFunction<IPlayer, List<DicePair>, DicePair> diceSelection, IPlayer player,
+			List<DicePair> dices) {
 		while (true) {
 			try {
-				DicePair selectedColorDice = player.chooseColorDices(colorDices);
-				crossSelectedDice(player, selectedColorDice, colorDices);
-				return selectedColorDice;
+				DicePair selectedDice = diceSelection.apply(player, dices);
+				if (!isEmptyOrMiss(selectedDice)) {
+					// Den Wurf nur ankreuzen, falls ein Würfel ausgewählt wurde
+					crossSelectedDice(player, selectedDice, dices);
+				}
+				return selectedDice;
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
