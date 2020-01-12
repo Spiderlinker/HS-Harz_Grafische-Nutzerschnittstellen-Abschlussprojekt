@@ -4,10 +4,13 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Objects;
 
 import de.hsharz.qwixx.model.GameListener;
+import de.hsharz.qwixx.model.board.GameBoard;
 import de.hsharz.qwixx.model.board.GameBoardListener;
+import de.hsharz.qwixx.model.board.UserScore;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
@@ -42,7 +45,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	protected boolean shouldNotify = false;
 	private DicePair humanInput;
-	private boolean isCurrentPlayersTurn = false;
 	private DiceSelectionType selectionType;
 
 	private DropShadow glowEffect;
@@ -75,7 +77,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		// add for each Row a new RowUI
 		player.getGameBoard().getRows().entrySet().forEach(e -> rows.put(e.getKey(), new RowUI(e.getValue())));
 
-		scoreLegend = new ScoreLegend();
+		List<Integer> scoreList = UserScore.SCORE_PER_CROSS.stream().filter(i -> i != 0).collect(Collectors.toList());
+		scoreLegend = new ScoreLegend(scoreList, GameBoard.AMOUNT_MISSES);
 		userScore = new UserScoreUI(player.getGameBoard().getScore());
 
 		glowEffect = new DropShadow();
@@ -123,12 +126,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		checkCrossedButtons();
 		disableAllButtons();
 
-		setMissFieldsDisabled(!isFirstDiceSelection());
 		updateHintLabel();
-	}
-
-	private boolean isFirstDiceSelection() {
-		return isCurrentPlayersTurn && humanInput == null;
 	}
 
 	private void playerSelectedDice(DicePair dice) {
@@ -202,13 +200,13 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	protected void disableAllButtons() {
-		rows.values().forEach(this::disableButtonsOfRow);
+		for (RowUI row : rows.values()) {
+			disableButtonsOfRow(row);
+		}
 	}
 
 	private void disableButtonsOfRow(RowUI row) {
-//		System.out.println("Disabling Row: " + row.getRow().getColor());
 		for (NumberFieldUI btn : row.getButtons()) {
-//			System.out.println("Disabling " + btn.getValue());
 			btn.setDisabled(true);
 		}
 	}
@@ -228,14 +226,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		isCurrentPlayersTurn = isCurrentPlayer(nextPlayer);
+		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
 		highlightGameboard(isCurrentPlayersTurn);
+		setMissFieldsDisabled(!isCurrentPlayersTurn);
 
 		humanInput = null;
-	}
-
-	private boolean isCurrentPlayer(IPlayer playerToCheck) {
-		return player.equals(playerToCheck);
 	}
 
 	@Override
