@@ -163,15 +163,15 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	private List<DicePair> getColorDicesSums() {
-		return Arrays.asList(new DicePair(DiceColor.RED, diceWhite1.getCurrentValue() + diceRed.getCurrentValue()),
-				new DicePair(DiceColor.YELLOW, diceWhite1.getCurrentValue() + diceYellow.getCurrentValue()),
-				new DicePair(DiceColor.GREEN, diceWhite1.getCurrentValue() + diceGreen.getCurrentValue()),
-				new DicePair(DiceColor.BLUE, diceWhite1.getCurrentValue() + diceBlue.getCurrentValue()),
+		return Arrays.asList(new DicePair(diceWhite1, diceRed), //
+				new DicePair(diceWhite1, diceYellow), //
+				new DicePair(diceWhite1, diceGreen), //
+				new DicePair(diceWhite1, diceBlue), //
 
-				new DicePair(DiceColor.RED, diceRed.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicePair(DiceColor.YELLOW, diceYellow.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicePair(DiceColor.GREEN, diceGreen.getCurrentValue() + diceWhite2.getCurrentValue()),
-				new DicePair(DiceColor.BLUE, diceBlue.getCurrentValue() + diceWhite2.getCurrentValue()));
+				new DicePair(diceWhite2, diceRed), //
+				new DicePair(diceWhite2, diceYellow), //
+				new DicePair(diceWhite2, diceGreen), //
+				new DicePair(diceWhite2, diceBlue)); //
 	}
 
 	private void letOtherPlayerChooseWhiteDices(List<DicePair> whiteDices, IPlayer currentPlayer) {
