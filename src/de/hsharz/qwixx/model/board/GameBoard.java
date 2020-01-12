@@ -167,6 +167,24 @@ public class GameBoard {
 		}
 	}
 
+	/**
+	 * Diese Methode kreuzt das gegebene Würfelpaar {@code pair} auf diesem
+	 * Spielfeld an. <br>
+	 * Das Würfelpaar wird vor dem Ankreuzen noch auf Richtigkeit geprüft. Sollte
+	 * das gegebene Paar nicht gültig sein, so wird eine
+	 * {@link IllegalArgumentException} mit der entsprechenden Fehlermeldung
+	 * geworfen.
+	 * <p>
+	 * <ul>
+	 * <li>Falls das gegebene Würfelpaar {@code null} sein sollte, so wird eine
+	 * {@link NullPointerException} geworfen</li>
+	 * <li>{@link DicePair#EMPTY} wird ignoriert und die Methode macht nichts.</li>
+	 * <li>{@link DicePair#MISS} wird verarbeitet und ein Fehlwurf wird
+	 * angekreuzt</li>
+	 * </ul>
+	 * 
+	 * @param pair Würfelpaar (nicht null), das angekreuzt werden soll
+	 */
 	public void crossField(DicePair pair) {
 		System.out.println("Should cross " + pair);
 		Objects.requireNonNull(pair);
@@ -186,16 +204,36 @@ public class GameBoard {
 		validateCross(rows.get(pair.getColor()), pair.getSum());
 	}
 
+	/**
+	 * Diese Methode prüft die gegebene Zahl {@code numberToCross}, die in der Reihe
+	 * {@code rowToCross} angekreuzt werden soll. <br>
+	 * Falls die gegebene Zahl nicht angekreuzt werden darf, so wird eine
+	 * {@link IllegalArgumentException} bzw. ein {@link IllegalAccessError}
+	 * geworfen.
+	 * 
+	 * @param rowToCross    Reihe, in der die Zahl {@code numberToCross} angekreuzt
+	 *                      werden soll
+	 * @param numberToCross Zahl, di in der Reihe {@code rowToCross} angekreuzt
+	 *                      werden soll
+	 */
 	private void validateCross(Row rowToCross, int numberToCross) {
 
+		/*
+		 * Das gegebene Feld auf Fehler prüfen. Falls Fehler gefunden wird, dann wird
+		 * eine Exception geworfen und diese Methode läuft nicht weiter
+		 */
 		int fieldToCrossIndex = getFieldToCrossIndex(rowToCross, numberToCross);
-
 		checkCrossForValidity(rowToCross, numberToCross, fieldToCrossIndex);
 
+		// Es wurde kein Fehler gefunden, das Feld kann angekreuzt werden
 		Field fieldToCross = rowToCross.getFields().get(fieldToCrossIndex);
 		fieldToCross.setCrossed(true);
 
+		// Prüfen, ob auch noch das Zusatzfeld angekreuzt werden und die Reihe
+		// geschlossen werden muss
 		checkIfCrossedFieldWasLastInRow(rowToCross, fieldToCross);
+
+		// Score aktualisieren
 		updateScore();
 
 		for (GameBoardListener listener : listeners) {
@@ -203,6 +241,19 @@ public class GameBoard {
 		}
 	}
 
+	/**
+	 * Liefert den Index des Feldes in der Reihe {@rowToCross}, welches den Wert der
+	 * gegebenen Zahl {@code numberToCross} besitzt. <br>
+	 * Zu der gegebenen Zahl wird also in der gegebenen Reihe nach dem
+	 * entsprechenden Feld gesucht, welches die Zahl in dieser Reihe repräsentiert.
+	 * 
+	 * @param rowToCross    Reihe der gegebenen Zahl, in der nach dem entsprechendem
+	 *                      Feld gesucht werden soll
+	 * @param numberToCross Zahl, zu der der Index des passenden Feldes in der
+	 *                      gegebenen Reihe gesucht werden soll
+	 * @return Index des Feldes, das zu der gegebenen Zahl in der gegebenen Reihe
+	 *         gehört
+	 */
 	private int getFieldToCrossIndex(Row rowToCross, int numberToCross) {
 		int fieldToCrossIndex = -1;
 		for (int i = 0; i < rowToCross.getFields().size(); i++) {
@@ -216,6 +267,17 @@ public class GameBoard {
 		return fieldToCrossIndex;
 	}
 
+	/**
+	 * Prüft die gegebene Zahl auf Gültigkeit und ob diese in der gegebenen Reihe
+	 * angekreuzt werden darf. Falls die Zahl bzw. das entsprechende Feld nicht
+	 * angekreuzt werden darf, so wird ein {@link IllegalAccessError} bzw. eine
+	 * {@link IllegalArgumentException} geworfen.
+	 * 
+	 * @param rowToCross        Reihe, in der die gegebene Zahl bzw. das
+	 *                          entsprechende Feld angekreuzt werden soll
+	 * @param numberToCross     Zahl, die angekreuzt werden soll
+	 * @param fieldToCrossIndex Feld der gegebenen Zahl, die angekreuzt werden soll
+	 */
 	public void checkCrossForValidity(Row rowToCross, int numberToCross, int fieldToCrossIndex) {
 		if (rowClosedSupplier.isRowClosed(rowToCross.getColor())) {
 			throw new IllegalAccessError("Row already closed: " + rowToCross.getColor());
@@ -238,6 +300,15 @@ public class GameBoard {
 		}
 	}
 
+	/**
+	 * Prüft, ob das angekreuzte Feld {@code crossedField} das letzte Feld in der
+	 * Reihe {@code rowOfField} war. Falls es das letzte Feld war und genügend
+	 * Felder in der Reihe angekreuzt sind, so wird auch das Zusatzfeld angekreuzt
+	 * und die Reihe geschlossen.
+	 * 
+	 * @param rowOfField   Reihe des angekreuzten Feldes {@code crossedField}
+	 * @param crossedField angekreuztes Feld, das geprüft werden soll
+	 */
 	private void checkIfCrossedFieldWasLastInRow(Row rowOfField, Field crossedField) {
 		/*
 		 * Falls das angekreuzte Feld das letzte Feld in der Reihe war und genügend
