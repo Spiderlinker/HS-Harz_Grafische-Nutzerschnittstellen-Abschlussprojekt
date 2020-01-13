@@ -4,8 +4,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.board.GameBoard;
@@ -36,6 +36,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener, MissFieldListener {
 
 	protected IPlayer player;
+	
+	protected HBox boxGameBoardHeader;
 	private Label lblName;
 	private Label lblHint;
 
@@ -68,6 +70,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		root.setPadding(new Insets(10, 20, 0, 20));
 		root.setStyle("-fx-background-color: #E3E3E3;");
 
+		boxGameBoardHeader = new HBox(20);
+		
 		lblName = new Label(player.getName());
 		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
 
@@ -100,12 +104,11 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	private void addWidgets() {
-		HBox descriptionBox = new HBox();
-		descriptionBox.getChildren().add(lblName);
-		descriptionBox.getChildren().add(getHBoxSpacer());
-		descriptionBox.getChildren().add(lblHint);
+		boxGameBoardHeader.getChildren().add(lblName);
+		boxGameBoardHeader.getChildren().add(getHBoxSpacer());
+		boxGameBoardHeader.getChildren().add(lblHint);
 
-		root.getChildren().add(descriptionBox);
+		root.getChildren().add(boxGameBoardHeader);
 		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
 
 		root.getChildren().add(scoreLegend.getPane());
@@ -129,7 +132,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		updateHintLabel();
 	}
 
-	private void playerSelectedDice(DicePair dice) {
+	protected void playerSelectedDice(DicePair dice) {
 		humanInput = dice;
 
 		if (shouldNotify) {
