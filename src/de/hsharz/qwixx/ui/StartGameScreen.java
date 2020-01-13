@@ -73,7 +73,7 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		root.setPadding(new Insets(50));
 		root.setHgap(10);
 		root.setVgap(20);
-		root.setStyle("-fx-background-color: #EAEAEA;");
+		root.setStyle("-fx-background-color: #ffffff;");
 
 		btnBack = new JFXButton("", new ImageView(getClass().getResource("/images/arrow_left.png").toString()));
 		btnBack.setFocusTraversable(false);
