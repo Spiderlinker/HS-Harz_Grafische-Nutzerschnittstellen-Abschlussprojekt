@@ -36,7 +36,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener, MissFieldListener {
 
 	protected IPlayer player;
-	
+
 	protected HBox boxGameBoardHeader;
 	private Label lblName;
 	private Label lblHint;
@@ -71,7 +71,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		root.setStyle("-fx-background-color: #E3E3E3;");
 
 		boxGameBoardHeader = new HBox(20);
-		
+
 		lblName = new Label(player.getName());
 		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
 
@@ -99,6 +99,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		root.setOnMouseClicked(e -> {
 			if (MouseButton.SECONDARY == e.getButton()) {
 				playerSelectedDice(DicePair.EMPTY);
+				e.consume();
 			}
 		});
 	}
