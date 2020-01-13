@@ -37,7 +37,7 @@ public class MissField extends AbstractPane<StackPane> {
 		root.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
 				+ "-fx-background-color: white; -fx-background-radius: 11px;");
 
-		imgView = new ImageView(new File("images/cross_klein.png").toURI().toString());
+		imgView = new ImageView(getClass().getResource("/images/cross_klein.png").toString());
 		imgView.setVisible(false);
 		imgView.setMouseTransparent(true);
 

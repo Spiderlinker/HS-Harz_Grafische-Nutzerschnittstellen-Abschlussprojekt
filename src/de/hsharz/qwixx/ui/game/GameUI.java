@@ -50,8 +50,8 @@ public class GameUI extends AbstractPane<StackPane> {
 		gamePane.setVgap(5);
 		gamePane.setAlignment(Pos.CENTER);
 
-		gamePane.setBackground(
-				new Background(new BackgroundImage(new Image(new File("images/background.jpg").toURI().toString()),
+		gamePane.setBackground(new Background(
+				new BackgroundImage(new Image(getClass().getResource("/images/background.jpg").toString()),
 						BackgroundRepeat.NO_REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT,
 						new BackgroundSize(100, 100, true, true, true, true))));
 

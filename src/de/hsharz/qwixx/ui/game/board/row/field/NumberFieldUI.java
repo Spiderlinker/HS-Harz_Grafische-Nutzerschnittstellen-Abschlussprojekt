@@ -38,7 +38,7 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 		btn.setMaxWidth(Double.MAX_VALUE);
 		btn.setMouseTransparent(true);
 
-		imgView = new ImageView(new File("images/cross.png").toURI().toString());
+		imgView = new ImageView(getClass().getResource("/images/cross.png").toString());
 		imgView.setScaleX(0.8);
 		imgView.setScaleY(0.8);
 		imgView.setScaleZ(0.8);

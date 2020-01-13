@@ -35,7 +35,7 @@ public class RowEndFieldUI extends AbstractPane<StackPane> {
 		imgLock = new ImageView(new File(img).toURI().toString());
 		imgLock.setRotate(20);
 
-		imgCross = new ImageView(new File("images/cross.png").toURI().toString());
+		imgCross = new ImageView(getClass().getResource("/images/cross.png").toString());
 		imgCross.setVisible(false);
 	}
 

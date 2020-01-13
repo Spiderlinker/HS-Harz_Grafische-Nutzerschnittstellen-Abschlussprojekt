@@ -21,7 +21,7 @@ public class GameBoardSimple extends GameBoardUI {
 	}
 
 	private void createNextButton() {
-		JFXButton btnNext = new JFXButton("", new ImageView(new File("images/arrow_right.png").toURI().toString()));
+		JFXButton btnNext = new JFXButton("", new ImageView(getClass().getResource("/images/arrow_right.png").toString()));
 		btnNext.setFocusTraversable(false);
 
 		Tooltip btnNextTooltip = new Tooltip("Weiter zum nächsten Würfelpaar / Zug");
