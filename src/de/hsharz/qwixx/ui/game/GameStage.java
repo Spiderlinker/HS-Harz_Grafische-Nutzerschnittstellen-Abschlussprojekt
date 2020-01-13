@@ -81,7 +81,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 		boxButtons = new HBox();
 		boxButtons.setPadding(new Insets(10));
 		boxButtons.setMaxHeight(50);
-//		boxButtons.setMouseTransparent(true);
+		boxButtons.setSpacing(10);
 
 		btnExit = new JFXButton("Spiel beenden (Esc)");
 		btnExit.setStyle("-fx-background-color: white;");
@@ -127,7 +127,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 
 			Text textFinishHeader = getBoldText("Spielende\n");
 			Text textFinish = getNormalText(
-					"Qwixx endet, sobald ein Spieler seinen vierten Fehlwurf angekreuzt hat oder aber der die zweite Reihe beendet wurde.");
+					"Qwixx endet, sobald ein Spieler seinen vierten Fehlwurf angekreuzt hat oder die zweite Reihe beendet wurde.");
 
 			text.getChildren().add(textGoalHeader);
 			text.getChildren().add(textGoal);
