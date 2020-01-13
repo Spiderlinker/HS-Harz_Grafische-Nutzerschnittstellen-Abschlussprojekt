@@ -72,11 +72,13 @@ public class GameOverDialog {
 		if (winningPlayer.size() == 1) {
 			IPlayer player = winningPlayer.get(0);
 			if (player instanceof Human) {
+				lblHeader.setText("Herzlichen Glückwunsch!");
 				winningPlayerText.append("Du hast gewonnen!");
 			} else {
 				winningPlayerText.append("Der Spieler " + player.getName() + " hat gewonnen!");
 			}
 		} else {
+			lblHeader.setText("Game Over");
 			winningPlayerText.append("Die Spieler:\n");
 			for (IPlayer p : winningPlayer) {
 				winningPlayerText.append(p.getName() + "\n");
