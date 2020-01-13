@@ -29,8 +29,8 @@ public class BreakLabel extends AbstractPane<VBox> {
 	}
 
 	private void createWidgets() {
-		root.setStyle(
-				"-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; -fx-background-color: white; -fx-background-radius: 11px; ");
+		root.setStyle("-fx-border-color: #999999; -fx-border-radius: 10px; -fx-border-width: 2px; "
+				+ "-fx-background-color: white; -fx-background-radius: 11px; ");
 		root.setPadding(new Insets(3, 8, 3, 8));
 		root.setAlignment(Pos.CENTER);
 
