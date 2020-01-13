@@ -110,7 +110,9 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		btnPlay.setOnAction(e -> startNewGame());
 
 		root.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
-			if (e.getCode() == KeyCode.ESCAPE) {
+			if (e.getCode() == KeyCode.ENTER) {
+				btnPlay.fire();
+			} else if (e.getCode() == KeyCode.ESCAPE) {
 				showPreviousPane();
 			}
 		});
