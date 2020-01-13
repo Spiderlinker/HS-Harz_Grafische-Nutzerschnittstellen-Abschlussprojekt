@@ -1,7 +1,5 @@
 package de.hsharz.qwixx.ui.game.board.row.field;
 
-import java.io.File;
-
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.image.ImageView;
@@ -30,9 +28,9 @@ public class RowEndFieldUI extends AbstractPane<StackPane> {
 				+ "-fx-border-color: black; -fx-border-width: 1px; -fx-border-radius: 100%; ");
 		root.setOpacity(0.8);
 
-		String img = "images/lock_" + color.toString().toLowerCase() + "_klein.png";
+		String img = "/images/lock_" + color.toString().toLowerCase() + "_klein.png";
 
-		imgLock = new ImageView(new File(img).toURI().toString());
+		imgLock = new ImageView(getClass().getResource(img).toString());
 		imgLock.setRotate(20);
 
 		imgCross = new ImageView(getClass().getResource("/images/cross.png").toString());
