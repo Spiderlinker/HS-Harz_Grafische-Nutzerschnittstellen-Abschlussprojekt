@@ -38,8 +38,10 @@ public class Notification extends AbstractPane<BorderPane> {
 				+ "-fx-background-color: white; -fx-background-radius: 11px;");
 		root.setMaxSize(200, 100);
 		root.setMouseTransparent(true);
+		root.setOpacity(0);
 
 		lblMessage = new Text();
+		lblMessage.setStyle("-fx-font-size: 12pt;");
 
 		transition = new FadeTransition(Duration.millis(500), root);
 		displayTimer = Executors.newSingleThreadScheduledExecutor();
