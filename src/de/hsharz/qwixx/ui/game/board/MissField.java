@@ -1,6 +1,5 @@
 package de.hsharz.qwixx.ui.game.board;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 

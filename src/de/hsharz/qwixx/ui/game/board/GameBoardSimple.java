@@ -1,6 +1,5 @@
 package de.hsharz.qwixx.ui.game.board;
 
-import java.io.File;
 import java.util.List;
 
 import com.jfoenix.controls.JFXButton;
@@ -21,13 +20,14 @@ public class GameBoardSimple extends GameBoardUI {
 	}
 
 	private void createNextButton() {
-		JFXButton btnNext = new JFXButton("", new ImageView(getClass().getResource("/images/arrow_right.png").toString()));
+		JFXButton btnNext = new JFXButton("",
+				new ImageView(getClass().getResource("/images/arrow_right.png").toString()));
 		btnNext.setFocusTraversable(false);
 
 		Tooltip btnNextTooltip = new Tooltip("Weiter zum nächsten Würfelpaar / Zug");
 		btnNextTooltip.setStyle("-fx-font-size: 14pt");
 		btnNext.setTooltip(btnNextTooltip);
-		
+
 		btnNext.setOnAction(e -> playerSelectedDice(DicePair.EMPTY));
 
 		btnNext.setAlignment(Pos.CENTER);

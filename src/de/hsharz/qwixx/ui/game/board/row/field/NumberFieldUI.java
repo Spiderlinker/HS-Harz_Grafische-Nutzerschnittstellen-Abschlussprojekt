@@ -1,7 +1,5 @@
 package de.hsharz.qwixx.ui.game.board.row.field;
 
-import java.io.File;
-
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.ui.AbstractPane;
 import javafx.scene.control.ToggleButton;

@@ -1,6 +1,5 @@
 package de.hsharz.qwixx.ui;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
