@@ -72,6 +72,7 @@ public class StartScreen extends AbstractPane<VBox> {
 		btnStatistics = new JFXButton("Statistik");
 		btnStatistics.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
 		btnStatistics.setMaxWidth(Double.MAX_VALUE);
+		btnStatistics.setDisable(true); // TODO implement statistics and enable button
 
 		btnExit = new JFXButton("Verlassen");
 		btnExit.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
