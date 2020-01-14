@@ -255,7 +255,7 @@ public class Game implements RowsClosedSupplier {
 
 	private void closeQueuedRows() {
 		while (!rowsToCloseAfterRoundFinished.isEmpty()) {
-			System.out.println("Row closed: " + rowsToCloseAfterRoundFinished.peek());
+			System.out.println("Row is now closed: " + rowsToCloseAfterRoundFinished.peek());
 			closedRows.add(rowsToCloseAfterRoundFinished.poll());
 		}
 	}
