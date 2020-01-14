@@ -5,7 +5,7 @@ package de.hsharz.qwixx.model.player;
  * weißen Würfel ({@link #WHITE_DICE}), oder eine Kombination aus weißem- und
  * Farbwürfel ({@link #COLOR_DICE}).
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public enum DiceSelectionType {
 

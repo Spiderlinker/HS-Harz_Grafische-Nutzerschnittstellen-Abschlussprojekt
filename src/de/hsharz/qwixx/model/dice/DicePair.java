@@ -13,7 +13,7 @@ import java.util.Objects;
  * und als Summe dieses Würfelpaares verwendet. <br>
  * Bei #2 werden die gegebenen Parameter für dieses Würfelpaar 1:1 übernommen.
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public class DicePair {
 
@@ -86,7 +86,7 @@ public class DicePair {
 
 	@Override
 	public String toString() {
-		if (this.equals(EMPTY)) {
+		if (this.equals(EMPTY) || this.equals(MISS)) {
 			return "-";
 		}
 		return "(Color: " + color + ", Sum: " + sum + ")";

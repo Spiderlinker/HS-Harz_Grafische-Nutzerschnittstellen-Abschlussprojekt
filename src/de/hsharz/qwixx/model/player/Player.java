@@ -10,7 +10,7 @@ import de.hsharz.qwixx.utils.StringUtils;
  * {@link IPlayer}. Die Erzeugung, der Name und das Spielfeld werden in dieser
  * Klasse verwaltet und alle dazugehörigen Methoden sind implementiert.
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public abstract class Player implements IPlayer {
 

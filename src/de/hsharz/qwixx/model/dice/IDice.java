@@ -10,7 +10,7 @@ package de.hsharz.qwixx.model.dice;
  * der die Methode {@link #getCurrentValue()} liefert, ändert sich bei jedem
  * neuen Aufruf der Methode {@link #rollDice()}.
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public interface IDice {
 

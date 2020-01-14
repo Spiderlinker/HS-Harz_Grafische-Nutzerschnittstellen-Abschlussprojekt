@@ -3,7 +3,7 @@ package de.hsharz.qwixx.model.dice;
 /**
  * Dieses Enum enthält verschiedene Farben, die ein Würfel haben kann.
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public enum DiceColor {
 

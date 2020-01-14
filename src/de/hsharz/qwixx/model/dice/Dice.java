@@ -6,7 +6,7 @@ import java.util.Random;
  * Diese Klasse implementiert das Interface {@link IDice} und repräsentiert
  * somit einen Würfel.
  * 
- * @author Oliver
+ * @author Oliver Lindemann
  */
 public class Dice implements IDice {
 
