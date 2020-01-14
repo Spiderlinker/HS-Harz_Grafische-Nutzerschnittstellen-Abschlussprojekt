@@ -181,6 +181,8 @@ public class GameBoard {
 	 * <li>{@link DicePair#EMPTY} wird ignoriert und die Methode macht nichts.</li>
 	 * <li>{@link DicePair#MISS} wird verarbeitet und ein Fehlwurf wird
 	 * angekreuzt</li>
+	 * <li>Falls das Würfelpaar ein weißes Würfelpaar sein sollte, so wird eine
+	 * {@link IllegalArgumentException} geworfen</li>
 	 * </ul>
 	 * 
 	 * @param pair Würfelpaar (nicht null), das angekreuzt werden soll
@@ -198,6 +200,11 @@ public class GameBoard {
 		if (pair.equals(DicePair.MISS)) {
 			crossMiss();
 			return;
+		}
+
+		// Prüfen, dass kein weißes Würfelpaar übergeben worden ist
+		if (DiceColor.WHITE.equals(pair.getColor())) {
+			throw new IllegalArgumentException("Es kann kein weißer Würfel angekreuzt werden!");
 		}
 
 		// Ansonsten das DicePair ankreuzen
