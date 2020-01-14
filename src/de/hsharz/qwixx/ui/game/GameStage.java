@@ -263,14 +263,12 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 
 	private void scaleGameUI() {
 		Pane gameUIPane = gameUI.getPane();
-		Pane dicePane = gameUI.getDicePane().getPane();
 
 		gameUIPane.applyCss();
 		gameUIPane.layout();
 
-		System.out.println(screen.getBounds());
-		System.out.println(gameUIPane.getBoundsInLocal());
-		System.out.println(dicePane.getBoundsInLocal());
+		System.out.println("Bildschirmgröße: " + screen.getBounds());
+		System.out.println("Spielfeldgröße: " + gameUIPane.getBoundsInLocal());
 
 		double scaleWidth = (screen.getBounds().getWidth()) / (gameUIPane.getBoundsInLocal().getWidth());
 		double scaleHeight = (screen.getBounds().getHeight()) / (gameUIPane.getBoundsInLocal().getHeight());
@@ -311,7 +309,8 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		if (btnShowNotifications.isSelected()) {
 			if (nextPlayer instanceof Human) {
-				notification.show("Du bist am Zug!\nBitte wähle zuerst aus den weißen Würfeln,\ndann aus den Farbwürfeln jeweils ein Paar aus.");
+				notification.show(
+						"Du bist am Zug!\nBitte wähle zuerst aus den weißen Würfeln,\ndann aus den Farbwürfeln jeweils ein Paar aus.");
 			} else {
 				notification.show(nextPlayer.getName() + " ist am Zug!\nDu kannst nun die weißen Würfel verwenden.");
 			}
