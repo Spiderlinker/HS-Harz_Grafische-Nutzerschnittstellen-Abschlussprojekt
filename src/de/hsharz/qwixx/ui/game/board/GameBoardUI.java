@@ -124,6 +124,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void askForInput(List<DicePair> dices, DiceSelectionType selectionType) {
+		this.humanInput = null;
 		this.shouldNotify = true;
 		this.selectionType = selectionType;
 
