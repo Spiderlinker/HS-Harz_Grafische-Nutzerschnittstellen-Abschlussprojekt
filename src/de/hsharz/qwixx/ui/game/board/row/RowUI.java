@@ -58,24 +58,22 @@ public class RowUI extends AbstractPane<StackPane> {
 		rowEnd = new RowEndFieldUI(row.getColor());
 
 		triangle = new Polygon();
-		triangle.getPoints().addAll(new Double[] { //
-				0.0, 10.0, // Startpunkt links oben
+		triangle.getPoints().addAll(0.0, 10.0, // Startpunkt links oben
 				20.0, 20.0, // Spitze rechts mitte
 				0.0, 30.0 // Endpunkt links unten
-		});
+		);
 	}
 
 	private void setupInteractions() {
-		buttons.stream() //
-				.forEach(button -> button.getButton().selectedProperty()
-						.addListener((observable, oldValue, newValue) -> {
-							if (newValue.booleanValue()) {
-								for (FieldCrossedListener l : listeners) {
-									l.userCrossedField(RowUI.this, button);
-								}
-							}
-						}));
-
+		for (NumberFieldUI field : buttons) {
+			field.getButton().selectedProperty().addListener((observable, oldValue, newValue) -> {
+				if (newValue.booleanValue()) {
+					for (FieldCrossedListener l : listeners) {
+						l.userCrossedField(RowUI.this, field);
+					}
+				}
+			});
+		}
 	}
 
 	private void addWidgets() {
