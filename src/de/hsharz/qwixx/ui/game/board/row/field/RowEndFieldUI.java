@@ -29,7 +29,6 @@ public class RowEndFieldUI extends AbstractPane<StackPane> {
 		root.setOpacity(0.8);
 
 		String img = "/images/lock_" + color.toString().toLowerCase() + "_klein.png";
-
 		imgLock = new ImageView(getClass().getResource(img).toString());
 		imgLock.setRotate(20);
 
