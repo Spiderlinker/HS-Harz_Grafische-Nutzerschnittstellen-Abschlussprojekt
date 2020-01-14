@@ -190,7 +190,27 @@ class GameBoardTest {
 			board.crossMiss();
 		}
 
-		Assertions.assertThrows(IllegalAccessError.class, board::crossMiss);
+		Assertions.assertThrows(IllegalStateException.class, board::crossMiss);
+	}
+
+	@Test
+	void testRowClosedSupplier() {
+		GameBoard board = new GameBoard();
+		Assertions.assertNull(board.getRowClosedSupplier());
+
+		RowsClosedSupplier testSupplier = new RowsClosedSupplier() {
+			@Override
+			public boolean isRowClosed(DiceColor rowColor) {
+				return false;
+			}
+
+			@Override
+			public void closeRow(DiceColor color) {
+			}
+		};
+
+		board.setRowClosedSupplier(testSupplier);
+		Assertions.assertEquals(testSupplier, board.getRowClosedSupplier());
 	}
 
 }
