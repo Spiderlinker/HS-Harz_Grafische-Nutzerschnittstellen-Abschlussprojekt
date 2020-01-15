@@ -58,4 +58,15 @@ public class GameBoardSimple extends GameBoardUI {
 		}
 	}
 
+	@Override
+	public void nextPlayersTurn(IPlayer nextPlayer) {
+		super.nextPlayersTurn(nextPlayer);
+
+		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
+		setMissFieldsDisabled(!isCurrentPlayersTurn);
+	}
+
+	private void setMissFieldsDisabled(boolean disabled) {
+		scoreLegend.getMissFields().forEach(f -> f.setDisabled(disabled));
+	}
 }

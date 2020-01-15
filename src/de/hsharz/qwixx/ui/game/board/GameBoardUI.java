@@ -220,10 +220,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
 	}
 
-	private void setMissFieldsDisabled(boolean disabled) {
-		scoreLegend.getMissFields().forEach(f -> f.setDisabled(disabled));
-	}
-
 	private void updateHintLabel() {
 		Platform.runLater(() -> lblHint.setText(
 				(DiceSelectionType.COLOR_DICE.equals(selectionType) ? "Farbwürfel" : "Weißen Würfel") + " wählen"));
@@ -233,7 +229,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
 		highlightGameboard(isCurrentPlayersTurn);
-		setMissFieldsDisabled(!isCurrentPlayersTurn);
 
 		humanInput = null;
 	}
