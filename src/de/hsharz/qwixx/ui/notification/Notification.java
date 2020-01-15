@@ -15,7 +15,7 @@ import javafx.util.Duration;
 
 public class Notification extends AbstractPane<BorderPane> {
 
-	public static final long DEFAULT_DISPLAY_TIME = 5000;
+	public static final long DEFAULT_DISPLAY_TIME = 8000;
 
 	private long displayTime = DEFAULT_DISPLAY_TIME;
 	private Text lblMessage;
