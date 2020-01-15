@@ -42,17 +42,33 @@ public class Game implements RowsClosedSupplier {
 	private Thread gameThread;
 	private boolean isPlaying;
 
+	/**
+	 * Erzeugt ein neues Spiel mit den gegebenen Spielern {@code player}. <br>
+	 * Das Spiel muss noch über die Methode {@link #startGame()} gestartet werden.
+	 * 
+	 * @param player Spieler, die diesem Spiel hinzugefügt werden sollen
+	 */
 	public Game(IPlayer... player) {
 		addPlayer(player);
 		addDices();
 	}
 
+	/**
+	 * Fügt diesem Spiel die gegebenen Spieler {@code player} hinzu.
+	 * 
+	 * @param player Spieler, die diesem Spiel hinzugefügt werden sollen
+	 */
 	public void addPlayer(IPlayer... player) {
 		for (IPlayer p : player) {
 			this.player.add(p);
 		}
 	}
 
+	/**
+	 * Fügt diesem Spiel den gegebenen Spieler {@code player} hinzu.
+	 * 
+	 * @param player Spieler, der diesem Spiel hinzugefügt werden soll
+	 */
 	public void removePlayer(IPlayer... player) {
 		for (IPlayer p : player) {
 			this.player.remove(p);
@@ -76,10 +92,21 @@ public class Game implements RowsClosedSupplier {
 		dices.add(diceBlue);
 	}
 
+	/**
+	 * Die Reihe der gegebenen Farbe {@code closedRow} der zu schließenden Reihen
+	 * {@link #rowsToCloseAfterRoundFinished} -Queue hinzu. Alle Reihen werden nach
+	 * Beendigung des aktuellen Spielzuges geschlossen.
+	 * 
+	 * @param closedRow Spielreihe, die am Ende des aktuellen Spielzuges geschlossen
+	 *                  werden soll
+	 */
 	public void addClosedRow(DiceColor closedRow) {
 		this.rowsToCloseAfterRoundFinished.add(closedRow);
 	}
 
+	/**
+	 * Stoppt dieses Spiel
+	 */
 	public void stopGame() {
 		this.isPlaying = false;
 		if (gameThread != null) {
@@ -87,18 +114,33 @@ public class Game implements RowsClosedSupplier {
 		}
 	}
 
+	/**
+	 * @return Liefert einen {@link Boolean} der angibt, ob dieses Spiel aktuell
+	 *         läuft
+	 */
 	public boolean isPlaying() {
 		return isPlaying;
 	}
 
+	/**
+	 * @return Liefert eine Liste mit allen Würfeln, die in diesem Spiel vorhanden
+	 *         sind
+	 */
 	public List<IDice> getDices() {
 		return dices;
 	}
 
+	/**
+	 * @return Liefert eine Liste mit allen zu diesem Spiel hinzugefügten Spieler
+	 */
 	public List<IPlayer> getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Startet das Spiel (in einem neuen Thread), falls es noch nicht gestartet ist
+	 * und Spieler hinzugefügt worden sind.
+	 */
 	public void startGame() {
 		if (player.isEmpty()) {
 			throw new IllegalArgumentException("There are no players to play with");
@@ -117,20 +159,26 @@ public class Game implements RowsClosedSupplier {
 		gameThread = new Thread(() -> {
 			isPlaying = true;
 
+			// Spieleschleife
 			while (isPlaying) {
 
+				// Jeder Spieler kommt pro Durchgang 1x dran
 				for (IPlayer currentPlayer : this.player) {
 
 					System.out.println("\n\nSpieler ist an der Reihe: " + currentPlayer);
 					gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
 
+					// Würfel würfeln
 					rollDices();
-					List<DicePair> whiteDices = getWhiteDicesSums();
-					List<DicePair> colorDices = getColorDicesSums();
+					List<DicePair> whiteDices = getWhiteDicePairs(); // Aus den weißen Würfel Würfelpaare bilden
+					List<DicePair> colorDices = getColorDicePairs(); // Aus den Farbwürfeln Würfelpaare bilden
 
+					// Andere Spieler wählen das weiße Würfelpaar aus
 					System.out.println("---------- Other Player choosing dices");
 					letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
+					// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare
+					// aus
 					System.out.println("---------- Current Player choosing dices");
 					letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
 
@@ -150,11 +198,19 @@ public class Game implements RowsClosedSupplier {
 	private void rollDices() {
 		dices.forEach(IDice::rollDice);
 		dices.forEach(System.out::println);
-
 		diceListeners.forEach(DiceListener::dicesRolled);
 	}
 
-	private List<DicePair> getWhiteDicesSums() {
+	/**
+	 * Aus den beiden weißen Würfeln wird die Summe berechnet und für jede Farbe ein
+	 * DicePair mit der berechneten Summe erzeugt. <br>
+	 * Da das weiße Würfelpaar für alle Farbreihen verwendet werden kann, muss auch
+	 * für jede Farbe ein Würfelpaar erstellt werden.
+	 * 
+	 * @return Würfelpaare von jeder Farbe mit der Summe der beiden weißen Würfeln
+	 */
+	private List<DicePair> getWhiteDicePairs() {
+
 		int sum = diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue();
 		return Arrays.asList(new DicePair(DiceColor.RED, sum), //
 				new DicePair(DiceColor.YELLOW, sum), //
@@ -162,7 +218,14 @@ public class Game implements RowsClosedSupplier {
 				new DicePair(DiceColor.BLUE, sum));
 	}
 
-	private List<DicePair> getColorDicesSums() {
+	/**
+	 * Jeder weiße Würfel wird mit jedem Farbwürfel kombiniert. Daraus ergeben sich
+	 * (Anzahl der weißen Würfel) * (Anzahl der Farbwürfel) verschiedene
+	 * Würfelpaare.
+	 * 
+	 * @return Würfelpaare kombiniert aus den weißen Würfeln mit Farbwürfeln
+	 */
+	private List<DicePair> getColorDicePairs() {
 		return Arrays.asList(new DicePair(diceWhite1, diceRed), //
 				new DicePair(diceWhite1, diceYellow), //
 				new DicePair(diceWhite1, diceGreen), //
@@ -174,6 +237,15 @@ public class Game implements RowsClosedSupplier {
 				new DicePair(diceWhite2, diceBlue)); //
 	}
 
+	/**
+	 * Alle Spieler, die aktuell nicht der aktive Spieler {@code currentPlayer}
+	 * sind, wählen aus den gegebenen Würfeln {@code whiteDices} ein weißes
+	 * Würfelpaar aus.
+	 * 
+	 * @param whiteDices    Weiße Würfelpaare, aus denen alle Spieler ein Würfelpaar
+	 *                      auswählen können
+	 * @param currentPlayer Der aktive Spieler dieser Runde
+	 */
 	private void letOtherPlayerChooseWhiteDices(List<DicePair> whiteDices, IPlayer currentPlayer) {
 		player.forEach(p -> {
 			if (!p.equals(currentPlayer)) {
@@ -186,6 +258,8 @@ public class Game implements RowsClosedSupplier {
 
 		DicePair selectedWhiteDice = letPlayerSelectWhiteDice(player, whiteDices);
 
+		// Falls der Benutzer einen Fehlwurf angekreuzt hat, so soll der keinen
+		// Farbwürfel mehr wählen dürfen.
 		if (DicePair.MISS.equals(selectedWhiteDice)) {
 			// User crossed MissField
 			// prevent user to cross second dice
@@ -221,16 +295,23 @@ public class Game implements RowsClosedSupplier {
 
 	private DicePair letPlayerSelectDice(BiFunction<IPlayer, List<DicePair>, DicePair> diceSelection, IPlayer player,
 			List<DicePair> dices) {
+		// Der Spieler wählt so lange einen Würfel aus den gegebenen Würfel aus, bis er
+		// einen gültigen Würfel ausgewählt hat.
 		while (true) {
 			try {
+				// Spieler wählt aus den gegebenen Würfelpaaren ein Würfelpaar aus
 				DicePair selectedDice = diceSelection.apply(player, dices);
 				if (!isEmptyOrMiss(selectedDice)) {
 					// Den Wurf nur ankreuzen, falls ein Würfel ausgewählt wurde
 					crossSelectedDice(player, selectedDice, dices);
 				}
+
+				// Wenn bis hierher keine Fehlermeldung kam, dann hat der Spieler ein gültiges
+				// Würfelpaar ausgewählt, dieses Würfelpaar wird zurückgegeben.
 				return selectedDice;
 			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				System.out
+						.println("Der Spieler " + player + " hat keinen gültigen Würfel ausgewählt: " + e.getMessage());
 				gameListeners.forEach(l -> l.invalidDiceChoiceMade(player, e.getMessage()));
 			}
 		}
@@ -253,6 +334,10 @@ public class Game implements RowsClosedSupplier {
 		return dice == null || dice.equals(DicePair.EMPTY);
 	}
 
+	/**
+	 * Schließt alle zur Schließung eingereihte Reihen in der
+	 * {@link #rowsToCloseAfterRoundFinished}-Queue
+	 */
 	private void closeQueuedRows() {
 		while (!rowsToCloseAfterRoundFinished.isEmpty()) {
 			System.out.println("Row is now closed: " + rowsToCloseAfterRoundFinished.peek());
@@ -260,6 +345,9 @@ public class Game implements RowsClosedSupplier {
 		}
 	}
 
+	/**
+	 * @return Liefert einen Boolean der angibt, ob das aktuelle Spiel beendet ist
+	 */
 	private boolean isGameOver() {
 		return !isPlaying || playerCrossedAllMisses() || closedRows.size() >= 2;
 	}
@@ -273,6 +361,11 @@ public class Game implements RowsClosedSupplier {
 		return false;
 	}
 
+	/**
+	 * @return Liefert eine Liste mit allen Spielern, die diese Spielrunde gewonnen
+	 *         haben (die die höchste Punktzahl erreicht haben). Dies können unter
+	 *         Umständen mehrere Spieler sein.
+	 */
 	public List<IPlayer> getWinningPlayer() {
 		OptionalInt maxScore = player.stream() //
 				.mapToInt(p -> p.getGameBoard().getScore().getScoreComplete()) //
