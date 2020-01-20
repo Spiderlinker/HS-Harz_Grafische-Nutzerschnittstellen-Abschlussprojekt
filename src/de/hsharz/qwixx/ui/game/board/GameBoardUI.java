@@ -157,9 +157,10 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void fieldCrossed(Row rowToCross, Field fieldToCross) {
-		RowUI rowToCrossUI = rows.get(rowToCross.getColor());
+		Platform.runLater(() -> userScore.updateScore());
 
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
+		RowUI rowToCrossUI = rows.get(rowToCross.getColor());
 		for (NumberFieldUI btn : rowToCrossUI.getButtons()) {
 			if (btn.getValue() == fieldToCross.getValue()) {
 				btn.setDisabled(true);
@@ -167,7 +168,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 				break;
 			}
 		}
-		Platform.runLater(() -> userScore.updateScore());
 	}
 
 	@Override
@@ -183,6 +183,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void missCrossed() {
+		Platform.runLater(() -> userScore.updateScore());
+
 		for (int i = 0; i < scoreLegend.getMissFields().size(); i++) {
 			MissField missField = scoreLegend.getMissFields().get(i);
 
@@ -192,7 +194,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 			missField.setDisabled(isMissAlreadyUsed);
 		}
 
-		Platform.runLater(() -> userScore.updateScore());
 	}
 
 	private void checkCrossedButtons() {
