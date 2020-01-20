@@ -308,6 +308,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		if (btnShowNotifications.isSelected()) {
+			System.out.println("Should show Notification: " + nextPlayer + " - " + (nextPlayer instanceof Human));
 			if (nextPlayer instanceof Human) {
 				notification.show(
 						"Du bist am Zug!\nBitte wähle zuerst aus den weißen Würfeln,\ndann aus den Farbwürfeln jeweils ein Paar aus.");
