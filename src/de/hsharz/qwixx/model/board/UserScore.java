@@ -99,10 +99,17 @@ public class UserScore {
 	 *         Reihe und die Punktzahl der Fehlwürfe
 	 */
 	public int getScoreComplete() {
-		return rowScores.values().stream()//
-				.mapToInt(i -> i) //
-				.sum() //
-				+ getScoreMisses();
+		int score = getScoreMisses();
+		for (int rowScore : rowScores.values()) {
+			score += rowScore;
+		}
+		return score;
+
+		// Alternativ: Stream
+//		return rowScores.values().stream()//
+//				.mapToInt(i -> i) //
+//				.sum() //
+//				+ getScoreMisses();
 	}
 
 }

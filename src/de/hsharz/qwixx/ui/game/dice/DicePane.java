@@ -3,8 +3,6 @@ package de.hsharz.qwixx.ui.game.dice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.dice.DiceColor;
@@ -47,17 +45,28 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 
 	private void addWidgets() {
 
-		Predicate<DiceUI> isWhiteDice = d -> d.getDice().getColor().equals(DiceColor.WHITE);
-		List<DiceUI> whiteDices = dicesUI.stream().filter(isWhiteDice::test).collect(Collectors.toList());
-		List<DiceUI> colorDices = dicesUI.stream().filter(isWhiteDice.negate()::test).collect(Collectors.toList());
+		List<DiceUI> whiteDices = new ArrayList<>();
+		List<DiceUI> colorDices = new ArrayList<>();
 
+		// Würfel nach Weiß- und Farbwürfeln in Listen sortieren
+		for (DiceUI dice : dicesUI) {
+			if (DiceColor.WHITE.equals(dice.getDice().getColor())) {
+				whiteDices.add(dice);
+			} else {
+				colorDices.add(dice);
+			}
+		}
+
+		// Weiße Würfel ins Pane hinzufügen
 		for (int i = 0; i < whiteDices.size(); i++) {
 			root.add(whiteDices.get(i).getPane(), 0, i);
 		}
 
+		// Trennlinie
 		root.add(new Separator(Orientation.VERTICAL), 1, 0);
 		root.add(new Separator(Orientation.VERTICAL), 1, 1);
 
+		// Farbwürfel ins Pane hinzufügen
 		for (int i = 0; i < colorDices.size(); i++) {
 			if (i < 2) {
 				root.add(colorDices.get(i).getPane(), (i % 2) + 2, 0);
@@ -68,7 +77,9 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	}
 
 	public void refreshDices() {
-		dicesUI.forEach(DiceUI::refreshDice);
+		for (DiceUI dice : dicesUI) {
+			dice.refreshDice();
+		}
 	}
 
 	@Override
@@ -78,9 +89,12 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		Predicate<DiceUI> isWhiteDice = d -> d.getDice().getColor().equals(DiceColor.WHITE);
-		dicesUI.stream().filter(isWhiteDice.negate()::test)
-				.forEach(d -> d.getPane().setOpacity(nextPlayer instanceof Computer ? 0.6 : 1));
+		double opacity = nextPlayer instanceof Computer ? 0.6 : 1;
+		for (DiceUI dice : dicesUI) {
+			if (!dice.getDice().getColor().equals(DiceColor.WHITE)) {
+				dice.getPane().setOpacity(opacity);
+			}
+		}
 	}
 
 	@Override
