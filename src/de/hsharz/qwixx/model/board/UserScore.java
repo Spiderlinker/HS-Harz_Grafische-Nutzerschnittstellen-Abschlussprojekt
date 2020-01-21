@@ -31,7 +31,7 @@ public class UserScore {
 
 	/**
 	 * Liste beinhaltet die Punkte für die jeweilige Reihe bzw. der Farbe der Reihe.
-	 * Die Map ist nach dem Schema <FarbeDerReihe, PunkteDerReihe> aufgebaut
+	 * Die Map ist nach dem Schema &lt;FarbeDerReihe, PunkteDerReihe&gt; aufgebaut
 	 */
 	private Map<DiceColor, Integer> rowScores = new EnumMap<>(DiceColor.class);
 

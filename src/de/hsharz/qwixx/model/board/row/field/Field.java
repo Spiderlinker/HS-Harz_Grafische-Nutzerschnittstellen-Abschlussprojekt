@@ -29,7 +29,7 @@ public interface Field {
 	/**
 	 * Liefert einen boolean der angibt, ob dieses Feld angekreuzt ist
 	 * 
-	 * @param true, falls das Feld angekreuzt ist; andernfalls false
+	 * @return true, falls das Feld angekreuzt ist; andernfalls false
 	 */
 	boolean isCrossed();
 

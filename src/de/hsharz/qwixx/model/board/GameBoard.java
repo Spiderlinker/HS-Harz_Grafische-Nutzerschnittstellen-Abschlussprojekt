@@ -43,7 +43,7 @@ public class GameBoard {
 	 * kann
 	 */
 	private RowsClosedSupplier rowClosedSupplier;
-	/** Map mit Reihen auf diesem Spielfeld (<Reihenfarbe, Reihe>) */
+	/** Map mit Reihen auf diesem Spielfeld (&lt;Reihenfarbe, Reihe&gt;) */
 	private Map<DiceColor, Row> rows = new EnumMap<>(DiceColor.class);
 
 	/** Anzahl der verbleibenden Fehlwürfe */
@@ -99,8 +99,8 @@ public class GameBoard {
 	}
 
 	/**
-	 * Setzt den {@link RowsClosedSupplier} dieses Spielfeldes. <b> Falls der
-	 * gegebene {@code supplier} null sein sollte, so wird jeglicher zuvor
+	 * Setzt den {@link RowsClosedSupplier} dieses Spielfeldes. <br>
+	 * Falls der gegebene {@code supplier} null sein sollte, so wird jeglicher zuvor
 	 * registrierte {@link RowsClosedSupplier} von diesem Spielfeld entfernt.
 	 * <p>
 	 * Beachte, dass ein {@link RowsClosedSupplier} für ein funktionierendes
@@ -115,7 +115,7 @@ public class GameBoard {
 
 	/**
 	 * Liefert die Reihen dieses Spielfeldes. Die Reihen sind in eienr Map
-	 * organisiert, die der Logik <Reihenfarbe, Reihe> folgt.
+	 * organisiert, die der Logik &lt;Reihenfarbe, Reihe&gt; folgt.
 	 * 
 	 * @return Liefert alle Reihen dieses Spielfeldes
 	 */
@@ -174,7 +174,6 @@ public class GameBoard {
 	 * das gegebene Paar nicht gültig sein, so wird eine
 	 * {@link IllegalArgumentException} mit der entsprechenden Fehlermeldung
 	 * geworfen.
-	 * <p>
 	 * <ul>
 	 * <li>Falls das gegebene Würfelpaar {@code null} sein sollte, so wird eine
 	 * {@link NullPointerException} geworfen</li>
@@ -249,7 +248,7 @@ public class GameBoard {
 	}
 
 	/**
-	 * Liefert den Index des Feldes in der Reihe {@rowToCross}, welches den Wert der
+	 * Liefert den Index des Feldes in der Reihe {@code rowToCross}, welches den Wert der
 	 * gegebenen Zahl {@code numberToCross} besitzt. <br>
 	 * Zu der gegebenen Zahl wird also in der gegebenen Reihe nach dem
 	 * entsprechenden Feld gesucht, welches die Zahl in dieser Reihe repräsentiert.

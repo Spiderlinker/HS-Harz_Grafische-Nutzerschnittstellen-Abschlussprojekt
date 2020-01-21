@@ -15,7 +15,7 @@ package de.hsharz.qwixx.model.dice;
 public interface IDice {
 
 	/**
-	 * @return Liefert die Farbe ({@link DiceColor) dieses Würfels
+	 * @return Liefert die Farbe ({@link DiceColor}) dieses Würfels
 	 */
 	DiceColor getColor();
 

@@ -11,12 +11,9 @@ import de.hsharz.qwixx.model.dice.DicePair;
  * kann) und ein Spielfeld / Spielblock, auf dem er dieses Spiel spielt (welches
  * über die Methode {@link #getGameBoard()} geholt werden kann).
  * <p>
- * Die Methode {@link #chooseWhiteDices(List)} wird vom Spiel auf dem Spieler
- * aufgerufen, wenn dieser einen weißen Würfel wählen soll. Alle möglichen
- * Würfel (-paare) werden dem Spieler als Liste als Parameter gegeben. <br>
- * Die Methode {@link #chooseColorDices(List)} wird vom Spiel auf dem Spieler
- * aufgerufen, wenn dieser einen Farbwürfel wählen soll. Alle möglichen Würfel
- * (-paare) werden dem Spieler als Liste als Parameter gegeben.
+ * Die Methode {@link #chooseDicePair(List, DiceSelectionType)} wird vom Spiel
+ * auf dem Spieler aufgerufen, wenn dieser ein Würfelpaar wählen soll. Alle
+ * möglichen Würfel (-paare) werden dem Spieler als Liste als Parameter gegeben.
  * 
  * @author Oliver Lindemann
  */
@@ -31,7 +28,7 @@ public interface IPlayer {
 	 * Verlauf nicht ausgeschlossen.
 	 * 
 	 * @param dices Würfelpaare, aus denen der Spieler ein Würfelpaar auswählen soll
-	 * @param type Typen der gegebenen Würfelpaare (WHITE_DICES, COLOR_DICES)
+	 * @param type  Typen der gegebenen Würfelpaare (WHITE_DICES, COLOR_DICES)
 	 * @return vom Spieler ausgewähltes Würfelpaar
 	 */
 	DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type);
