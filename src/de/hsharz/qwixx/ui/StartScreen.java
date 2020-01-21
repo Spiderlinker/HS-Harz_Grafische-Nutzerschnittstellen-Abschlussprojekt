@@ -12,13 +12,11 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -52,8 +50,7 @@ public class StartScreen extends AbstractPane<VBox> {
 		new Scene(startGameScreen.getPane());
 		startGameScreen.getPane().applyCss();
 		startGameScreen.getPane().layout();
-		
-		
+
 		root.setPadding(new Insets(50));
 		root.setSpacing(20);
 		root.setAlignment(Pos.CENTER);
@@ -87,19 +84,13 @@ public class StartScreen extends AbstractPane<VBox> {
 	private void addWidgets() {
 		root.getChildren().add(lblQwixx);
 		root.getChildren().add(separator);
-		root.getChildren().add(getSpacer());
+		root.getChildren().add(UiUtils.getVBoxSpacer());
 		root.getChildren().add(btnPlay);
 		root.getChildren().add(btnStatistics);
-		root.getChildren().add(getSpacer());
+		root.getChildren().add(UiUtils.getVBoxSpacer());
 		root.getChildren().add(btnExit);
 
 		VBox.setVgrow(separator, Priority.ALWAYS);
-	}
-
-	private Node getSpacer() {
-		Region spacer = new Region();
-		VBox.setVgrow(spacer, Priority.ALWAYS);
-		return spacer;
 	}
 
 	private void showStartGameScreen() {

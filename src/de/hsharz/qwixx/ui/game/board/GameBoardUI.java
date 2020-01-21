@@ -19,6 +19,7 @@ import de.hsharz.qwixx.model.player.DiceSelectionType;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.UiUtils;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
@@ -27,8 +28,6 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -106,7 +105,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	private void addWidgets() {
 		boxGameBoardHeader.getChildren().add(lblName);
-		boxGameBoardHeader.getChildren().add(getHBoxSpacer());
+		boxGameBoardHeader.getChildren().add(UiUtils.getHBoxSpacer());
 		boxGameBoardHeader.getChildren().add(lblHint);
 
 		root.getChildren().add(boxGameBoardHeader);
@@ -114,12 +113,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 		root.getChildren().add(scoreLegend.getPane());
 		root.getChildren().add(userScore.getPane());
-	}
-
-	private Region getHBoxSpacer() {
-		Region spacer = new Region();
-		HBox.setHgrow(spacer, Priority.ALWAYS);
-		return spacer;
 	}
 
 	@Override

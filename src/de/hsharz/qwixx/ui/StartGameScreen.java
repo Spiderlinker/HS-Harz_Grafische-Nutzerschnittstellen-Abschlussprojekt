@@ -27,7 +27,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -38,7 +37,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -126,11 +124,11 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		root.add(lblCreateGame, 0, 0, 2, 1);
 		root.add(new Separator(Orientation.HORIZONTAL), 0, 1, 2, 1);
 		root.add(btnBack, 0, 2);
-		root.add(getSpacer(), 0, 3);
+		root.add(UiUtils.getGridPaneVSpacer(), 0, 3);
 		root.add(textName, 0, 4, 2, 1);
 		root.add(lblChoosePlayer, 0, 5);
 		root.add(boxChoosePlayer, 1, 5);
-		root.add(getSpacer(), 0, 6);
+		root.add(UiUtils.getGridPaneVSpacer(), 0, 6);
 		root.add(btnPlay, 0, 7, 2, 1);
 
 		GridPane.setMargin(textName, new Insets(0, 0, 20, 0));
@@ -140,12 +138,6 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		GridPane.setHgrow(textName, Priority.ALWAYS);
 		GridPane.setHgrow(lblCreateGame, Priority.ALWAYS);
 		GridPane.setHgrow(btnPlay, Priority.ALWAYS);
-	}
-
-	private Node getSpacer() {
-		Region spacer = new Region();
-		GridPane.setVgrow(spacer, Priority.ALWAYS);
-		return spacer;
 	}
 
 	private void showPreviousPane() {

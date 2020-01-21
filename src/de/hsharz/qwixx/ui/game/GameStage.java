@@ -12,6 +12,7 @@ import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import de.hsharz.qwixx.ui.UiUtils;
 import de.hsharz.qwixx.ui.notification.Notification;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -29,8 +30,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -244,13 +243,10 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	private void addWidgets() {
 		root.getChildren().add(gameUI.getPane());
 
-		Region region = new Region();
-		HBox.setHgrow(region, Priority.ALWAYS);
-
 		boxButtons.getChildren().add(btnHelp);
 		boxButtons.getChildren().add(btnControls);
 		boxButtons.getChildren().add(btnShowNotifications);
-		boxButtons.getChildren().add(region);
+		boxButtons.getChildren().add(UiUtils.getHBoxSpacer());
 		boxButtons.getChildren().add(btnExit);
 
 		root.getChildren().add(boxButtons);

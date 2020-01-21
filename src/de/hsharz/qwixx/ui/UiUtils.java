@@ -1,6 +1,7 @@
 package de.hsharz.qwixx.ui;
 
 import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -16,7 +17,7 @@ public class UiUtils {
 	 * Erstellt einen VBox-Spacer, der den verbleibenden Platz in einer VBox
 	 * einnimmt.
 	 */
-	public Node getVBoxSpacer() {
+	public static Node getVBoxSpacer() {
 		Region spacer = new Region();
 		VBox.setVgrow(spacer, Priority.ALWAYS);
 		return spacer;
@@ -32,4 +33,12 @@ public class UiUtils {
 		return spacer;
 	}
 
+	
+
+	public static Node getGridPaneVSpacer() {
+		Region spacer = new Region();
+		GridPane.setVgrow(spacer, Priority.ALWAYS);
+		return spacer;
+	}
+	
 }
