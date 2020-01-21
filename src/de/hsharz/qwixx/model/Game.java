@@ -94,36 +94,6 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	/**
-	 * Die Reihe der gegebenen Farbe {@code closedRow} der zu schließenden Reihen
-	 * {@link #rowsToCloseAfterRoundFinished} -Queue hinzu. Alle Reihen werden nach
-	 * Beendigung des aktuellen Spielzuges geschlossen.
-	 * 
-	 * @param closedRow Spielreihe, die am Ende des aktuellen Spielzuges geschlossen
-	 *                  werden soll
-	 */
-	public void addClosedRow(DiceColor closedRow) {
-		this.rowsToCloseAfterRoundFinished.add(closedRow);
-	}
-
-	/**
-	 * Stoppt dieses Spiel
-	 */
-	public void stopGame() {
-		this.isPlaying = false;
-		if (gameThread != null) {
-			this.gameThread.interrupt();
-		}
-	}
-
-	/**
-	 * @return Liefert einen {@link Boolean} der angibt, ob dieses Spiel aktuell
-	 *         läuft
-	 */
-	public boolean isPlaying() {
-		return isPlaying;
-	}
-
-	/**
 	 * @return Liefert eine Liste mit allen Würfeln, die in diesem Spiel vorhanden
 	 *         sind
 	 */
@@ -136,6 +106,14 @@ public class Game implements RowsClosedSupplier {
 	 */
 	public List<IPlayer> getPlayer() {
 		return player;
+	}
+
+	/**
+	 * @return Liefert einen {@link Boolean} der angibt, ob dieses Spiel aktuell
+	 *         läuft
+	 */
+	public boolean isPlaying() {
+		return isPlaying;
 	}
 
 	/**
@@ -154,6 +132,16 @@ public class Game implements RowsClosedSupplier {
 
 		createGameThread();
 		gameThread.start();
+	}
+
+	/**
+	 * Stoppt dieses Spiel
+	 */
+	public void stopGame() {
+		this.isPlaying = false;
+		if (gameThread != null) {
+			this.gameThread.interrupt();
+		}
 	}
 
 	private void createGameThread() {
@@ -382,6 +370,14 @@ public class Game implements RowsClosedSupplier {
 		return new ArrayList<>();
 	}
 
+	/**
+	 * Die Reihe der gegebenen Farbe {@code color} wird der zu schließenden Reihen
+	 * {@link #rowsToCloseAfterRoundFinished} -Queue hinzugefügt. Alle Reihen werden
+	 * nach Beendigung des aktuellen Spielzuges geschlossen.
+	 * 
+	 * @param color Farbe der Reihe, die am Ende des aktuellen Spielzuges
+	 *              geschlossen werden soll
+	 */
 	@Override
 	public void closeRow(DiceColor color) {
 		System.out.println("Closing row after round finished: " + color);
