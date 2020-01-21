@@ -114,6 +114,21 @@ public class GameBoard {
 	}
 
 	/**
+	 * @return Liefert die {@link RowsClosedSupplier}, der diesem Spielfeld
+	 *         zugewiesen wurde
+	 */
+	public RowsClosedSupplier getRowClosedSupplier() {
+		return rowClosedSupplier;
+	}
+
+	/**
+	 * @return Liefert den Score dieses Spielfeldes
+	 */
+	public UserScore getScore() {
+		return userScore;
+	}
+
+	/**
 	 * Liefert die Reihen dieses Spielfeldes. Die Reihen sind in eienr Map
 	 * organisiert, die der Logik &lt;Reihenfarbe, Reihe&gt; folgt.
 	 * 
@@ -248,8 +263,8 @@ public class GameBoard {
 	}
 
 	/**
-	 * Liefert den Index des Feldes in der Reihe {@code rowToCross}, welches den Wert der
-	 * gegebenen Zahl {@code numberToCross} besitzt. <br>
+	 * Liefert den Index des Feldes in der Reihe {@code rowToCross}, welches den
+	 * Wert der gegebenen Zahl {@code numberToCross} besitzt. <br>
 	 * Zu der gegebenen Zahl wird also in der gegebenen Reihe nach dem
 	 * entsprechenden Feld gesucht, welches die Zahl in dieser Reihe repräsentiert.
 	 * 
@@ -284,7 +299,7 @@ public class GameBoard {
 	 * @param numberToCross     Zahl, die angekreuzt werden soll
 	 * @param fieldToCrossIndex Feld der gegebenen Zahl, die angekreuzt werden soll
 	 */
-	public void checkCrossForValidity(Row rowToCross, int numberToCross, int fieldToCrossIndex) {
+	private void checkCrossForValidity(Row rowToCross, int numberToCross, int fieldToCrossIndex) {
 		// Falls die Reihe, in der das gegebene Feld angekreuzt werden soll, geschlossen
 		// ist, so darf das Feld nicht angekreuzt werden -> nicht zulässig
 		if (rowClosedSupplier.isRowClosed(rowToCross.getColor())) {
@@ -390,21 +405,6 @@ public class GameBoard {
 	 */
 	private int getAmountCrossedFieldsOfRow(Row row) {
 		return (int) row.getFields().stream().filter(Field::isCrossed).count();
-	}
-
-	/**
-	 * @return Liefert die {@link RowsClosedSupplier}, der diesem Spielfeld
-	 *         zugewiesen wurde
-	 */
-	public RowsClosedSupplier getRowClosedSupplier() {
-		return rowClosedSupplier;
-	}
-
-	/**
-	 * @return Liefert den Score dieses Spielfeldes
-	 */
-	public UserScore getScore() {
-		return userScore;
 	}
 
 }
