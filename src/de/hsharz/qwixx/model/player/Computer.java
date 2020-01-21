@@ -20,12 +20,10 @@ public class Computer extends Player {
 	}
 
 	@Override
-	public DicePair chooseWhiteDices(List<DicePair> dices) {
-		return getBestWhiteDicesSum(dices);
-	}
-
-	@Override
-	public DicePair chooseColorDices(List<DicePair> dices) {
+	public DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type) {
+		if (type.equals(DiceSelectionType.WHITE_DICE)) {
+			return getBestWhiteDicesSum(dices);
+		}
 		return getBestDicesSum(dices);
 	}
 

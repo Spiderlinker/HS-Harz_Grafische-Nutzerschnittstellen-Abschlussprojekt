@@ -31,22 +31,10 @@ public interface IPlayer {
 	 * Verlauf nicht ausgeschlossen.
 	 * 
 	 * @param dices Würfelpaare, aus denen der Spieler ein Würfelpaar auswählen soll
+	 * @param type Typen der gegebenen Würfelpaare (WHITE_DICES, COLOR_DICES)
 	 * @return vom Spieler ausgewähltes Würfelpaar
 	 */
-	DicePair chooseWhiteDices(List<DicePair> dices);
-
-	/**
-	 * Der Spieler soll aus der gegebenen Liste mit Würfelpaaren {@code dices} einen
-	 * Würfel auswählen und diesen an den Aufrufer zurückliefern. <br>
-	 * Falls der Spieler keinen Würfel wählen will, so kann er auch einen
-	 * {@link DicePair#EMPTY} oder einen {@link DicePair#MISS} zurück liefern. <br>
-	 * Falls {@code null} zurückgeliefert werden sollte, so sind Fehler im weiteren
-	 * Verlauf nicht ausgeschlossen.
-	 * 
-	 * @param dices Würfelpaare, aus denen der Spieler ein Würfelpaar auswählen soll
-	 * @return vom Spieler ausgewähltes Würfelpaar
-	 */
-	DicePair chooseColorDices(List<DicePair> dices);
+	DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type);
 
 	/**
 	 * @return Liefert das Spielfeld / den Spielblock dieses Spielers

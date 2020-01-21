@@ -20,8 +20,10 @@ class HumanTest extends PlayerTest<Human> {
 	void testExceptionNoHumanInputSupplierSet() {
 		Player player = getPlayer("Test", new GameBoard());
 
-		Assertions.assertThrows(NullPointerException.class, () -> player.chooseWhiteDices(new ArrayList<>()));
-		Assertions.assertThrows(NullPointerException.class, () -> player.chooseColorDices(new ArrayList<>()));
+		Assertions.assertThrows(NullPointerException.class,
+				() -> player.chooseDicePair(new ArrayList<>(), DiceSelectionType.WHITE_DICE));
+		Assertions.assertThrows(NullPointerException.class,
+				() -> player.chooseDicePair(new ArrayList<>(), DiceSelectionType.COLOR_DICE));
 	}
 
 	@Test
@@ -35,8 +37,8 @@ class HumanTest extends PlayerTest<Human> {
 		Human player = getPlayer("Test", new GameBoard());
 		player.setHumanInputSupplier(new TestInputSupplier(player));
 
-		Assertions.assertEquals(DicePair.EMPTY, player.chooseWhiteDices(new ArrayList<>()));
-		Assertions.assertEquals(DicePair.EMPTY, player.chooseColorDices(new ArrayList<>()));
+		Assertions.assertEquals(DicePair.EMPTY, player.chooseDicePair(new ArrayList<>(), DiceSelectionType.WHITE_DICE));
+		Assertions.assertEquals(DicePair.EMPTY, player.chooseDicePair(new ArrayList<>(), DiceSelectionType.COLOR_DICE));
 
 	}
 

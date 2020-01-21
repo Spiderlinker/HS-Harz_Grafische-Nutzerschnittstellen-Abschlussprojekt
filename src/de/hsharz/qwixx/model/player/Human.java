@@ -63,13 +63,8 @@ public class Human extends Player {
 	}
 
 	@Override
-	public DicePair chooseWhiteDices(List<DicePair> dices) {
-		return waitForSelectionAndCrossField(dices, DiceSelectionType.WHITE_DICE);
-	}
-
-	@Override
-	public DicePair chooseColorDices(List<DicePair> dices) {
-		return waitForSelectionAndCrossField(dices, DiceSelectionType.COLOR_DICE);
+	public DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type) {
+		return waitForSelectionAndCrossField(dices, type);
 	}
 
 	/**

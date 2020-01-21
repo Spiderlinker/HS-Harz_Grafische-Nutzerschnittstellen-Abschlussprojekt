@@ -17,6 +17,7 @@ import de.hsharz.qwixx.model.dice.Dice;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.DicePair;
 import de.hsharz.qwixx.model.dice.IDice;
+import de.hsharz.qwixx.model.player.DiceSelectionType;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.game.dice.DiceListener;
 
@@ -286,11 +287,11 @@ public class Game implements RowsClosedSupplier {
 	}
 
 	private DicePair letPlayerSelectWhiteDice(IPlayer player, List<DicePair> whiteDices) {
-		return letPlayerSelectDice((p, d) -> p.chooseWhiteDices(d), player, whiteDices);
+		return letPlayerSelectDice((p, d) -> p.chooseDicePair(d, DiceSelectionType.WHITE_DICE), player, whiteDices);
 	}
 
 	private DicePair letPlayerSelectColorDice(IPlayer player, List<DicePair> colorDices) {
-		return letPlayerSelectDice((p, d) -> p.chooseColorDices(d), player, colorDices);
+		return letPlayerSelectDice((p, d) -> p.chooseDicePair(d, DiceSelectionType.COLOR_DICE), player, colorDices);
 	}
 
 	private DicePair letPlayerSelectDice(BiFunction<IPlayer, List<DicePair>, DicePair> diceSelection, IPlayer player,
