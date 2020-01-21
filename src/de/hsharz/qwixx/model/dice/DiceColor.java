@@ -28,7 +28,11 @@ public enum DiceColor {
 	/** Farbe des Enums als Hex-Darstellung */
 	private String colorAsHex;
 
-	/** Setzt für das Enum die entsprechende Hex-Darstellung */
+	/**
+	 * Setzt für das Enum die entsprechende Hex-Darstellung
+	 * 
+	 * @param colorAsHex Hex-Darstellung des Enums
+	 */
 	private DiceColor(String colorAsHex) {
 		this.colorAsHex = colorAsHex;
 	}
