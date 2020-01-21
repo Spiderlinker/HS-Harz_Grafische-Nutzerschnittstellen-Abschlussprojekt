@@ -17,7 +17,7 @@ import de.hsharz.qwixx.model.dice.DicePair;
  * <p>
  * Die Auswahl eines Würfelpaares erfolgt folgendermaßen: <br>
  * Game -&gt; fragt diese Instanz, welches Würfelpaar ausgewählt werden soll <br>
- * Human-Instanz -> gibt Frage an gesetzten {@link HumanInputSupplier} weiter
+ * Human-Instanz -&gt; gibt Frage an gesetzten {@link HumanInputSupplier} weiter
  * und ruft {@link #wait()} auf. <br>
  * {@link HumanInputSupplier} holt Entscheidung des Benutzers ein und ruft
  * {@link #notify()} auf. <br>
