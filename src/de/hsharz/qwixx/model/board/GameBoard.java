@@ -382,8 +382,7 @@ public class GameBoard {
 	 *         Reihe {@code row} ist; false falls nicht
 	 */
 	private boolean isLastFieldOfRow(Field field, Row row) {
-		return (row.getOrder().equals(Order.ASC) && field.getValue() == Row.ASC_LAST_VALUE)
-				|| row.getOrder().equals(Order.DESC) && field.getValue() == Row.DESC_LAST_VALUE;
+		return field.getValue() == row.getLastValue();
 	}
 
 	/**
