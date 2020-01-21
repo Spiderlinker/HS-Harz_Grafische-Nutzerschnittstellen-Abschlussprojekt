@@ -181,7 +181,7 @@ public class Game implements RowsClosedSupplier {
 
 			System.out.println("Game over");
 			gameListeners.forEach(GameListener::gameOver);
-		});
+		}, "Game"); // Thread mit Namen 'Game' erstellen
 	}
 
 	private void rollDices() {

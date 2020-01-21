@@ -194,7 +194,7 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 			}
 		});
 
-		new Thread(createUITask).start();
+		new Thread(createUITask, "Create-UI").start();
 	}
 
 	private JFXDialog showLoadingScreen() {
