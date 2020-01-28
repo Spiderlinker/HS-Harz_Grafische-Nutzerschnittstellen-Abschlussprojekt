@@ -18,8 +18,8 @@ import de.hsharz.qwixx.model.dice.DiceColor;
  */
 public class UserScore {
 
-	/** Punktezahl pro Fehlwurf */
-	public static final int SCORE_PER_MISS = -5;
+	/** Punktezahl pro Fehlwurf (wird von dem Ergebnis abgezogen) */
+	public static final int SCORE_PER_MISS = 5;
 
 	/**
 	 * Nicht-veränderbare-Liste mit Punkten pro angekreuztes Feld. <br>
@@ -99,7 +99,7 @@ public class UserScore {
 	 *         Reihe und die Punktzahl der Fehlwürfe
 	 */
 	public int getScoreComplete() {
-		int score = getScoreMisses();
+		int score = - getScoreMisses(); // - << beachten, Miss-Score wird vom Ergebnis abgezogen
 		for (int rowScore : rowScores.values()) {
 			score += rowScore;
 		}
