@@ -2,6 +2,7 @@ package de.hsharz.qwixx.ui.game.board.row.field;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.ui.AbstractPane;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
@@ -42,7 +43,10 @@ public class RowEndFieldUI extends AbstractPane<StackPane> {
 	}
 
 	public void setCrossed(boolean crossed) {
-		imgCross.setVisible(crossed);
+		Platform.runLater(() -> {
+			imgCross.setVisible(crossed);
+			root.setOpacity(crossed ? 0.6 : 1);
+		});
 	}
 
 	public boolean isCrossed() {
