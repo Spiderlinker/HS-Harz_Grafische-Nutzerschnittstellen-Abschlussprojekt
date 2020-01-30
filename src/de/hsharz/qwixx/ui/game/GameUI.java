@@ -55,6 +55,8 @@ public class GameUI extends AbstractPane<StackPane> {
 						new BackgroundSize(100, 100, true, true, true, true))));
 
 		dicePane = new DicePane(game.getDices());
+		dicePane.addRowClosedSupplier(game);
+		
 		game.addDiceListener(dicePane);
 		game.addGameListener(dicePane);
 	}

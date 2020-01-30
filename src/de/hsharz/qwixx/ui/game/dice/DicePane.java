@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hsharz.qwixx.model.GameListener;
+import de.hsharz.qwixx.model.board.row.RowsClosedSupplier;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.Computer;
@@ -22,6 +23,8 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	private List<IDice> dices;
 	private List<DiceUI> dicesUI = new ArrayList<>();
 
+	private RowsClosedSupplier rowClosedSupplier;
+
 	public DicePane(List<IDice> dices) {
 		super(new GridPane());
 
@@ -29,6 +32,10 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 
 		createWidgets();
 		addWidgets();
+	}
+
+	public void addRowClosedSupplier(RowsClosedSupplier supplier) {
+		this.rowClosedSupplier = supplier;
 	}
 
 	private void createWidgets() {
@@ -93,12 +100,22 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		double opacity = nextPlayer instanceof Computer ? 0.6 : 1;
+
 		Platform.runLater(() -> {
+
 			for (DiceUI dice : dicesUI) {
+				// Falls die Reihe der Farbe des Würfels bereits geschlossen ist,
+				// so soll dieser Würfel ausgeblendet werden
+				if (rowClosedSupplier != null && rowClosedSupplier.isRowClosed(dice.getDice().getColor())) {
+					dice.getPane().setVisible(false);
+					continue;
+				}
+
 				if (!dice.getDice().getColor().equals(DiceColor.WHITE)) {
 					dice.getPane().setOpacity(opacity);
 				}
 			}
+
 		});
 	}
 
