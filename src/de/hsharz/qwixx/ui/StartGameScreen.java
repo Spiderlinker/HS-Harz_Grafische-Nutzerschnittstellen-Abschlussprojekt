@@ -177,8 +177,13 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		Task<GameStage> createUITask = new Task<GameStage>() {
 			@Override
 			protected GameStage call() throws Exception {
-				Game game = createNewGame();
-				return new GameStage(game, screen);
+				try {
+					Game game = createNewGame();
+					return new GameStage(game, screen);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
 			}
 		};
 
@@ -203,7 +208,7 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		dialog.setContent(new ProgressIndicator(-1));
 		return dialog;
 	}
-
+ 
 	private Game createNewGame() {
 		Game game = new Game();
 

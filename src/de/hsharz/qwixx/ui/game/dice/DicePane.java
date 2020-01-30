@@ -10,6 +10,7 @@ import de.hsharz.qwixx.model.dice.IDice;
 import de.hsharz.qwixx.model.player.Computer;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -77,9 +78,11 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	}
 
 	public void refreshDices() {
-		for (DiceUI dice : dicesUI) {
-			dice.refreshDice();
-		}
+		Platform.runLater(() -> {
+			for (DiceUI dice : dicesUI) {
+				dice.refreshDice();
+			}
+		});
 	}
 
 	@Override
@@ -90,11 +93,13 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		double opacity = nextPlayer instanceof Computer ? 0.6 : 1;
-		for (DiceUI dice : dicesUI) {
-			if (!dice.getDice().getColor().equals(DiceColor.WHITE)) {
-				dice.getPane().setOpacity(opacity);
+		Platform.runLater(() -> {
+			for (DiceUI dice : dicesUI) {
+				if (!dice.getDice().getColor().equals(DiceColor.WHITE)) {
+					dice.getPane().setOpacity(opacity);
+				}
 			}
-		}
+		});
 	}
 
 	@Override

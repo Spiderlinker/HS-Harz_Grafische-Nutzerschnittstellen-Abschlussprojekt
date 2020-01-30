@@ -122,17 +122,18 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		this.selectionType = selectionType;
 
 		checkCrossedButtons();
-		disableAllButtons();
-
 		updateHintLabel();
 	}
 
 	protected void playerSelectedDice(DicePair dice) {
-		humanInput = dice;
-
-		if (shouldNotify) {
-			synchronized (player) {
-				player.notify();
+		try {
+			humanInput = dice;
+			disableAllButtons();
+		} finally {
+			if (shouldNotify) {
+				synchronized (player) {
+					player.notify();
+				}
 			}
 		}
 	}
@@ -150,7 +151,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void fieldCrossed(Row rowToCross, Field fieldToCross) {
-		Platform.runLater(() -> userScore.updateScore());
+		userScore.updateScore();
 
 		System.out.println("Field crossed in Row: " + rowToCross.getColor());
 		RowUI rowToCrossUI = rows.get(rowToCross.getColor());
@@ -176,7 +177,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void missCrossed() {
-		Platform.runLater(() -> userScore.updateScore());
+		userScore.updateScore();
 
 		for (int i = 0; i < scoreLegend.getMissFields().size(); i++) {
 			MissField missField = scoreLegend.getMissFields().get(i);
@@ -186,7 +187,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 			missField.setSelected(isMissAlreadyUsed);
 			missField.setDisabled(isMissAlreadyUsed);
 		}
-
 	}
 
 	private void checkCrossedButtons() {
@@ -211,7 +211,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	public void highlightGameboard(boolean highlight) {
-		glowEffect.setColor(highlight ? Color.RED : Color.WHITE);
+		Platform.runLater(() -> glowEffect.setColor(highlight ? Color.RED : Color.WHITE));
 	}
 
 	private void updateHintLabel() {

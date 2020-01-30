@@ -148,35 +148,39 @@ public class Game implements RowsClosedSupplier {
 		gameThread = new Thread(() -> {
 			isPlaying = true;
 
-			// Spieleschleife
-			while (isPlaying) {
+			try {
+				// Spieleschleife
+				while (isPlaying) {
 
-				// Jeder Spieler kommt pro Durchgang 1x dran
-				for (IPlayer currentPlayer : this.player) {
+					// Jeder Spieler kommt pro Durchgang 1x dran
+					for (IPlayer currentPlayer : this.player) {
 
-					System.out.println("\n\nSpieler ist an der Reihe: " + currentPlayer);
-					gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
+						System.out.println("\n\nSpieler ist an der Reihe: " + currentPlayer);
+						gameListeners.forEach(l -> l.nextPlayersTurn(currentPlayer));
 
-					// Würfel würfeln
-					rollDices();
-					List<DicePair> whiteDices = getWhiteDicePairs(); // Aus den weißen Würfel Würfelpaare bilden
-					List<DicePair> colorDices = getColorDicePairs(); // Aus den Farbwürfeln Würfelpaare bilden
+						// Würfel würfeln
+						rollDices();
+						List<DicePair> whiteDices = getWhiteDicePairs(); // Aus den weißen Würfel Würfelpaare bilden
+						List<DicePair> colorDices = getColorDicePairs(); // Aus den Farbwürfeln Würfelpaare bilden
 
-					// Andere Spieler wählen das weiße Würfelpaar aus
-					System.out.println("---------- Other Player choosing dices");
-					letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
+						// Andere Spieler wählen das weiße Würfelpaar aus
+						System.out.println("---------- Other Player choosing dices");
+						letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
-					// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare
-					// aus
-					System.out.println("---------- Current Player choosing dices");
-					letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
+						// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare
+						// aus
+						System.out.println("---------- Current Player choosing dices");
+						letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
 
-					closeQueuedRows();
-					if (isGameOver()) {
-						isPlaying = false;
-						break;
+						closeQueuedRows();
+						if (isGameOver()) {
+							isPlaying = false;
+							break;
+						}
 					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			System.out.println("Game over");

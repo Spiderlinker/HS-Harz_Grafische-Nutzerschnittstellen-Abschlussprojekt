@@ -5,6 +5,7 @@ import java.util.Objects;
 import de.hsharz.qwixx.model.board.UserScore;
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.ui.AbstractPane;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -85,14 +86,15 @@ public class UserScoreUI extends AbstractPane<HBox> {
 	}
 
 	public void updateScore() {
-		
-		lblScoreRedRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.RED)));
-		lblScoreYellowRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.YELLOW)));
-		lblScoreGreenRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.GREEN)));
-		lblScoreBlueRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.BLUE)));
+		Platform.runLater(() -> {
+			lblScoreRedRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.RED)));
+			lblScoreYellowRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.YELLOW)));
+			lblScoreGreenRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.GREEN)));
+			lblScoreBlueRow.setText(Integer.toString(userScore.getScoreOfRow(DiceColor.BLUE)));
 
-		lblScoreMisses.setText(Integer.toString(userScore.getScoreMisses()));
-		lblScoreResult.setText(Integer.toString(userScore.getScoreComplete()));
+			lblScoreMisses.setText(Integer.toString(userScore.getScoreMisses()));
+			lblScoreResult.setText(Integer.toString(userScore.getScoreComplete()));
+		});
 	}
 
 }

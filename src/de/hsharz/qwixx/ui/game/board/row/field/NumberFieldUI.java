@@ -2,6 +2,7 @@ package de.hsharz.qwixx.ui.game.board.row.field;
 
 import de.hsharz.qwixx.model.dice.DiceColor;
 import de.hsharz.qwixx.ui.AbstractPane;
+import javafx.application.Platform;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -71,11 +72,7 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
-		if (disabled) {
-			root.setOpacity(0.6);
-		} else {
-			root.setOpacity(1);
-		}
+		Platform.runLater(() -> root.setOpacity(disabled ? 0.6 : 1));
 	}
 
 	public boolean isDiabled() {
@@ -83,9 +80,11 @@ public class NumberFieldUI extends AbstractPane<StackPane> {
 	}
 
 	public void setSelected(boolean selected) {
-		btn.setSelected(selected);
-		imgView.setOpacity(1);
-		imgView.setVisible(btn.isSelected());
+		Platform.runLater(() -> {
+			btn.setSelected(selected);
+			imgView.setOpacity(1);
+			imgView.setVisible(btn.isSelected());
+		});
 	}
 
 	public ToggleButton getButton() {

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.hsharz.qwixx.ui.AbstractPane;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
@@ -70,16 +71,12 @@ public class MissField extends AbstractPane<StackPane> {
 
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
-		if (disabled) {
-			root.setOpacity(0.6);
-		} else {
-			root.setOpacity(1);
-		}
+		Platform.runLater(() -> root.setOpacity(disabled ? 0.6 : 1));
 	}
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
-		imgView.setVisible(selected);
+		Platform.runLater(() -> imgView.setVisible(selected));
 	}
 
 	public boolean isSelected() {
