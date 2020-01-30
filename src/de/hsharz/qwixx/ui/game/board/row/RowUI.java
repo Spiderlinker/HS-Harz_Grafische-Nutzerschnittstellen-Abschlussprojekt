@@ -1,6 +1,7 @@
 package de.hsharz.qwixx.ui.game.board.row;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +23,7 @@ public class RowUI extends AbstractPane<StackPane> {
 	private Row row;
 
 	private TilePane rowPane;
-	private List<NumberFieldUI> buttons = new ArrayList<>();
+	private List<NumberFieldUI> buttons = new LinkedList<>();
 	private RowEndFieldUI rowEnd;
 
 	private Polygon triangle;
