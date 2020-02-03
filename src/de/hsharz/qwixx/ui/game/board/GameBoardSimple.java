@@ -46,6 +46,7 @@ public class GameBoardSimple extends GameBoardUI {
 
 	private void highlightRemainingFieldsOfRow(RowUI row) {
 		if (player.getGameBoard().getRowClosedSupplier().isRowClosed(row.getRow().getColor())) {
+			row.setStroked(true);
 			return;
 		}
 
