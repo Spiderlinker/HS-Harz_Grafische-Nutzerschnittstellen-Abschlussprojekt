@@ -30,7 +30,7 @@ public class RowUI extends AbstractPane<StackPane> {
 	private RowEndFieldUI rowEnd;
 
 	private Polygon triangle;
-	private Line line;
+	private Line strokeLine;
 	private boolean isStroked = false;
 
 	private List<FieldCrossedListener> listeners = new ArrayList<>();
@@ -69,14 +69,14 @@ public class RowUI extends AbstractPane<StackPane> {
 				0.0, 30.0 // Endpunkt links unten
 		);
 
-		line = new Line();
-		line.setStartX(0);
-		line.setStartY(0);
-		line.setEndY(0);
-		line.endXProperty().bind(Bindings.subtract((root.getPadding().getLeft() + root.getPadding().getRight()) * 2,
+		strokeLine = new Line();
+		strokeLine.setStartX(0);
+		strokeLine.setStartY(0);
+		strokeLine.setEndY(0);
+		strokeLine.endXProperty().bind(Bindings.subtract((root.getPadding().getLeft() + root.getPadding().getRight()) * 2,
 				root.widthProperty()));
-		line.setStrokeWidth(2);
-		line.setVisible(false);
+		strokeLine.setStrokeWidth(2);
+		strokeLine.setVisible(false);
 	}
 
 	private void setupInteractions() {
@@ -101,7 +101,7 @@ public class RowUI extends AbstractPane<StackPane> {
 
 		root.getChildren().add(rowPane);
 		root.getChildren().add(triangle);
-		root.getChildren().add(line);
+		root.getChildren().add(strokeLine);
 
 		StackPane.setMargin(rowPane, new Insets(0, 0, 0, 30));
 		StackPane.setAlignment(triangle, Pos.CENTER_LEFT);
@@ -125,7 +125,7 @@ public class RowUI extends AbstractPane<StackPane> {
 
 	public void setStroked(boolean stroked) {
 		this.isStroked = stroked;
-		Platform.runLater(() -> line.setVisible(stroked));
+		Platform.runLater(() -> strokeLine.setVisible(stroked));
 	}
 
 }
