@@ -121,11 +121,11 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 
 		Text textAblaufHeader = getBoldText("Spielablauf\n");
 		Text textAblauf = getNormalText(
-				"Wer am Zug ist und somit der aktive Spieler ist, wirfst mit alle Würfeln genau einmal. Alle Spieler dürfen (nicht müssen!) nun die Summe der geworfenen weißen Würfeln in einer beliebigen Farbreihe auf Ihrem Spielblock ankreuzen.\n"
+				"Wer am Zug und somit der aktive Spieler ist, wirft mit alle Würfeln genau einmal. Alle Spieler dürfen (nicht müssen!) nun die Summe der geworfenen weißen Würfeln in einer beliebigen Farbreihe auf Ihrem Spielblock ankreuzen.\n"
 						+ "Der aktive Spieler darf nun zusätzlich die Augenzahl eines (beliebigen) weißen Würfels mit der Augenzahl eines (beliebigen) Farbwürfels addieren und die Summe in die Farbreihe (entsprechend des gewählten Farbwürfels) eintragen.\n\n"
-						+ "Falls ein Spieler keine Zahl akreuzen will oder kann, so muss er ein Kreuz in der Spalte \"Fehlwürfe\" machen. Für nicht aktive Spieler gilt diese Regel nicht.\n\n");
+						+ "Falls der aktive Spieler keine Zahl akreuzen will oder kann, so muss er ein Kreuz in der Spalte \"Fehlwürfe\" machen. Für nicht aktive Spieler gilt diese Regel nicht.\n\n");
 
-		Text textHintHeader = getBoldText("Hinweise zum Abkreuzen von Feldern\n");
+		Text textHintHeader = getBoldText("Hinweise zum Ankreuzen von Feldern\n");
 		Text textHint = getNormalText("– Alle Zahlen in jeder Reihe müssen von links nach rechts angekreuzt werden.\n"
 				+ "– Es dürfen Zahlen ausgelassen werden.\n"
 				+ "– Ausgelassene Ziffern dürfen nicht nachträglich angekreuzt werden.\n"
@@ -304,7 +304,6 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
 		if (btnShowNotifications.isSelected()) {
-			System.out.println("Should show Notification: " + nextPlayer + " - " + (nextPlayer instanceof Human));
 			if (nextPlayer instanceof Human) {
 				notification.show(
 						"Du bist am Zug!\nBitte wähle zuerst aus den weißen Würfeln,\ndann aus den Farbwürfeln jeweils ein Paar aus.");
