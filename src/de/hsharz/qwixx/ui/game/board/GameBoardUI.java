@@ -221,10 +221,20 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
+		humanInput = null;
+
 		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
 		highlightGameboard(isCurrentPlayersTurn);
 
-		humanInput = null;
+		strokeClosedRows();
+	}
+
+	private void strokeClosedRows() {
+		for (RowUI row : rows.values()) {
+			if (player.getGameBoard().getRowClosedSupplier().isRowClosed(row.getRow().getColor())) {
+				row.setStroked(true);
+			}
+		}
 	}
 
 	@Override
