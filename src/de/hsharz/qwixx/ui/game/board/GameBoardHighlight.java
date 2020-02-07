@@ -8,7 +8,7 @@ import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 
-public class GameBoardHighlight extends GameBoardUI {
+public class GameBoardHighlight extends HumanGameBoard {
 
 	public GameBoardHighlight(IPlayer player) {
 		super(player);
