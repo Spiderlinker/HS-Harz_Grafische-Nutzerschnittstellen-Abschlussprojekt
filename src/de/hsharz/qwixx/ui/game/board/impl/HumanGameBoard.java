@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.game.board;
+package de.hsharz.qwixx.ui.game.board.impl;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -10,6 +10,9 @@ import de.hsharz.qwixx.model.dice.DicePair;
 import de.hsharz.qwixx.model.player.DiceSelectionType;
 import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.game.board.FieldCrossedListener;
+import de.hsharz.qwixx.ui.game.board.GameBoardUI;
+import de.hsharz.qwixx.ui.game.board.MissFieldListener;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
