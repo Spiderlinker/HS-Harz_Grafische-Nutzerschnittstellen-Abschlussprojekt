@@ -22,15 +22,14 @@ public class Computer extends Player {
 	@Override
 	public DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type) {
 		if (type.equals(DiceSelectionType.WHITE_DICE)) {
-			return getBestWhiteDicesSum(dices);
+			return getBestWhiteDicePair(dices);
 		}
-		return getBestDicesSum(dices);
+		return getBestDicePair(dices);
 	}
 
-	private DicePair getBestWhiteDicesSum(List<DicePair> whiteDices) {
+	private DicePair getBestWhiteDicePair(List<DicePair> whiteDices) {
 
 		List<DicePair> mappedDices = new ArrayList<>();
-
 		for (DicePair whiteDice : whiteDices) {
 			mappedDices.add(new DicePair(DiceColor.RED, whiteDice.getSum()));
 			mappedDices.add(new DicePair(DiceColor.YELLOW, whiteDice.getSum()));
@@ -38,10 +37,10 @@ public class Computer extends Player {
 			mappedDices.add(new DicePair(DiceColor.BLUE, whiteDice.getSum()));
 		}
 
-		return getBestDicesSum(mappedDices);
+		return getBestDicePair(mappedDices);
 	}
 
-	private DicePair getBestDicesSum(List<DicePair> dices) {
+	private DicePair getBestDicePair(List<DicePair> dices) {
 		DicePair bestDices = null;
 
 		Map<DicePair, Integer> distance = getDistancesForDices(dices);
