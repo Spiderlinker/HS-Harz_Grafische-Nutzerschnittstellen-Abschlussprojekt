@@ -18,7 +18,8 @@ public interface GameListener {
 	 * 
 	 * @param nextPlayer Dieser Spieler ist am Zug
 	 */
-	default void nextPlayersTurn(IPlayer nextPlayer) {}
+	default void nextPlayersTurn(IPlayer nextPlayer) {
+	}
 
 	/**
 	 * Der als Parameter gegebene Spieler {@code player} hat einen ungültigen
@@ -28,10 +29,14 @@ public interface GameListener {
 	 * @param player Spieler, der einen ungültigen Spielzug gemacht hat
 	 * @param msg    Beschreibung des ungültigen Spielzuges
 	 */
-	default void invalidDiceChoiceMade(IPlayer player, String msg) {}
+	default void invalidDiceChoiceMade(IPlayer player, String msg) {
+	}
 
 	/**
 	 * Das Spiel ist vorbei
+	 * 
+	 * @param game Spiel, das beendet worden ist
 	 */
-	default void gameOver(Game game) {}
+	default void gameOver(Game game) {
+	}
 }

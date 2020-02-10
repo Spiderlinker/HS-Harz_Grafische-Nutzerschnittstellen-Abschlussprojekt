@@ -119,13 +119,4 @@ public class DicePane extends AbstractPane<GridPane> implements GameListener, Di
 		});
 	}
 
-	@Override
-	public void gameOver() {
-		// ignore
-	}
-
-	@Override
-	public void invalidDiceChoiceMade(IPlayer player, String msg) {
-		// ignore
-	}
 }
