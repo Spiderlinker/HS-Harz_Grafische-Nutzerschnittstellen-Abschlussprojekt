@@ -11,6 +11,7 @@ import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.game.board.ComputerGameBoardUI;
 import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
+import de.hsharz.qwixx.ui.game.board.HumanGameBoard;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -56,7 +57,7 @@ public class GameUI extends AbstractPane<StackPane> {
 
 		dicePane = new DicePane(game.getDices());
 		dicePane.addRowClosedSupplier(game);
-		
+
 		game.addDiceListener(dicePane);
 		game.addGameListener(dicePane);
 	}
@@ -68,7 +69,8 @@ public class GameUI extends AbstractPane<StackPane> {
 
 			if (player instanceof Human) {
 				boardUI = new GameBoardSimple(player);
-				((Human) player).setHumanInputSupplier(boardUI);
+//				boardUI = new GameBoardHighlight(player);
+				((Human) player).setHumanInputSupplier((HumanGameBoard) boardUI);
 			} else {
 				boardUI = new ComputerGameBoardUI(player);
 			}
