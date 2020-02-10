@@ -202,7 +202,6 @@ public class Game implements RowsClosedSupplier {
 	 * @return Würfelpaare von jeder Farbe mit der Summe der beiden weißen Würfeln
 	 */
 	private List<DicePair> getWhiteDicePairs() {
-
 		int sum = diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue();
 		return Arrays.asList(new DicePair(DiceColor.RED, sum), //
 				new DicePair(DiceColor.YELLOW, sum), //
