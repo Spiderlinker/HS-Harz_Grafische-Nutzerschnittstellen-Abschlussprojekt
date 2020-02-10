@@ -27,7 +27,6 @@ public class HumanGameBoard extends GameBoardUI implements HumanInputSupplier, F
 	private Label lblHint;
 	private JFXButton btnNext;
 
-	protected boolean shouldNotify = false;
 	private DicePair humanInput;
 	private DiceSelectionType selectionType;
 
@@ -72,21 +71,8 @@ public class HumanGameBoard extends GameBoardUI implements HumanInputSupplier, F
 	}
 
 	@Override
-	public void nextPlayersTurn(IPlayer nextPlayer) {
-		super.nextPlayersTurn(nextPlayer);
-
-		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
-		setMissFieldsDisabled(!isCurrentPlayersTurn);
-	}
-
-	private void setMissFieldsDisabled(boolean disabled) {
-		scoreLegend.getMissFields().forEach(f -> f.setDisabled(disabled));
-	}
-
-	@Override
 	public void askForInput(List<DicePair> dices, DiceSelectionType selectionType) {
 		this.humanInput = null;
-		this.shouldNotify = true;
 		this.selectionType = selectionType;
 
 		checkCrossedButtons();
@@ -111,15 +97,13 @@ public class HumanGameBoard extends GameBoardUI implements HumanInputSupplier, F
 	 * Der Spieler hat das gegebene Würfelpaar über die UI ausgewählt. Der Spieler
 	 * dieses Spielfeldes wird darüber benachrichtigt.
 	 */
-	protected void playerSelectedDice(DicePair dice) {
+	private void playerSelectedDice(DicePair dice) {
 		try {
 			humanInput = dice;
 			disableAllButtons();
 		} finally {
-			if (shouldNotify) {
-				synchronized (player) {
-					player.notify();
-				}
+			synchronized (player) {
+				player.notify();
 			}
 		}
 	}
@@ -139,6 +123,18 @@ public class HumanGameBoard extends GameBoardUI implements HumanInputSupplier, F
 	public void userCrossedMiss() {
 		// remove selected dices and notify player to continue
 		playerSelectedDice(DicePair.MISS);
+	}
+
+	@Override
+	public void nextPlayersTurn(IPlayer nextPlayer) {
+		super.nextPlayersTurn(nextPlayer);
+
+		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
+		setMissFieldsDisabled(!isCurrentPlayersTurn);
+	}
+
+	private void setMissFieldsDisabled(boolean disabled) {
+		scoreLegend.getMissFields().forEach(f -> f.setDisabled(disabled));
 	}
 
 }
