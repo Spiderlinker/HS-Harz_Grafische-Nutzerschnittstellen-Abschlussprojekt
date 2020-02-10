@@ -164,12 +164,11 @@ public class Game implements RowsClosedSupplier {
 						List<DicePair> colorDices = getColorDicePairs(); // Aus den Farbwürfeln Würfelpaare bilden
 
 						// Andere Spieler wählen das weiße Würfelpaar aus
-						System.out.println("---------- Other Player choosing dices");
+						System.out.println("---------- Alle anderen Spieler wählen weiße Würfel");
 						letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
-						// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare
-						// aus
-						System.out.println("---------- Current Player choosing dices");
+						// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare aus
+						System.out.println("---------- Aktiver Spieler wählt Würfelpaare");
 						letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
 
 						closeQueuedRows();
@@ -184,7 +183,7 @@ public class Game implements RowsClosedSupplier {
 			}
 
 			System.out.println("Game over");
-			gameListeners.forEach(GameListener::gameOver);
+			gameListeners.forEach(l -> l.gameOver(this));
 		}, "Game"); // Thread mit Namen 'Game' erstellen
 	}
 
