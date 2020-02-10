@@ -83,15 +83,17 @@ public class Human extends Player {
 		synchronized (this) {
 			try {
 
-				System.out.println("Waiting for human to make input: " + dices);
+				System.out.println("Benutzer nach Auswahl des Würfelpaares fragen: " + dices);
 				inputSupplier.askForInput(dices, selectionType);
 
+				// Auf Eingabe des Benutzers über die UI warten
 				while ((selection = inputSupplier.getHumanInput()) == null) {
 					this.wait();
 				}
 
 			} catch (InterruptedException e) {
-				System.err.println("Player left the game or system interrupted this thread! " + e.getMessage());
+				System.err.println("Der Spieler hat das Spiel verlassen oder "
+						+ "das System hat diesen Thread unterbrochen! " + e.getMessage());
 			}
 		}
 
