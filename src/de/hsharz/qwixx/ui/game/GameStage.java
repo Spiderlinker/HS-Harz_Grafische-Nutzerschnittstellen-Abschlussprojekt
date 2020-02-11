@@ -7,7 +7,6 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialog.DialogTransition;
 
-import de.hsharz.qwixx.database.ScoreDatabase;
 import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.GameListener;
 import de.hsharz.qwixx.model.player.Human;
@@ -63,7 +62,6 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 		this.screen = Objects.requireNonNull(screen);
 
 		this.game.addGameListener(this);
-		this.game.addGameListener(ScoreDatabase.INSTANCE);
 
 		gameUI = new GameUI(game);
 
@@ -327,7 +325,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	public void gameOver(Game game) {
 		showGameOverScreen();
 	}
-	
+
 	private void showGameOverScreen() {
 		dialogGameOver.updateWinningPlayer(game.getWinningPlayer());
 		Platform.runLater(() -> dialogGameOver.getDialog().show());
