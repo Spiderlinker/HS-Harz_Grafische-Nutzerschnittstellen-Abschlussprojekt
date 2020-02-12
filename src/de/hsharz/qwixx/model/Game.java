@@ -238,7 +238,7 @@ public class Game implements RowsClosedSupplier {
 	 * @param currentPlayer Der aktive Spieler dieser Runde
 	 */
 	private void letOtherPlayerChooseWhiteDices(List<DicePair> whiteDices, IPlayer currentPlayer) {
-		player.forEach(p -> {
+		player.parallelStream().forEach(p -> {
 			if (!p.equals(currentPlayer)) {
 				letPlayerSelectWhiteDice(p, whiteDices);
 			}
