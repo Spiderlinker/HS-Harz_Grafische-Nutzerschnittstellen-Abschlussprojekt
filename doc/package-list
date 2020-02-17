@@ -1,16 +1,1 @@
-de.hsharz.qwixx
 de.hsharz.qwixx.model
-de.hsharz.qwixx.model.board
-de.hsharz.qwixx.model.board.row
-de.hsharz.qwixx.model.board.row.field
-de.hsharz.qwixx.model.dice
-de.hsharz.qwixx.model.player
-de.hsharz.qwixx.ui
-de.hsharz.qwixx.ui.game
-de.hsharz.qwixx.ui.game.board
-de.hsharz.qwixx.ui.game.board.row
-de.hsharz.qwixx.ui.game.board.row.field
-de.hsharz.qwixx.ui.game.board.utils
-de.hsharz.qwixx.ui.game.dice
-de.hsharz.qwixx.ui.notification
-de.hsharz.qwixx.utils
