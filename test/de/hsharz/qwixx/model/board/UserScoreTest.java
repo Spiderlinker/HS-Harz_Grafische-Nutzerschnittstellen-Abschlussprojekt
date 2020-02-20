@@ -49,7 +49,7 @@ class UserScoreTest {
 		score.setScoreOfRow(DiceColor.BLUE, testScoreBlue);
 		score.setScoreMisses(testScoreMisses);
 
-		int completeScore = testScoreMisses * UserScore.SCORE_PER_MISS // Fehlwürfel
+		int completeScore = -testScoreMisses * UserScore.SCORE_PER_MISS // Fehlwürfel
 				+ UserScore.SCORE_PER_CROSS.get(testScoreRed) // Rote Reihe
 				+ UserScore.SCORE_PER_CROSS.get(testScoreYellow) // Gelbe Reihe
 				+ UserScore.SCORE_PER_CROSS.get(testScoreGreen) // Grüne Reihe
