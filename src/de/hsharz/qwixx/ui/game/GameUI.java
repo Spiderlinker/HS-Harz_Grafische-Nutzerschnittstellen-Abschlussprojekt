@@ -8,10 +8,11 @@ import de.hsharz.qwixx.model.Game;
 import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
-import de.hsharz.qwixx.ui.game.board.ComputerGameBoardUI;
-import de.hsharz.qwixx.ui.game.board.GameBoardHighlight;
-import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
+import de.hsharz.qwixx.ui.game.board.impl.ComputerGameBoard;
+import de.hsharz.qwixx.ui.game.board.impl.GameBoardHighlight;
+import de.hsharz.qwixx.ui.game.board.impl.GameBoardSimple;
+import de.hsharz.qwixx.ui.game.board.impl.HumanGameBoard;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -72,9 +73,9 @@ public class GameUI extends AbstractPane<StackPane> {
 
 			if (player instanceof Human) {
 				boardUI = highlightedGameBoard ? new GameBoardHighlight(player) : new GameBoardSimple(player);
-				((Human) player).setHumanInputSupplier(boardUI);
+				((Human) player).setHumanInputSupplier((HumanGameBoard) boardUI);
 			} else {
-				boardUI = new ComputerGameBoardUI(player);
+				boardUI = new ComputerGameBoard(player);
 			}
 
 			game.addGameListener(boardUI);
