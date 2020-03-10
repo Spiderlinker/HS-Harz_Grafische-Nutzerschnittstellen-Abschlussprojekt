@@ -3,7 +3,6 @@ package de.hsharz.qwixx.ui.game.board;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -14,39 +13,30 @@ import de.hsharz.qwixx.model.board.UserScore;
 import de.hsharz.qwixx.model.board.row.Row;
 import de.hsharz.qwixx.model.board.row.field.Field;
 import de.hsharz.qwixx.model.dice.DiceColor;
-import de.hsharz.qwixx.model.dice.DicePair;
-import de.hsharz.qwixx.model.player.DiceSelectionType;
-import de.hsharz.qwixx.model.player.HumanInputSupplier;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.UiUtils;
 import de.hsharz.qwixx.ui.game.board.row.RowUI;
 import de.hsharz.qwixx.ui.game.board.row.field.NumberFieldUI;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public abstract class GameBoardUI extends AbstractPane<VBox>
-		implements GameListener, HumanInputSupplier, GameBoardListener, FieldCrossedListener, MissFieldListener {
+public abstract class GameBoardUI extends AbstractPane<VBox> implements GameListener, GameBoardListener {
 
 	protected IPlayer player;
 
 	protected HBox boxGameBoardHeader;
 	private Label lblName;
-	private Label lblHint;
 
 	protected Map<DiceColor, RowUI> rows = new EnumMap<>(DiceColor.class);
 	protected ScoreLegend scoreLegend;
 	protected UserScoreUI userScore;
-
-	protected boolean shouldNotify = false;
-	private DicePair humanInput;
-	private DiceSelectionType selectionType;
 
 	private DropShadow glowEffect;
 
@@ -57,7 +47,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		player.getGameBoard().addListener(this);
 
 		createWidgets();
-		setupInteractions();
 		addWidgets();
 
 		disableAllButtons();
@@ -73,9 +62,7 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 
 		lblName = new Label(player.getName());
 		lblName.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
-
-		lblHint = new Label();
-		lblHint.setStyle("-fx-font-size: 18pt; -fx-font-weight: bold;");
+		lblName.maxWidthProperty().bind(Bindings.divide(root.widthProperty(), 2.5));
 
 		// add for each Row a new RowUI
 		player.getGameBoard().getRows().entrySet().forEach(e -> rows.put(e.getKey(), new RowUI(e.getValue())));
@@ -91,62 +78,15 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		root.setEffect(glowEffect);
 	}
 
-	private void setupInteractions() {
-		rows.values().forEach(r -> r.addFieldCrossedListener(this));
-		scoreLegend.getMissFields().forEach(f -> f.addListener(this));
-
-		root.setOnMouseClicked(e -> {
-			if (MouseButton.SECONDARY == e.getButton()) {
-				playerSelectedDice(DicePair.EMPTY);
-				e.consume();
-			}
-		});
-	}
-
 	private void addWidgets() {
 		boxGameBoardHeader.getChildren().add(lblName);
 		boxGameBoardHeader.getChildren().add(UiUtils.getHBoxSpacer());
-		boxGameBoardHeader.getChildren().add(lblHint);
 
 		root.getChildren().add(boxGameBoardHeader);
 		rows.values().forEach(r -> root.getChildren().add(r.getPane()));
 
 		root.getChildren().add(scoreLegend.getPane());
 		root.getChildren().add(userScore.getPane());
-	}
-
-	@Override
-	public void askForInput(List<DicePair> dices, DiceSelectionType selectionType) {
-		this.humanInput = null;
-		this.shouldNotify = true;
-		this.selectionType = selectionType;
-
-		checkCrossedButtons();
-		updateHintLabel();
-	}
-
-	protected void playerSelectedDice(DicePair dice) {
-		try {
-			humanInput = dice;
-			disableAllButtons();
-		} finally {
-			if (shouldNotify) {
-				synchronized (player) {
-					player.notify();
-				}
-			}
-		}
-	}
-
-	@Override
-	public DicePair getHumanInput() {
-		return humanInput;
-	}
-
-	@Override
-	public void userCrossedField(RowUI ui, NumberFieldUI btn) {
-		System.out.println("User crossed field: " + btn);
-		playerSelectedDice(new DicePair(ui.getRow().getColor(), btn.getValue()));
 	}
 
 	@Override
@@ -170,12 +110,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 	}
 
 	@Override
-	public void userCrossedMiss() {
-		// remove selected dices and notify player to continue
-		playerSelectedDice(DicePair.MISS);
-	}
-
-	@Override
 	public void missCrossed() {
 		userScore.updateScore();
 
@@ -186,15 +120,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 					- player.getGameBoard().getRemainingMisses());
 			missField.setSelected(isMissAlreadyUsed);
 			missField.setDisabled(isMissAlreadyUsed);
-		}
-	}
-
-	private void checkCrossedButtons() {
-		for (Entry<DiceColor, RowUI> e : rows.entrySet()) {
-			for (int i = 0; i < e.getValue().getButtons().size(); i++) {
-				NumberFieldUI numberField = e.getValue().getButtons().get(i);
-				numberField.setSelected(player.getGameBoard().getRow(e.getKey()).getFields().get(i).isCrossed());
-			}
 		}
 	}
 
@@ -214,15 +139,8 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 		Platform.runLater(() -> glowEffect.setColor(highlight ? Color.RED : Color.WHITE));
 	}
 
-	private void updateHintLabel() {
-		Platform.runLater(() -> lblHint.setText(
-				(DiceSelectionType.COLOR_DICE.equals(selectionType) ? "Farbwürfel" : "Weißen Würfel") + " wählen"));
-	}
-
 	@Override
 	public void nextPlayersTurn(IPlayer nextPlayer) {
-		humanInput = null;
-
 		boolean isCurrentPlayersTurn = player.equals(nextPlayer);
 		highlightGameboard(isCurrentPlayersTurn);
 
@@ -235,16 +153,6 @@ public abstract class GameBoardUI extends AbstractPane<VBox>
 				row.setStroked(true);
 			}
 		}
-	}
-
-	@Override
-	public void invalidDiceChoiceMade(IPlayer player, String msg) {
-		humanInput = null;
-	}
-
-	@Override
-	public void gameOver() {
-		// ignore
 	}
 
 	public IPlayer getPlayer() {

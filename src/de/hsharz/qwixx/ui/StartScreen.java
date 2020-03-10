@@ -3,6 +3,7 @@ package de.hsharz.qwixx.ui;
 import java.util.Objects;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -29,10 +30,11 @@ public class StartScreen extends AbstractPane<VBox> {
 	private Label lblQwixx;
 	private Separator separator;
 	private JFXButton btnPlay;
-	private JFXButton btnStatistics;
+	private JFXButton btnCredits;
 	private JFXButton btnExit;
 
 	private StartGameScreen startGameScreen;
+	private JFXDialog creditsDialog;
 
 	public StartScreen(Stage stage) {
 		super(new VBox());
@@ -66,10 +68,9 @@ public class StartScreen extends AbstractPane<VBox> {
 		btnPlay.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
 		btnPlay.setMaxWidth(Double.MAX_VALUE);
 
-		btnStatistics = new JFXButton("Statistik");
-		btnStatistics.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
-		btnStatistics.setMaxWidth(Double.MAX_VALUE);
-		btnStatistics.setDisable(true); // TODO implement statistics and enable button
+		btnCredits = new JFXButton("Credits");
+		btnCredits.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
+		btnCredits.setMaxWidth(Double.MAX_VALUE);
 
 		btnExit = new JFXButton("Verlassen");
 		btnExit.setStyle("-fx-font-size: 16pt; -fx-text-fill: white;");
@@ -78,6 +79,7 @@ public class StartScreen extends AbstractPane<VBox> {
 
 	private void setupInteractions() {
 		btnPlay.setOnAction(e -> showStartGameScreen());
+		btnCredits.setOnAction(e -> showCredits());
 		btnExit.setOnAction(e -> Platform.exit());
 	}
 
@@ -86,7 +88,7 @@ public class StartScreen extends AbstractPane<VBox> {
 		root.getChildren().add(separator);
 		root.getChildren().add(UiUtils.getVBoxSpacer());
 		root.getChildren().add(btnPlay);
-		root.getChildren().add(btnStatistics);
+		root.getChildren().add(btnCredits);
 		root.getChildren().add(UiUtils.getVBoxSpacer());
 		root.getChildren().add(btnExit);
 
@@ -110,4 +112,11 @@ public class StartScreen extends AbstractPane<VBox> {
 		timeline.play();
 	}
 
+	private void showCredits() {
+		if (creditsDialog == null) {
+			creditsDialog = new JFXDialog();
+			creditsDialog.setContent(new AboutDialog().getPane());
+		}
+		creditsDialog.show((StackPane) getPane().getScene().getRoot());
+	}
 }

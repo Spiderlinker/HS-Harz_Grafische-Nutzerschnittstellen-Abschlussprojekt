@@ -1,10 +1,11 @@
-package de.hsharz.qwixx.ui.game.board;
+package de.hsharz.qwixx.ui.game.board.impl;
 
 import de.hsharz.qwixx.model.player.IPlayer;
+import de.hsharz.qwixx.ui.game.board.GameBoardUI;
 
-public class ComputerGameBoardUI extends GameBoardUI {
+public class ComputerGameBoard extends GameBoardUI {
 
-	public ComputerGameBoardUI(IPlayer player) {
+	public ComputerGameBoard(IPlayer player) {
 		super(player);
 
 		disableAllButtons();

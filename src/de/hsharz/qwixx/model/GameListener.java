@@ -7,7 +7,7 @@ import de.hsharz.qwixx.model.player.IPlayer;
  * eines Spiels. Diese Klasse stellt Methoden bereit, die über den nächsten
  * Spieler an der Reihe ({@link #nextPlayersTurn(IPlayer)}), ungültige Spielzüge
  * ({@link #invalidDiceChoiceMade(IPlayer, String)} und das Spielende
- * ({@link #gameOver()}) benachrichtigen.
+ * ({@link #gameOver(Game)}) benachrichtigen.
  * 
  * @author Oliver Lindemann
  */
@@ -18,7 +18,8 @@ public interface GameListener {
 	 * 
 	 * @param nextPlayer Dieser Spieler ist am Zug
 	 */
-	void nextPlayersTurn(IPlayer nextPlayer);
+	default void nextPlayersTurn(IPlayer nextPlayer) {
+	}
 
 	/**
 	 * Der als Parameter gegebene Spieler {@code player} hat einen ungültigen
@@ -28,10 +29,14 @@ public interface GameListener {
 	 * @param player Spieler, der einen ungültigen Spielzug gemacht hat
 	 * @param msg    Beschreibung des ungültigen Spielzuges
 	 */
-	void invalidDiceChoiceMade(IPlayer player, String msg);
+	default void invalidDiceChoiceMade(IPlayer player, String msg) {
+	}
 
 	/**
 	 * Das Spiel ist vorbei
+	 * 
+	 * @param game Spiel, das beendet worden ist
 	 */
-	void gameOver();
+	default void gameOver(Game game) {
+	}
 }

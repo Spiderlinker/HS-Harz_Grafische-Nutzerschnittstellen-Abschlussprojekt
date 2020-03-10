@@ -164,12 +164,11 @@ public class Game implements RowsClosedSupplier {
 						List<DicePair> colorDices = getColorDicePairs(); // Aus den Farbwürfeln Würfelpaare bilden
 
 						// Andere Spieler wählen das weiße Würfelpaar aus
-						System.out.println("---------- Other Player choosing dices");
+						System.out.println("---------- Alle anderen Spieler wählen weiße Würfel");
 						letOtherPlayerChooseWhiteDices(whiteDices, currentPlayer);
 
-						// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare
-						// aus
-						System.out.println("---------- Current Player choosing dices");
+						// Der aktive Spieler wählt nun aus den weißen und den Farbwürfeln Würfelpaare aus
+						System.out.println("---------- Aktiver Spieler wählt Würfelpaare");
 						letPlayerSelectDice(currentPlayer, whiteDices, colorDices);
 
 						closeQueuedRows();
@@ -184,7 +183,7 @@ public class Game implements RowsClosedSupplier {
 			}
 
 			System.out.println("Game over");
-			gameListeners.forEach(GameListener::gameOver);
+			gameListeners.forEach(l -> l.gameOver(this));
 		}, "Game"); // Thread mit Namen 'Game' erstellen
 	}
 
@@ -203,7 +202,6 @@ public class Game implements RowsClosedSupplier {
 	 * @return Würfelpaare von jeder Farbe mit der Summe der beiden weißen Würfeln
 	 */
 	private List<DicePair> getWhiteDicePairs() {
-
 		int sum = diceWhite1.getCurrentValue() + diceWhite2.getCurrentValue();
 		return Arrays.asList(new DicePair(DiceColor.RED, sum), //
 				new DicePair(DiceColor.YELLOW, sum), //
@@ -240,7 +238,7 @@ public class Game implements RowsClosedSupplier {
 	 * @param currentPlayer Der aktive Spieler dieser Runde
 	 */
 	private void letOtherPlayerChooseWhiteDices(List<DicePair> whiteDices, IPlayer currentPlayer) {
-		player.forEach(p -> {
+		player.parallelStream().forEach(p -> {
 			if (!p.equals(currentPlayer)) {
 				letPlayerSelectWhiteDice(p, whiteDices);
 			}

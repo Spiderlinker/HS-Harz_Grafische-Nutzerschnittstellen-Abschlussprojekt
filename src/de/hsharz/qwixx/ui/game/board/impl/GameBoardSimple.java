@@ -1,4 +1,4 @@
-package de.hsharz.qwixx.ui.game.board;
+package de.hsharz.qwixx.ui.game.board.impl;
 
 import java.util.List;
 

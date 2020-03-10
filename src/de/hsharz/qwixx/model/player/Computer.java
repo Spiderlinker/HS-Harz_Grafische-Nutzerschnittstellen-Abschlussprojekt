@@ -15,6 +15,9 @@ import de.hsharz.qwixx.model.dice.DicePair;
 
 public class Computer extends Player {
 
+	/** Gibt die maximale Distanz zwischen zwei Kreuzen an */
+	private static final byte MAX_DICE_CROSS_DISTANCE = 2;
+
 	public Computer(String name, GameBoard board) {
 		super(name, board);
 	}
@@ -22,15 +25,14 @@ public class Computer extends Player {
 	@Override
 	public DicePair chooseDicePair(List<DicePair> dices, DiceSelectionType type) {
 		if (type.equals(DiceSelectionType.WHITE_DICE)) {
-			return getBestWhiteDicesSum(dices);
+			return getBestWhiteDicePair(dices);
 		}
-		return getBestDicesSum(dices);
+		return getBestDicePair(dices);
 	}
 
-	private DicePair getBestWhiteDicesSum(List<DicePair> whiteDices) {
+	private DicePair getBestWhiteDicePair(List<DicePair> whiteDices) {
 
 		List<DicePair> mappedDices = new ArrayList<>();
-
 		for (DicePair whiteDice : whiteDices) {
 			mappedDices.add(new DicePair(DiceColor.RED, whiteDice.getSum()));
 			mappedDices.add(new DicePair(DiceColor.YELLOW, whiteDice.getSum()));
@@ -38,29 +40,27 @@ public class Computer extends Player {
 			mappedDices.add(new DicePair(DiceColor.BLUE, whiteDice.getSum()));
 		}
 
-		return getBestDicesSum(mappedDices);
+		return getBestDicePair(mappedDices);
 	}
 
-	private DicePair getBestDicesSum(List<DicePair> dices) {
-		DicePair bestDices = null;
+	private DicePair getBestDicePair(List<DicePair> dices) {
 
 		Map<DicePair, Integer> distance = getDistancesForDices(dices);
-		Optional<Entry<DicePair, Integer>> shortestDistance = distance.entrySet().stream()//
-				.filter(e -> !getGameBoard().getRowClosedSupplier().isRowClosed(e.getKey().getColor())) //
-				.filter(e -> e.getValue() >= 0)//
+		Optional<Entry<DicePair, Integer>> shortestDistance = distance.entrySet().stream() //
+				// Alle geschlossenen Reihen herausfiltern
+				.filter(e -> !getGameBoard().getRowClosedSupplier().isRowClosed(e.getKey().getColor()))
+				// Alle negativen Distanzen herausfiltern
+				.filter(e -> e.getValue() >= 0)
+				// Kürzeste Entfernung ermitteln
 				.reduce((first, second) -> first.getValue().compareTo(second.getValue()) <= 0 ? first : second);
 
-		System.out.println("Distances: " + distance);
-		System.out.println("Filtered dice: " + shortestDistance);
-		if (shortestDistance.isPresent() && shortestDistance.get().getValue() <= 2) {
-			System.out.println("Found dices <= 2 " + shortestDistance);
-			bestDices = shortestDistance.get().getKey();
-		} else {
-			bestDices = DicePair.EMPTY;
-			System.out.println("No dice found");
+		
+		if (shortestDistance.isPresent() && shortestDistance.get().getValue() <= MAX_DICE_CROSS_DISTANCE) {
+			System.out.println(getName() + ": DicePair=" + shortestDistance.get().getKey());
+			return shortestDistance.get().getKey();
 		}
-
-		return bestDices;
+		System.out.println(getName() + ": No DicePair found!");
+		return DicePair.EMPTY;
 	}
 
 	private Map<DicePair, Integer> getDistancesForDices(List<DicePair> dices) {

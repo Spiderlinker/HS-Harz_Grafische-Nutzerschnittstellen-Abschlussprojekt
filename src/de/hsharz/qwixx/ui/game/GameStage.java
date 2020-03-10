@@ -126,9 +126,9 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 						+ "Falls der aktive Spieler keine Zahl akreuzen will oder kann, so muss er ein Kreuz in der Spalte \"Fehlwürfe\" machen. Für nicht aktive Spieler gilt diese Regel nicht.\n\n");
 
 		Text textHintHeader = getBoldText("Hinweise zum Ankreuzen von Feldern\n");
-		Text textHint = getNormalText("– Alle Zahlen in jeder Reihe müssen von links nach rechts angekreuzt werden.\n"
-				+ "– Es dürfen Zahlen ausgelassen werden.\n"
-				+ "– Ausgelassene Ziffern dürfen nicht nachträglich angekreuzt werden.\n"
+		Text textHint = getNormalText("- Alle Zahlen in jeder Reihe müssen von links nach rechts angekreuzt werden. \n"
+				+ "- Es dürfen Zahlen ausgelassen werden. \n"
+				+ "- Ausgelassene Ziffern dürfen nicht nachträglich angekreuzt werden. \n"
 				+ "- Um eine Reihe beenden zu können (und somit das Schloss am Ende dieser Reihe anzukreuzen), müssen in der Reihe mindestens 6 Kreuze gesetzt worden sein, wobei eines hiervon die letze Zahl in der Reihe sein muss (12 oder 2). "
 				+ "Falls ein Spieler mit weniger als 6 Kreuzen die letzte Zahl in der Reihe ankreuzt, so wird die Reihe von ihm nicht beendet und andere Spieler können weiterhin in dieser Reihe Kreuze setzen.\n\n");
 
@@ -322,7 +322,7 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	}
 
 	@Override
-	public void gameOver() {
+	public void gameOver(Game game) {
 		showGameOverScreen();
 	}
 
