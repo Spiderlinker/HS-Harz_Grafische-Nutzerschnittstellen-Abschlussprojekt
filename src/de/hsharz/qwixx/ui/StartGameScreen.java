@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
@@ -50,6 +51,8 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 	private Label lblChoosePlayer;
 	private JFXButton btnBack;
 	private JFXButton btnPlay;
+	
+	private JFXCheckBox boxHelp;
 
 	private JFXTextField textName;
 	private JFXComboBox<Integer> boxChoosePlayer;
@@ -79,6 +82,10 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		btnPlay = new JFXButton("Spiel starten");
 		btnPlay.setStyle("-fx-font-size: 16pt;");
 		btnPlay.setMaxWidth(Double.MAX_VALUE);
+
+		boxHelp = new JFXCheckBox("Einführendes Spiel");
+		boxHelp.setStyle("-fx-font-size: 16pt;");
+		boxHelp.setMaxWidth(Double.MAX_VALUE);
 
 		textName = new JFXTextField();
 		textName.setPromptText("Wie heißt du?");
@@ -128,8 +135,9 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 		root.add(textName, 0, 4, 2, 1);
 		root.add(lblChoosePlayer, 0, 5);
 		root.add(boxChoosePlayer, 1, 5);
-		root.add(UiUtils.getGridPaneVSpacer(), 0, 6);
-		root.add(btnPlay, 0, 7, 2, 1);
+		root.add(boxHelp, 0, 6, 2, 1);
+		root.add(UiUtils.getGridPaneVSpacer(), 0, 7);
+		root.add(btnPlay, 0, 8, 2, 1);
 
 		GridPane.setMargin(textName, new Insets(0, 0, 20, 0));
 
@@ -179,7 +187,7 @@ public class StartGameScreen extends AbstractPane<GridPane> {
 			protected GameStage call() throws Exception {
 				try {
 					Game game = createNewGame();
-					return new GameStage(game, screen);
+					return new GameStage(game, screen, boxHelp.isSelected());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

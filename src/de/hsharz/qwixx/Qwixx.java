@@ -19,7 +19,7 @@ public class Qwixx extends Application {
 		});
 
 		primaryStage.setTitle("Qwixx");
-		primaryStage.setScene(new Scene(root, 440, 500));
+		primaryStage.setScene(new Scene(root, 450, 530));
 		primaryStage.show();
 	}
 

@@ -9,6 +9,7 @@ import de.hsharz.qwixx.model.player.Human;
 import de.hsharz.qwixx.model.player.IPlayer;
 import de.hsharz.qwixx.ui.AbstractPane;
 import de.hsharz.qwixx.ui.game.board.ComputerGameBoardUI;
+import de.hsharz.qwixx.ui.game.board.GameBoardHighlight;
 import de.hsharz.qwixx.ui.game.board.GameBoardSimple;
 import de.hsharz.qwixx.ui.game.board.GameBoardUI;
 import de.hsharz.qwixx.ui.game.dice.DicePane;
@@ -28,14 +29,17 @@ import javafx.scene.layout.StackPane;
 public class GameUI extends AbstractPane<StackPane> {
 
 	private Game game;
+	private boolean highlightedGameBoard = false;
+
 	private List<GameBoardUI> boards = new ArrayList<>();
 	private GridPane gamePane;
 	private DicePane dicePane;
 
-	public GameUI(Game game) {
+	public GameUI(Game game, boolean highlightedGameBoard) {
 		super(new StackPane());
 
 		this.game = Objects.requireNonNull(game);
+		this.highlightedGameBoard = highlightedGameBoard;
 
 		createWidgets();
 		addWidgets();
@@ -56,7 +60,7 @@ public class GameUI extends AbstractPane<StackPane> {
 
 		dicePane = new DicePane(game.getDices());
 		dicePane.addRowClosedSupplier(game);
-		
+
 		game.addDiceListener(dicePane);
 		game.addGameListener(dicePane);
 	}
@@ -67,7 +71,7 @@ public class GameUI extends AbstractPane<StackPane> {
 			GameBoardUI boardUI = null;
 
 			if (player instanceof Human) {
-				boardUI = new GameBoardSimple(player);
+				boardUI = highlightedGameBoard ? new GameBoardHighlight(player) : new GameBoardSimple(player);
 				((Human) player).setHumanInputSupplier(boardUI);
 			} else {
 				boardUI = new ComputerGameBoardUI(player);

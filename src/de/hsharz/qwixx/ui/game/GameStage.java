@@ -56,14 +56,14 @@ public class GameStage extends AbstractPane<StackPane> implements GameListener {
 	private JFXDialog dialogControls;
 	private Notification notification;
 
-	public GameStage(Game game, Screen screen) {
+	public GameStage(Game game, Screen screen, boolean highlightedGameBoard) {
 		super(new StackPane());
 		this.game = Objects.requireNonNull(game);
 		this.screen = Objects.requireNonNull(screen);
 
 		this.game.addGameListener(this);
 
-		gameUI = new GameUI(game);
+		gameUI = new GameUI(game, highlightedGameBoard);
 
 		Platform.runLater(() -> {
 			createWidgets();
